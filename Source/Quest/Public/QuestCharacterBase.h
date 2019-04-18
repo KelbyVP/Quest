@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "QuestAbilitySystemComponent.h"
+#include "GameplayAbility.h"
 #include "QuestCharacterBase.generated.h"
 
 UCLASS()
@@ -28,9 +29,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")
 		UQuestAbilitySystemComponent* AbilitySystemComponent;
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
 
 };

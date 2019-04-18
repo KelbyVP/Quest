@@ -39,3 +39,15 @@ UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire)
+{
+	if (AbilitySystemComponent)
+	{
+		if (HasAuthority() && AbilityToAcquire)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
+		}
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+

@@ -32,8 +32,10 @@ void AQuestCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 }
 
+// Gets the ability system component
 UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 {
+	
 	return AbilitySystemComponent;
 }
 

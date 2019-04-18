@@ -51,3 +51,14 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 	}
 }
 
+void AQuestCharacterBase::AddGameplayTag(FGameplayTag TagToAdd)
+{
+	GetAbilitySystemComponent()->AddLooseGameplayTag(TagToAdd);
+	GetAbilitySystemComponent()->SetTagMapCount(TagToAdd, 1);
+}
+
+void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
+{
+	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
+}
+

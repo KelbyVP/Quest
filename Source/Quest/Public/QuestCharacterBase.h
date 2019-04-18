@@ -33,8 +33,14 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")
 		UQuestAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
+		FGameplayTag FullHealthTag;
 
 	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+		void AddGameplayTag(FGameplayTag TagToAdd);
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+		void RemoveGameplayTag(FGameplayTag TagToRemove);
 
 };

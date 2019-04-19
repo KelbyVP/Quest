@@ -31,8 +31,8 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")
-		UQuestAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AbilitySystemComponent")
+		class UQuestAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
 		FGameplayTag FullHealthTag;
 

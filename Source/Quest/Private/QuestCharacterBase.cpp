@@ -15,7 +15,6 @@ AQuestCharacterBase::AQuestCharacterBase()
 void AQuestCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -29,7 +28,6 @@ void AQuestCharacterBase::Tick(float DeltaTime)
 void AQuestCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 // Gets the ability system component
@@ -41,6 +39,7 @@ UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 
 void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire)
 {
+	FString Name = AbilityToAcquire->GetName();
 	if (AbilitySystemComponent)
 	{
 		if (HasAuthority() && AbilityToAcquire)
@@ -48,7 +47,9 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
 	}
+
 }
 
 void AQuestCharacterBase::AddGameplayTag(FGameplayTag TagToAdd)

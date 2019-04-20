@@ -9,6 +9,8 @@
 #include "GameplayAbility.h"
 #include "QuestCharacterBase.generated.h"
 
+class UQuestAttributeSet;
+
 UCLASS()
 class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -31,16 +33,19 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AbilitySystemComponent")
-		class UQuestAbilitySystemComponent* AbilitySystemComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		UQuestAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		UQuestAttributeSet* AttributeSetComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		FGameplayTag FullHealthTag;
 
-	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
-	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AddGameplayTag(FGameplayTag TagToAdd);
-	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
+
 
 };

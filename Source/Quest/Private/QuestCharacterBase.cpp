@@ -12,6 +12,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
+	NewRotation = FRotator(0, 0, 0);
 }
 
 // Called when the game starts or when spawned

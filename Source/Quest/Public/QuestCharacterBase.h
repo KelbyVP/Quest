@@ -39,6 +39,12 @@ public:
 		UQuestAttributeSet* AttributeSetComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		FGameplayTag FullHealthTag;
+	
+	// Used to track distance and rotation to new location; may be useful for setting animation transitions
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		float DistanceFromDestination;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		FRotator NewRotation;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);

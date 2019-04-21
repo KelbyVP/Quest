@@ -38,6 +38,9 @@ protected:
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Quest Player Controller")
+		FVector DestinationLocation;
 };
 
 

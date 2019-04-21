@@ -95,6 +95,7 @@ void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 		if ((Distance > 120.0f))
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+			DestinationLocation = DestLocation;
 		}
 	}
 }

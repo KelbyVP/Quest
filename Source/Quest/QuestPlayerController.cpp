@@ -113,15 +113,33 @@ void AQuestPlayerController::OnSetDestinationPressed()
 
 	if (Hit.bBlockingHit)
 	{
-		// We hit something, so set ActorClicked and PawnClicked
+		// We hit something, so set ActorClicked to the thing we clicked on
 		AActor* ActorClicked;
 		ActorClicked = Hit.GetActor();
-		PawnClicked = Cast<APawn>(ActorClicked);
-		FString ActorName = ActorClicked->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("Clicked on Actor %s"), *FString(ActorName));
-		if (PawnClicked != nullptr)
+
+		// check whether thing we clicked on is a Pawn
+		//PawnClicked = Cast<APawn>(ActorClicked);
+
+		// check whether the thing we clicked is a QuestCharacterBase
+		PawnClicked = Cast<AQuestCharacterBase>(ActorClicked);
+
+		// If pawn is hostile and we clicked on it, then set it as the attack target
+		if (PawnClicked)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Clicked on Pawn"));
+			if (PawnClicked->bIsHostile == true)
+			{
+				ControlledPawn = Cast<AQuestCharacter>(GetPawn());
+				ControlledPawn->CharacterToAttack = PawnClicked;
+
+
+				UE_LOG(LogTemp, Warning, TEXT("The pawn is hostile and is named %s"), *FString(ControlledPawn->CharacterToAttack->GetName()));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("The pawn is NOT hostile"));
+			}
+
+
 		}
 	}
 

@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "QuestPlayerController.generated.h"
 
+class AQuestCharacter;
+class AQuestCharacterBase;
+
 UCLASS()
 class AQuestPlayerController : public APlayerController
 {
@@ -43,7 +46,11 @@ protected:
 		FVector DestinationLocation;
 
 public:
-	APawn* PawnClicked;
+	AQuestCharacterBase* PawnClicked;
+
+private:
+	AQuestCharacter* ControlledPawn;
+
 };
 
 

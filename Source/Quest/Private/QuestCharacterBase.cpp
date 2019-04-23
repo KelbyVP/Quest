@@ -4,6 +4,7 @@
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 AQuestCharacterBase::AQuestCharacterBase()
@@ -12,6 +13,12 @@ AQuestCharacterBase::AQuestCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
+	MeleeAttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
+	MeleeAttackSphere->SetupAttachment(RootComponent);
+	MeleeAttackSphere->SetSphereRadius(200.f);
+	bIsHostile = false;
+	bIsWithinMeleeAttackRange = false;
+	CharacterToAttack = nullptr;
 	//NewRotation = FRotator(0, 0, 0);
 }
 

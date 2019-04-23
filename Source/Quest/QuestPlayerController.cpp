@@ -36,13 +36,13 @@ void AQuestPlayerController::SetupInputComponent()
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AQuestPlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AQuestPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AQuestPlayerController::OnResetVR);
+	//InputComponent->BindAction("ResetVR", IE_Pressed, this, &AQuestPlayerController::OnResetVR);
 }
 
-void AQuestPlayerController::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
+//void AQuestPlayerController::OnResetVR()
+//{
+//	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+//}
 
 void AQuestPlayerController::MoveToMouseCursor()
 {
@@ -104,6 +104,27 @@ void AQuestPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
+
+	/** Check to see whether the thing we hit was a Pawn;
+	* if it was a Pawn, set a poitner to PawnClicked;
+	* if it was not a Pawn, there is no Pawn Clicked */
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		// We hit something, so set ActorClicked and PawnClicked
+		AActor* ActorClicked;
+		ActorClicked = Hit.GetActor();
+		PawnClicked = Cast<APawn>(ActorClicked);
+		FString ActorName = ActorClicked->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("Clicked on Actor %s"), *FString(ActorName));
+		if (PawnClicked != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Clicked on Pawn"));
+		}
+	}
+
 }
 
 void AQuestPlayerController::OnSetDestinationReleased()

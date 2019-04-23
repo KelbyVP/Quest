@@ -12,13 +12,16 @@ AQuestCharacterBase::AQuestCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
-	NewRotation = FRotator(0, 0, 0);
+	//NewRotation = FRotator(0, 0, 0);
 }
 
 // Called when the game starts or when spawned
 void AQuestCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged
+	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
 }
 
 // Called every frame
@@ -66,5 +69,10 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
 {
 	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
 }
-//
+
+void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
+{ /** Called when the AttributeSet broadcasts an OnHealthChanged delegate;
+  *   Calls the BP_OnHealthChanged implemented in blueprint */
+	BP_OnHealthChanged(Health, MaxHealth);
+}
 

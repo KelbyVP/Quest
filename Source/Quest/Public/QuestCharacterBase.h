@@ -43,8 +43,8 @@ public:
 	// Used to track distance and rotation to new location; may be useful for setting animation transitions
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		float DistanceFromDestination;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
-		FRotator NewRotation;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+	//	FRotator NewRotation;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
@@ -52,6 +52,11 @@ public:
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
+	UFUNCTION()
+		void OnHealthChanged(float Health, float MaxHealth);
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
+		void BP_OnHealthChanged(float Health, float MaxHealth);
+
 
 
 };

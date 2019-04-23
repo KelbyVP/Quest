@@ -28,11 +28,13 @@ public:
 	// Current Health, when 0 we expect owner to die.  Capped by MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
 		FGameplayAttributeData Health;
-	//ATTRIBUTE_ACCESSORS(UQuestAttributeSet, Health)
 
 	// MaxHealth is its own attribute, since it can be modified by GameplayEffects
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
 		FGameplayAttributeData MaxHealth;
-	//ATTRIBUTE_ACCESSORS(UQuestAttributeSet, MaxHealth)
+
+	FOnHealthChange OnHealthChange;
+
+	void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 };

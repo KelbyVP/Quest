@@ -23,8 +23,8 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
+	///** Resets HMD orientation in VR. */
+	//void OnResetVR();
 
 	/** Navigate player to the current mouse cursor location. */
 	void MoveToMouseCursor();
@@ -41,6 +41,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Quest Player Controller")
 		FVector DestinationLocation;
+
+public:
+	APawn* PawnClicked;
 };
 
 

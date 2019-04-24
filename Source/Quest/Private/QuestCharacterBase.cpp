@@ -84,6 +84,7 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
   *   Calls the BP_OnHealthChanged implemented in blueprint */
 void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 { 
+	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
 }
 

@@ -11,15 +11,20 @@ AQuestCharacterBase::AQuestCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Create ability and attribute components
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
-	MeleeAttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
-	MeleeAttackSphere->SetupAttachment(RootComponent);
-	MeleeAttackSphere->SetSphereRadius(200.f);
+
+	// Create InteractionSphere that tells us whether character is close enough to attack or interact with another character
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
+	InteractionSphereRadius = 200.f;
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
+
 	bIsHostile = false;
-	bIsWithinMeleeAttackRange = false;
-	CharacterToAttack = nullptr;
-	//NewRotation = FRotator(0, 0, 0);
+	bIsTargetCharacterWithinInteractionSphere = false;
+	TargetCharacter = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -35,7 +40,6 @@ void AQuestCharacterBase::BeginPlay()
 void AQuestCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -44,13 +48,14 @@ void AQuestCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-// Gets the ability system component
+// Gives this character an ability system component
 UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 {
 	
 	return AbilitySystemComponent;
 }
 
+// Gives this character an ability
 void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire)
 {
 	FString Name = AbilityToAcquire->GetName();
@@ -61,9 +66,7 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
 	}
-
 }
 
 void AQuestCharacterBase::AddGameplayTag(FGameplayTag TagToAdd)
@@ -77,9 +80,10 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
 	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
 }
 
-void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
-{ /** Called when the AttributeSet broadcasts an OnHealthChanged delegate;
+/** Called when the AttributeSet broadcasts an OnHealthChanged delegate;
   *   Calls the BP_OnHealthChanged implemented in blueprint */
+void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
+{ 
 	BP_OnHealthChanged(Health, MaxHealth);
 }
 

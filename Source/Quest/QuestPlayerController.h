@@ -26,9 +26,6 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	///** Resets HMD orientation in VR. */
-	//void OnResetVR();
-
 	/** Navigate player to the current mouse cursor location. */
 	void MoveToMouseCursor();
 
@@ -39,8 +36,8 @@ protected:
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	/** Input handlers for SetDestination action. */
-	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
+	void OnSetTargetPressed();
+	void OnSetTargetReleased();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Quest Player Controller")
 		FVector DestinationLocation;
@@ -48,8 +45,13 @@ protected:
 public:
 	AQuestCharacterBase* PawnClicked;
 
+	/**	Set whether the controller can move the character
+	*	(false if character is trying to cast spell, attack from range, etc.) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
+	bool bControllerCanMoveCharacter;
+
 private:
-	AQuestCharacter* ControlledPawn;
+	AQuestCharacter* ControlledCharacter;
 
 };
 

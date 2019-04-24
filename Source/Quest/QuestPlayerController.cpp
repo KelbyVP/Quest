@@ -11,6 +11,7 @@ AQuestPlayerController::AQuestPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	bControllerCanMoveCharacter = true;
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -29,20 +30,14 @@ void AQuestPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AQuestPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AQuestPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("SetTarget", IE_Pressed, this, &AQuestPlayerController::OnSetTargetPressed);
+	InputComponent->BindAction("SetTarget", IE_Released, this, &AQuestPlayerController::OnSetTargetReleased);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AQuestPlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AQuestPlayerController::MoveToTouchLocation);
-
-	//InputComponent->BindAction("ResetVR", IE_Pressed, this, &AQuestPlayerController::OnResetVR);
 }
 
-//void AQuestPlayerController::OnResetVR()
-//{
-//	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-//}
 
 void AQuestPlayerController::MoveToMouseCursor()
 {
@@ -86,10 +81,22 @@ void AQuestPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerI
 
 void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
-	APawn* const MyPawn = GetPawn();
-	if (MyPawn)
+	if (ControlledCharacter)
 	{
-		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
+		float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
+
+		// If we have a target character, see if it is within range
+		if (ControlledCharacter->TargetCharacter)
+		{
+			if (Distance <= ControlledCharacter->InteractionSphereRadius)
+			{
+				ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = true;
+			}
+			else
+			{
+				ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = false;
+			}
+		}
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 120.0f))
@@ -100,14 +107,14 @@ void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 	}
 }
 
-void AQuestPlayerController::OnSetDestinationPressed()
+void AQuestPlayerController::OnSetTargetPressed()
 {
-	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	if (bControllerCanMoveCharacter)
+	{
+		// set flag to keep updating destination until released
+		bMoveToMouseCursor = true;
+	}
 
-	/** Check to see whether the thing we hit was a Pawn;
-	* if it was a Pawn, set a poitner to PawnClicked;
-	* if it was not a Pawn, there is no Pawn Clicked */
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
@@ -117,35 +124,22 @@ void AQuestPlayerController::OnSetDestinationPressed()
 		AActor* ActorClicked;
 		ActorClicked = Hit.GetActor();
 
-		// check whether thing we clicked on is a Pawn
-		//PawnClicked = Cast<APawn>(ActorClicked);
-
-		// check whether the thing we clicked is a QuestCharacterBase
+		// check whether the thing we clicked is a character, and if it is, set it as the target
 		PawnClicked = Cast<AQuestCharacterBase>(ActorClicked);
+		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 
-		// If pawn is hostile and we clicked on it, then set it as the attack target
 		if (PawnClicked)
 		{
-			if (PawnClicked->bIsHostile == true)
-			{
-				ControlledPawn = Cast<AQuestCharacter>(GetPawn());
-				ControlledPawn->CharacterToAttack = PawnClicked;
-
-
-				UE_LOG(LogTemp, Warning, TEXT("The pawn is hostile and is named %s"), *FString(ControlledPawn->CharacterToAttack->GetName()));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("The pawn is NOT hostile"));
-			}
-
-
+			ControlledCharacter->TargetCharacter = PawnClicked;
+		}
+		else
+		{
+			ControlledCharacter->TargetCharacter = nullptr;
 		}
 	}
-
 }
 
-void AQuestPlayerController::OnSetDestinationReleased()
+void AQuestPlayerController::OnSetTargetReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;

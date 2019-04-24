@@ -6,7 +6,6 @@
 
 AQuestEnemyCharacter::AQuestEnemyCharacter()
 {
-
 	bIsHostile = true;
 }
 

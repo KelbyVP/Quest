@@ -91,11 +91,10 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 
 		if (ControlledCharacter)
 		{
-			float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
-
 			//  If we clicked on a character, set it as the target character
 			if (PawnClicked)
 			{
+				float const Distance = FVector::Dist(PawnClicked->GetActorLocation(), ControlledCharacter->GetActorLocation());
 				ControlledCharacter->TargetCharacter = PawnClicked;
 
 				// if we are out of range, move to the target character

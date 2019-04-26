@@ -33,7 +33,7 @@ protected:
 	void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
 	
 	/** Navigate player to the given world location. */
-	void SetNewMoveDestination(const FVector DestLocation);
+	void SetNewMoveDestination(FHitResult &Hit);
 
 	/** Input handlers for SetDestination action. */
 	void OnSetTargetPressed();

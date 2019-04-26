@@ -23,7 +23,6 @@ AQuestCharacterBase::AQuestCharacterBase()
 	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
 
 	bIsDead = false;
-	bIsHostile = false;
 	bIsTargetCharacterWithinInteractionSphere = false;
 	TargetCharacter = nullptr;
 }
@@ -35,12 +34,26 @@ void AQuestCharacterBase::BeginPlay()
 
 	// Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
+	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
+	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
 }
 
 // Called every frame
 void AQuestCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (TargetCharacter)
+	{
+		if (bIsTargetCharacterWithinInteractionSphere)
+		{
+			if (TargetCharacter->bIsHostile)
+			{
+				MeleeAttack();
+				UE_LOG(LogTemp, Warning, TEXT("Is Hostile!"))
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -96,5 +109,26 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
 
+}
+
+void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (TargetCharacter && TargetCharacter == OtherActor)
+	{
+		bIsTargetCharacterWithinInteractionSphere = true;
+	}
+}
+
+void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (TargetCharacter && TargetCharacter == OtherActor)
+	{
+		bIsTargetCharacterWithinInteractionSphere = false;
+	}
+}
+
+void AQuestCharacterBase::MeleeAttack()
+{
+		BP_MeleeAttack();
 }
 

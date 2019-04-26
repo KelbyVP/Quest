@@ -54,13 +54,13 @@ void AQuestPlayerController::MoveToMouseCursor()
 	else
 	{
 		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		 FHitResult Hit;
+		 GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
 		if (Hit.bBlockingHit)
 		{
 			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
+			SetNewMoveDestination(Hit);
 		}
 	}
 }
@@ -75,38 +75,51 @@ void AQuestPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerI
 	if (HitResult.bBlockingHit)
 	{
 		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
+		SetNewMoveDestination(HitResult);
 	}
 }
 
-void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 {
-	if (ControlledCharacter)
+	FVector DestLocation = Hit.ImpactPoint;
+	if (Hit.bBlockingHit)
 	{
-		float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
+		AActor* ActorClicked;
+		ActorClicked = Hit.GetActor();
+		PawnClicked = Cast<AQuestCharacterBase>(ActorClicked);
+		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 
-		// If we have a target character, see if it is within range, and if it's not, move to that character
-		if (ControlledCharacter->TargetCharacter)
+		if (ControlledCharacter)
 		{
-			if (Distance <= ControlledCharacter->InteractionSphereRadius)
+			float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
+
+			//  If we clicked on a character, set it as the target character
+			if (PawnClicked)
 			{
-				ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = true;
+				ControlledCharacter->TargetCharacter = PawnClicked;
+
+				// if we are out of range, move to the target character
+
+				if (Distance > ControlledCharacter->InteractionSphereRadius)
+				{
+					ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = false;
+					UAIBlueprintHelperLibrary::SimpleMoveToActor(this, ControlledCharacter->TargetCharacter);
+				}
+				else
+				{
+					ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = true;
+				}
 			}
+			// If we did not click on a character, move unless we're too close for the animation to play correctly
 			else
 			{
-				ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = false;
-				UAIBlueprintHelperLibrary::SimpleMoveToActor(this, ControlledCharacter->TargetCharacter);
-			}
-		}
-
-		/**	if we do not have a target character, move to location;
-		*	we need to issue move command only if far enough in order for walk animation to play correctly */
-		if (!ControlledCharacter->TargetCharacter)
-		{
-			if ((Distance > 120.0f))
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
-				DestinationLocation = DestLocation;
+				ControlledCharacter->TargetCharacter = nullptr;
+				float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
+				if ((Distance > 120.0f))
+				{
+					UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+					DestinationLocation = DestLocation;
+				}
 			}
 		}
 	}
@@ -120,28 +133,6 @@ void AQuestPlayerController::OnSetTargetPressed()
 		bMoveToMouseCursor = true;
 	}
 
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (Hit.bBlockingHit)
-	{
-		// We hit something, so set ActorClicked to the thing we clicked on
-		AActor* ActorClicked;
-		ActorClicked = Hit.GetActor();
-
-		// check whether the thing we clicked is a character, and if it is, set it as the target
-		PawnClicked = Cast<AQuestCharacterBase>(ActorClicked);
-		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
-
-		if (PawnClicked)
-		{
-			ControlledCharacter->TargetCharacter = PawnClicked;
-		}
-		else
-		{
-			ControlledCharacter->TargetCharacter = nullptr;
-		}
-	}
 }
 
 void AQuestPlayerController::OnSetTargetReleased()

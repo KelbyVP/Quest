@@ -24,8 +24,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	// Tells us whether the character is dead
-	bool bIsDead;
+
 
 
 public:	
@@ -65,6 +64,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		bool bIsTargetCharacterWithinInteractionSphere;
 
+	// Tells us whether the character is dead
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+	bool bIsDead;
+
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
@@ -73,8 +76,16 @@ public:
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
 	UFUNCTION()
 		void OnHealthChanged(float Health, float MaxHealth);
+	UFUNCTION()
+		void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
 		void BP_OnHealthChanged(float Health, float MaxHealth);
+	UFUNCTION()
+		void MeleeAttack();
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
+		void BP_MeleeAttack();
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();
 };

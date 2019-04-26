@@ -18,10 +18,11 @@ AQuestCharacterBase::AQuestCharacterBase()
 
 	// Create InteractionSphere that tells us whether character is close enough to attack or interact with another character
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
-	InteractionSphereRadius = 200.f;
+	InteractionSphereRadius = 130.f;
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
 
+	bIsDead = false;
 	bIsHostile = false;
 	bIsTargetCharacterWithinInteractionSphere = false;
 	TargetCharacter = nullptr;
@@ -80,11 +81,20 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
 	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
 }
 
-/** Called when the AttributeSet broadcasts an OnHealthChanged delegate;
-  *   Calls the BP_OnHealthChanged implemented in blueprint */
+/** Called when the AttributeSet broadcasts an OnHealthChanged delegate; */
+
 void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 { 
+	// Check to see whether the character is dead
+	if (Health <= 0)
+	{
+		bIsDead = true;
+		BP_Die();
+	}
+
+	// call the Blueprint function that determines what happens when health changed
 	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
+
 }
 

@@ -85,7 +85,7 @@ void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 	{
 		float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
 
-		// If we have a target character, see if it is within range
+		// If we have a target character, see if it is within range, and if it's not, move to that character
 		if (ControlledCharacter->TargetCharacter)
 		{
 			if (Distance <= ControlledCharacter->InteractionSphereRadius)
@@ -95,14 +95,19 @@ void AQuestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 			else
 			{
 				ControlledCharacter->bIsTargetCharacterWithinInteractionSphere = false;
+				UAIBlueprintHelperLibrary::SimpleMoveToActor(this, ControlledCharacter->TargetCharacter);
 			}
 		}
 
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		/**	if we do not have a target character, move to location;
+		*	we need to issue move command only if far enough in order for walk animation to play correctly */
+		if (!ControlledCharacter->TargetCharacter)
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
-			DestinationLocation = DestLocation;
+			if ((Distance > 120.0f))
+			{
+				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+				DestinationLocation = DestLocation;
+			}
 		}
 	}
 }

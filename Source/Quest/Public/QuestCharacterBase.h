@@ -28,10 +28,8 @@ protected:
 
 
 public:	
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
@@ -45,6 +43,7 @@ public:
 	// Creates a sphere around the character that tells us when the player can interact with (usually melee attack) the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestCharacterBase")
 		USphereComponent* InteractionSphere;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		float InteractionSphereRadius;
 	
@@ -84,7 +83,7 @@ public:
 		void BP_OnHealthChanged(float Health, float MaxHealth);
 	UFUNCTION()
 		void MeleeAttack();
-	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
 		void BP_MeleeAttack();
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();

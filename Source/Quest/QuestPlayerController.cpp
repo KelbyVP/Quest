@@ -12,6 +12,7 @@ AQuestPlayerController::AQuestPlayerController()
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerCanMoveCharacter = true;
+	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -22,6 +23,31 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 	if (bMoveToMouseCursor)
 	{
 		MoveToMouseCursor();
+	}
+	if (!ControlledCharacter)
+	{
+		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
+	}
+	if (ControlledCharacter->TargetCharacter)
+	{	
+		if (ControlledCharacter->bIsTargetCharacterWithinInteractionSphere)
+		{
+			if (!ControlledCharacter->TargetCharacter->bIsDead)
+			{
+				if (ControlledCharacter->TargetCharacter->bIsHostile)
+				{
+					ControlledCharacter->MeleeAttack();
+				}
+				else
+				{
+					// TODO:  initiate dialogue if the target is not dead and is not hostile
+				}
+			}
+			else
+			{
+				// TODO:  loot the body if the target is dead
+			}
+		}
 	}
 }
 

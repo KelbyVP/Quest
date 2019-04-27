@@ -16,6 +16,8 @@ AQuestCharacterBase::AQuestCharacterBase()
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
 
+	//  Acquire basic abilities
+
 	// Create InteractionSphere that tells us whether character is close enough to attack or interact with another character
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
 	InteractionSphereRadius = 130.f;
@@ -43,17 +45,7 @@ void AQuestCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (TargetCharacter)
-	{
-		if (bIsTargetCharacterWithinInteractionSphere)
-		{
-			if (TargetCharacter->bIsHostile)
-			{
-				MeleeAttack();
-				UE_LOG(LogTemp, Warning, TEXT("Is Hostile!"))
-			}
-		}
-	}
+
 }
 
 // Called to bind functionality to input
@@ -65,7 +57,6 @@ void AQuestCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 // Gives this character an ability system component
 UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 {
-	
 	return AbilitySystemComponent;
 }
 
@@ -108,7 +99,6 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	// call the Blueprint function that determines what happens when health changed
 	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
-
 }
 
 void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

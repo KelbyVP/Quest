@@ -9,8 +9,15 @@
 UQuestAttributeSet::UQuestAttributeSet()
 	: Health(100.f)
 	, MaxHealth(100.f)
+	, Level (5.0f)
+	, ArmorClass(6.f)
+	, Strength (16.f)
+	, Intelligence (11.f)
+	, Wisdom (10.f)
+	, Agility (12.f)
+	, Constitution (10.f)
+	, Charm (10.f)
 {
-
 }
 
 void UQuestAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)

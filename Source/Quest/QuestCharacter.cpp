@@ -11,6 +11,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "QuestAttributeSet.h"
 
 AQuestCharacter::AQuestCharacter()
 {
@@ -59,6 +60,8 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
+
+
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)

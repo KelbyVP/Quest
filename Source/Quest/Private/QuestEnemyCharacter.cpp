@@ -1,18 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Kelby Van Patten
 
 
 #include "QuestEnemyCharacter.h"
+#include "QuestAttributeSet.h"
 
 
 AQuestEnemyCharacter::AQuestEnemyCharacter()
 {
 	bIsHostile = true;
+
 }
 
 void AQuestEnemyCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 
-	
-	
 }

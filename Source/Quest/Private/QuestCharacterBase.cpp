@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Kelby Van Patten
 
 
 #include "QuestCharacterBase.h"
@@ -44,8 +44,6 @@ void AQuestCharacterBase::BeginPlay()
 void AQuestCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 // Called to bind functionality to input
@@ -120,5 +118,13 @@ void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent
 void AQuestCharacterBase::MeleeAttack()
 {
 		BP_MeleeAttack();
+}
+
+void AQuestCharacterBase::SetTargetCharacterToNull()
+{
+	if (TargetCharacter)
+	{
+		TargetCharacter = nullptr;
+	}
 }
 

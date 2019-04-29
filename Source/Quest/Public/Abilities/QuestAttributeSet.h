@@ -33,6 +33,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
 		FGameplayAttributeData MaxHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Level;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData ArmorClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Strength;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Intelligence;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Wisdom;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Agility;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Constitution;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestAttributeSet")
+		FGameplayAttributeData Charm;
+
 	FOnHealthChange OnHealthChange;
 
 	void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;

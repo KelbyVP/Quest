@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Kelby Van Patten
 
 #pragma once
 
@@ -87,4 +87,6 @@ public:
 		void BP_MeleeAttack();
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetTargetCharacterToNull();
 };

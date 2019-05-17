@@ -6,11 +6,11 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "QuestAbilitySystemComponent.h"
-#include "GameplayAbility.h"
 #include "QuestCharacterBase.generated.h"
 
 class UQuestAttributeSet;
 class USphereComponent;
+class UQuestGameplayAbility;
 
 UCLASS()
 class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -25,6 +25,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/** Abilities to grant this character upon creation.  These will be activated by tag or event and are not bound to specific inputs */
+	TArray<TSubclassOf<UQuestGameplayAbility>> GameplayAbilties;
+
+	/** Map of item slot to gameplay ability class; these are bound before any abilities added byt he inventory */
+	//TMap<FQuestItemSlot, TSubclassOf<UQuestGameplayAbility>> DefaultSlottedAbilities;
 
 
 public:	
@@ -89,4 +94,28 @@ public:
 		void BP_Die();
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetTargetCharacterToNull();
+
+	//	Getters and setters for character attributes
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetHealth();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetMaxHealth();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetLevel();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetLevel(float NewLevel);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetArmorClass();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetStrength();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetIntelligence();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetWisdom();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetAgility();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetConstitution();
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		float GetCharm();
 };

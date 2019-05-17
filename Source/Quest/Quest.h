@@ -2,6 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
+#include "Engine/Engine.h"
+#include "QuestTypes.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogQuest, Log, All);

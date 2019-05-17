@@ -4,6 +4,7 @@
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 #include "GameFramework/Actor.h"
+#include "QuestGameplayAbility.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -38,6 +39,7 @@ void AQuestCharacterBase::BeginPlay()
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
+
 }
 
 // Called every frame
@@ -126,5 +128,60 @@ void AQuestCharacterBase::SetTargetCharacterToNull()
 	{
 		TargetCharacter = nullptr;
 	}
+}
+
+float AQuestCharacterBase::GetHealth()
+{
+	return AttributeSetComponent->Health.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetMaxHealth()
+{
+	return AttributeSetComponent->MaxHealth.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetLevel()
+{
+	return AttributeSetComponent->Level.GetCurrentValue();
+}
+
+void AQuestCharacterBase::SetLevel(float NewLevel)
+{
+	AttributeSetComponent->Level.SetCurrentValue(NewLevel);
+}
+
+float AQuestCharacterBase::GetArmorClass()
+{
+	return AttributeSetComponent->ArmorClass.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetStrength()
+{
+	return AttributeSetComponent->Strength.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetIntelligence()
+{
+	return AttributeSetComponent->Intelligence.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetWisdom()
+{
+	return AttributeSetComponent->Wisdom.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetAgility()
+{
+	return AttributeSetComponent->Agility.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetConstitution()
+{
+	return AttributeSetComponent->Constitution.GetCurrentValue();
+}
+
+float AQuestCharacterBase::GetCharm()
+{
+	return AttributeSetComponent->Charm.GetCurrentValue();
 }
 

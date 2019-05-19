@@ -20,10 +20,9 @@ struct QUEST_API FQuestItemSlot
 	GENERATED_BODY()
 
 		/** Constructor, -1 means an invalid slot */
-		FQuestItemSlot()
+	FQuestItemSlot()
 		: SlotNumber(-1)
 	{}
-
 
 	FQuestItemSlot(const FPrimaryAssetType& InItemType, int32 InSlotNumber)
 		: ItemType(InItemType)

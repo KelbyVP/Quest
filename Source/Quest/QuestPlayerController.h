@@ -57,8 +57,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 		TMap<UQuestItem*, FQuestItemData> InventoryData;
 
-	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on QuestGameInstanceBase
-	*  TODO: Create QuestGameInstanceBase */
+	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on QuestGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 		TMap<FQuestItemSlot, UQuestItem*> SlottedItems;
 

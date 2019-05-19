@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/Texture2D.h"
+#include "Runtime/SlateCore/Public/Styling/SlateBrush.h"
 #include "QuestItem.generated.h"
 
 class UQuestGameplayAbility;
@@ -31,7 +32,7 @@ public:
 
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		UTexture2D* ItemIcon;
+		FSlateBrush ItemIcon;
 
 	/** Is the item consumable? */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
@@ -44,6 +45,5 @@ public:
 	/** Can the item be stacked with other identical items in a single inventory slot? */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		bool bCanBeStacked;
-
 
 };

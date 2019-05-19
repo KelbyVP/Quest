@@ -46,4 +46,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		bool bCanBeStacked;
 
+	/** Can the item be discarded?  (Don't throw away essential quest items) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		bool bCanBeThrownAway;
+
 };

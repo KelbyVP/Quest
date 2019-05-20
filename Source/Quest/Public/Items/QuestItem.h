@@ -10,6 +10,16 @@
 
 class UQuestGameplayAbility;
 
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	IT_Potion UMETA(DisplayName = "Potion"),
+	IT_Weapon UMETA(DisplayName = "Weapon"),
+	IT_Ring UMETA(DisplayName = "Ring")
+
+
+};
+
 /** Base class for all items; do not blueprint this class directly */
 UCLASS(Abstract, BlueprintType)
 class QUEST_API UQuestItem : public UPrimaryDataAsset
@@ -21,6 +31,11 @@ public:
 	/** Type of this item, set in native parent class */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 		FPrimaryAssetType ItemType;
+
+	/** ENUM type of this item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+		EItemType ItemTypeEnum;
+
 
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)

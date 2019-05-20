@@ -3,3 +3,7 @@
 
 #include "items/QuestPotionItem.h"
 
+UQuestPotionItem::UQuestPotionItem()
+{
+	ItemTypeEnum = EItemType::IT_Potion;
+}

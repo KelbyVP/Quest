@@ -13,5 +13,6 @@ UCLASS()
 class QUEST_API UQuestPotionItem : public UQuestItem
 {
 	GENERATED_BODY()
-	
+
+		UQuestPotionItem();
 };

@@ -6,4 +6,8 @@
 UQuestRingItem::UQuestRingItem()
 {
 	ItemTypeEnum = EItemType::IT_Ring;
+	bIsUsable = true;
+	bCanBeStacked = true;
+	bCanBeThrownAway = true;
+	UseText = "Equip";
 }

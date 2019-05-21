@@ -128,3 +128,5 @@ void AQuestCharacterBase::SetTargetCharacterToNull()
 	}
 }
 
+
+

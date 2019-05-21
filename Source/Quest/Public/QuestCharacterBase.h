@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "QuestAbilitySystemComponent.h"
 #include "GameplayAbility.h"
+#include "QuestWeaponItem.h"
 #include "QuestCharacterBase.generated.h"
 
 class UQuestAttributeSet;
@@ -66,6 +67,15 @@ public:
 	// Tells us whether the character is dead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 	bool bIsDead;
+
+	// The weapon that the character is currently wielding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+		UQuestWeaponItem *EquippedWeapon;
+
+	// The static mesh component of the EquippedWeapon
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+		USkeletalMeshComponent* EquippedWeaponMesh;
+
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);

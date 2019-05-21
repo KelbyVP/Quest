@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/QuestItem.h"
+#include "NameTypes.h"
 #include "QuestWeaponItem.generated.h"
 
 /**
@@ -14,6 +15,23 @@ class QUEST_API UQuestWeaponItem : public UQuestItem
 {
 	GENERATED_BODY()
 
-		UQuestWeaponItem();
+public:
+
+	UQuestWeaponItem();
+
+	/** The socket on the character's skeletal mesh where the weapon will attach */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		FName SocketName;
+
+	/** The static mesh of the weapon, determines its appearance */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		USkeletalMesh *WeaponMesh;
+
+	/** The location where the weapon will spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		FTransform RelativeSpawnLocation;
+
+
+
 	
 };

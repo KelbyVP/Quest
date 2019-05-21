@@ -33,7 +33,7 @@ public:
 		FPrimaryAssetType ItemType;
 
 	/** ENUM type of this item */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		EItemType ItemTypeEnum;
 
 
@@ -45,13 +45,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FText ItemDescription;
 
+	/** User-visible text describing what to do with the item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+		FString UseText;
+
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FSlateBrush ItemIcon;
 
-	/** Is the item consumable? */
+	/** Is the item usable? */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		bool bIsConsumable;
+		bool bIsUsable;
 
 	/** Ability to trigger upon consuming this item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)

@@ -6,4 +6,8 @@
 UQuestPotionItem::UQuestPotionItem()
 {
 	ItemTypeEnum = EItemType::IT_Potion;
+	bIsUsable = true;
+	bCanBeStacked = true;
+	bCanBeThrownAway = true;
+	UseText = "Drink";
 }

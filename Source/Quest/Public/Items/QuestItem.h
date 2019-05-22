@@ -41,6 +41,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FText ItemName;
 
+	/** Name without caps or white spaces; used for sorting */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		FText SortName;
+
 	/** User-visible long description */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FText ItemDescription;

@@ -9,6 +9,7 @@ UQuestWeaponItem::UQuestWeaponItem()
 	bIsUsable = true;
 	bCanBeStacked = true;
 	bCanBeThrownAway = true;
+	bCanBeCrafted = false;
 	SocketName = "swordSocket";
 	UseText = "Equip";
 }

@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "QuestCharacter.h"
+#include "QuestMerchantCharacter.h"
 #include "Engine/World.h"
 
 AQuestPlayerController::AQuestPlayerController()
@@ -13,6 +14,7 @@ AQuestPlayerController::AQuestPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerCanMoveCharacter = true;
 	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
+	Gold = 0;
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -34,14 +36,20 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 		{
 			if (!ControlledCharacter->TargetCharacter->bIsDead)
 			{
+				/** If the Target Character is an enemy, then begin melee */
 				if (ControlledCharacter->TargetCharacter->bIsHostile)
 				{
 					ControlledCharacter->MeleeAttack();
 				}
-				else
+
+				/** If the Target Character is a Merchant, then begin a buy/sell dialog with that merchant */
+				else if (Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetCharacter))
 				{
-					// TODO:  initiate dialogue if the target is not dead and is not hostile
+					AQuestMerchantCharacter *Merchant = Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetCharacter);
+					Merchant->OnInteract(this);					
 				}
+
+				// TODO:  initiate dialog, etc. if the target is not dead and is not hostile
 			}
 			else
 			{
@@ -164,4 +172,18 @@ void AQuestPlayerController::OnSetTargetReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void AQuestPlayerController::IncreaseGold(int Amount)
+{
+	Gold += Amount;
+	FMath::Clamp(Gold, 0, MaxGold);
+	UpdateGold();
+}
+
+void AQuestPlayerController::DecreaseGold(int Amount)
+{
+	Gold -= Amount;
+	FMath::Clamp(Gold, 0, MaxGold);
+	UpdateGold();
 }

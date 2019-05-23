@@ -8,6 +8,7 @@
 
 class AQuestCharacter;
 class AQuestCharacterBase;
+class AQuestMerchantCharacter;
 
 UCLASS()
 class AQuestPlayerController : public APlayerController
@@ -49,6 +50,25 @@ public:
 	*	(false if character is trying to cast spell, attack from range, etc.) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 	bool bControllerCanMoveCharacter;
+
+	/** Tracks the amount of gold the player has */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
+		int Gold;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
+		int MaxGold = 999999999;
+
+	/** Increases the amount of gold the player has */
+	UFUNCTION(BlueprintCallable, Category = "QuestPlayerController")
+		void IncreaseGold(int Amount);
+
+	/** Decreases the amount of gold the player has */
+	UFUNCTION(BlueprintCallable, Category = "QuestPlayerController")
+		void DecreaseGold(int Amount);
+
+	/** A blueprint function that updates widgets that reflect the amount of gold the player has */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta=(DisplayName = "UpdateGold"), Category = "QuestPlayerController")
+		void UpdateGold();
 
 private:
 	AQuestCharacter* ControlledCharacter;

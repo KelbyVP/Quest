@@ -9,5 +9,6 @@ UQuestRingItem::UQuestRingItem()
 	bIsUsable = true;
 	bCanBeStacked = true;
 	bCanBeThrownAway = true;
+	bCanBeCrafted = false;
 	UseText = "Equip";
 }

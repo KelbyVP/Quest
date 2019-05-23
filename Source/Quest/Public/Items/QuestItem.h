@@ -15,9 +15,8 @@ enum class EItemType : uint8
 {
 	IT_Potion UMETA(DisplayName = "Potion"),
 	IT_Weapon UMETA(DisplayName = "Weapon"),
-	IT_Ring UMETA(DisplayName = "Ring")
-
-
+	IT_Ring UMETA(DisplayName = "Ring"),
+	IT_Material UMETA(DisplayName = "Material")
 };
 
 /** Base class for all items; do not blueprint this class directly */
@@ -35,7 +34,6 @@ public:
 	/** ENUM type of this item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		EItemType ItemTypeEnum;
-
 
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
@@ -57,6 +55,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FSlateBrush ItemIcon;
 
+	/** Value of the item, which will determine price in gold at which it can be bought and sold */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		float Value;
+
 	/** Is the item usable? */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		bool bIsUsable;
@@ -73,4 +75,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		bool bCanBeThrownAway;
 
+	/** Can the item be crafted? */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		bool bCanBeCrafted;
+
+	/** If the item can be crafted, these are the items that are necessary to make it */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		TArray<UQuestItem*> Recipe;
 };

@@ -46,7 +46,8 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 				else if (Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetCharacter))
 				{
 					AQuestMerchantCharacter *Merchant = Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetCharacter);
-					Merchant->OnInteract(this);					
+					Merchant->OnInteract(this);
+					ControlledCharacter->TargetCharacter = nullptr;
 				}
 
 				// TODO:  initiate dialog, etc. if the target is not dead and is not hostile

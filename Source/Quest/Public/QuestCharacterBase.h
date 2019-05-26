@@ -58,11 +58,11 @@ public:
 
 	// Identifies the character that this character is targeting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
-		AQuestCharacterBase *TargetCharacter;
+		AActor *TargetActor;
 
 	//  Tells us whether this character is within range of the character that this character is trying to melee attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
-		bool bIsTargetCharacterWithinInteractionSphere;
+		bool bIsTargetWithinInteractionSphere;
 
 	// Tells us whether the character is dead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")

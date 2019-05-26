@@ -9,6 +9,7 @@
 class AQuestCharacter;
 class AQuestCharacterBase;
 class AQuestMerchantCharacter;
+class AQuestStorage;
 
 UCLASS()
 class AQuestPlayerController : public APlayerController
@@ -45,11 +46,12 @@ protected:
 
 public:
 	AQuestCharacterBase* PawnClicked;
+	AQuestStorage* StorageClicked;
 
-	/**	Set whether the controller can move the character
-	*	(false if character is trying to cast spell, attack from range, etc.) */
+	/**	Set whether the controller should move the character
+	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
-	bool bControllerCanMoveCharacter;
+	bool bControllerShouldMoveCharacter;
 
 	/** Tracks the amount of gold the player has */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
@@ -72,6 +74,8 @@ public:
 
 private:
 	AQuestCharacter* ControlledCharacter;
+	void MoveToTarget(AActor *MoveTarget);
+	void InteractWithTarget(AActor* InteractionTarget);
 
 };
 

@@ -25,8 +25,8 @@ AQuestCharacterBase::AQuestCharacterBase()
 	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
 
 	bIsDead = false;
-	bIsTargetCharacterWithinInteractionSphere = false;
-	TargetCharacter = nullptr;
+	bIsTargetWithinInteractionSphere = false;
+	TargetActor = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -101,17 +101,18 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 
 void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (TargetCharacter && TargetCharacter == OtherActor)
+	if (TargetActor && TargetActor == OtherActor)
 	{
-		bIsTargetCharacterWithinInteractionSphere = true;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with target actor!"))
+		bIsTargetWithinInteractionSphere = true;
 	}
 }
 
 void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (TargetCharacter && TargetCharacter == OtherActor)
+	if (TargetActor && TargetActor == OtherActor)
 	{
-		bIsTargetCharacterWithinInteractionSphere = false;
+		bIsTargetWithinInteractionSphere = false;
 	}
 }
 
@@ -122,9 +123,9 @@ void AQuestCharacterBase::MeleeAttack()
 
 void AQuestCharacterBase::SetTargetCharacterToNull()
 {
-	if (TargetCharacter)
+	if (TargetActor)
 	{
-		TargetCharacter = nullptr;
+		TargetActor = nullptr;
 	}
 }
 

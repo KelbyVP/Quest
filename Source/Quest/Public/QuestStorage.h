@@ -7,6 +7,7 @@
 #include "QuestStorage.generated.h"
 
 class AQuestPlayerController;
+class UBoxComponent;
 
 UCLASS()
 class QUEST_API AQuestStorage : public AActor
@@ -24,6 +25,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Creates a box around the storage actor that tells us when the player can interact with the storage actor
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestStorage")
+		UBoxComponent* InteractionBox;
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestStorage")
+		FVector InteractionBoxExtents;
 
 	/** A blueprint function that allows the player to move items between a storage and the player inventory */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (DisplayName = "OnInteract"), Category = "QuestPlayerController")

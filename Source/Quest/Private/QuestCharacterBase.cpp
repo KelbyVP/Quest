@@ -36,6 +36,7 @@ void AQuestCharacterBase::BeginPlay()
 
 	// Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
+
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
 }
@@ -103,7 +104,6 @@ void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveCompon
 {
 	if (TargetActor && TargetActor == OtherActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with target actor!"))
 		bIsTargetWithinInteractionSphere = true;
 	}
 }

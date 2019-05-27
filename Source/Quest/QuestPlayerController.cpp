@@ -29,17 +29,17 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 	{
 		MoveToMouseCursor();
 	}
-	if (!ControlledCharacter)
-	{
-		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
-	}
-	if (ControlledCharacter->TargetActor)
-	{	
-		if (ControlledCharacter->bIsTargetWithinInteractionSphere)
-		{
-			InteractWithTarget(ControlledCharacter->TargetActor);
-		}
-	}
+	//if (!ControlledCharacter)
+	//{
+	//	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
+	//}
+	//if (ControlledCharacter->TargetActor)
+	//{	
+	//	if (ControlledCharacter->bIsTargetWithinInteractionSphere)
+	//	{
+	//		InteractWithTarget(ControlledCharacter->TargetActor);
+	//	}
+	//}
 }
 
 void AQuestPlayerController::SetupInputComponent()
@@ -102,7 +102,10 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 	if (Hit.bBlockingHit)
 	{
 		AActor* ActorClicked;
-		ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
+		if (!ControlledCharacter)
+		{
+			ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
+		}
 
 		if (ControlledCharacter)
 		{
@@ -113,14 +116,12 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 			//  If we clicked on a character, set it as the TargetCharacter, move to it, and then interact
 			if (PawnClicked)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Interaction Target is a Quest Character Base!"))
 				ControlledCharacter->TargetActor = PawnClicked;
 				MoveToTarget(PawnClicked);
 			}
 			// If we clicked on a storage actor, set it as the TargetStorage
 			else if (StorageClicked)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Interaction Target is a Quest Storage actor!"))
 				ControlledCharacter->TargetActor = StorageClicked;
 				MoveToTarget(StorageClicked);
 			}
@@ -169,69 +170,11 @@ void AQuestPlayerController::DecreaseGold(int Amount)
 }
 
 void AQuestPlayerController::MoveToTarget(AActor *MoveTarget)
-{	// if we are out of range, move to the target
+{	
 	if (MoveTarget)
 	{
-	float const Distance = FVector::Dist(MoveTarget->GetActorLocation(), ControlledCharacter->GetActorLocation());
-
-		if (Distance > ControlledCharacter->InteractionSphereRadius)
-		{
-			ControlledCharacter->bIsTargetWithinInteractionSphere = false;
-			UAIBlueprintHelperLibrary::SimpleMoveToActor(this, MoveTarget);
-			UE_LOG(LogTemp, Warning, TEXT("Distance to Target: %f"), Distance)
-				UE_LOG(LogTemp, Warning, TEXT("Interaction Sphere radius: %f"), ControlledCharacter->InteractionSphereRadius)
-		}
-		else
-		{
-			ControlledCharacter->bIsTargetWithinInteractionSphere = true;
-			UE_LOG(LogTemp, Warning, TEXT("Interaction Target is already within the interaction sphere!"))
-		}
+		ControlledCharacter->MoveToTarget(MoveTarget);
 	}
 	return;
 }
 
-void AQuestPlayerController::InteractWithTarget(AActor* InteractionTarget)
-{
-	// Decide what to do if the target is a character
-	if (Cast<AQuestCharacterBase>(InteractionTarget))
-	{
-		AQuestCharacterBase* TargetCharacter = Cast<AQuestCharacterBase>(InteractionTarget);
-
-		// Check to see whether the target character is dead
-		if (!TargetCharacter->bIsDead)
-		{
-
-			/** If the target character is hostile, melee attack */
-			if (TargetCharacter->bIsHostile)
-			{
-				ControlledCharacter->MeleeAttack();
-			}
-
-			/** If the Target Character is a Merchant, then begin a buy/sell dialog with that merchant */
-			else if (Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetActor))
-			{
-				AQuestMerchantCharacter* Merchant = Cast<AQuestMerchantCharacter>(ControlledCharacter->TargetActor);
-				Merchant->OnInteract(this);
-				ControlledCharacter->TargetActor = nullptr;
-			}
-			// TODO:  initiate dialog, etc. if the target is an NPC
-			else 
-			{
-
-			}
-		}
-		else
-		{
-			// TODO:  loot the body if the target is dead
-		}
-	}
-	/** Check to see whether the target is a storage actor, and if so, open the storage widget*/
-	else if (Cast<AQuestStorage>(InteractionTarget))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Interaction Target is a Quest Storage actor!"))
-		AQuestStorage* Storage = Cast<AQuestStorage>(ControlledCharacter->TargetActor);
-		Storage->OnInteract(this);
-		ControlledCharacter->TargetActor = nullptr;
-	}
-
-}

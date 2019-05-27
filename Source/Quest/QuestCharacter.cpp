@@ -11,7 +11,12 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "QuestMerchantCharacter.h"
+#include "QuestPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "QuestAttributeSet.h"
+#include "QuestStorage.h"
 
 AQuestCharacter::AQuestCharacter()
 {
@@ -93,5 +98,100 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
+	}
+}
+
+void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
+{
+	if (InteractionTarget && InteractionTarget == TargetActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with Target Actor!"))
+
+			//  Decide what to do if the target is a character
+			if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Target is a Quest Character Base!"))
+					//  Check to see whether the character is dead
+					if (TargetCharacter->bIsDead)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with dead Quest Character Base!"))
+							// TODO:  Figure out what to do if the character is dead (eg. loot the body)
+					}
+					else
+					{
+						/**	If the target character is hostile, melee attack */
+						if (TargetCharacter->bIsHostile)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with hostile Quest Character Base!"))
+								MeleeAttack();
+						}
+
+						/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
+						else if (AQuestMerchantCharacter * Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter))
+						{
+							UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with Merchant!"))
+								AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+							if (PlayerController)
+							{
+								Merchant->OnInteract(PlayerController);
+								TargetActor = nullptr;
+							}
+						}
+						else
+						{
+							/** TODO:  implement functionality for other types of characters (eg., dialogue for NPCs) */
+						}
+					}
+			}
+			/** If the target is a storage actor, open it */
+			else if (Cast<AQuestStorage>(TargetActor))
+			{
+				AQuestStorage* Storage = Cast<AQuestStorage>(TargetActor);
+				AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+				if (PlayerController)
+				{
+					Storage->OnInteract(PlayerController);
+					TargetActor = nullptr;
+				}
+			}
+	}
+}
+
+void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
+{
+	if (MoveTarget)
+	{
+		// See whether we are in range, and if we are, interact with the target actor
+		if (IsOverlappingActor(MoveTarget))
+		{
+			bIsTargetWithinInteractionSphere = true;
+			InteractWithTarget(MoveTarget);
+			return;
+		}
+
+		// If we are not in range, move to the target
+		else
+		{
+			bIsTargetWithinInteractionSphere = false;
+			UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), MoveTarget);
+			return;
+		}
+	}
+}
+
+void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (TargetActor && TargetActor == OtherActor)
+	{
+		bIsTargetWithinInteractionSphere = true;
+		InteractWithTarget(OtherActor);
+	}
+}
+
+void AQuestCharacter::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (TargetActor && TargetActor == OtherActor)
+	{
+		bIsTargetWithinInteractionSphere = false;
 	}
 }

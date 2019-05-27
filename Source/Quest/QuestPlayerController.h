@@ -75,7 +75,6 @@ public:
 private:
 	AQuestCharacter* ControlledCharacter;
 	void MoveToTarget(AActor *MoveTarget);
-	void InteractWithTarget(AActor* InteractionTarget);
 
 };
 

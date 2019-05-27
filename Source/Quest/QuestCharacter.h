@@ -7,8 +7,6 @@
 #include "QuestCharacterBase.h"
 #include "QuestCharacter.generated.h"
 
-class AQuestStorage;
-
 UCLASS(Blueprintable)
 class AQuestCharacter : public AQuestCharacterBase
 {
@@ -39,5 +37,12 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
+
+public:
+	void InteractWithTarget(AActor* InteractionTarget);
+	void MoveToTarget(AActor* MoveTarget);
+
+	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 };
 

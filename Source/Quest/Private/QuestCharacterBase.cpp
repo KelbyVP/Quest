@@ -121,7 +121,7 @@ void AQuestCharacterBase::MeleeAttack()
 		BP_MeleeAttack();
 }
 
-void AQuestCharacterBase::SetTargetCharacterToNull()
+void AQuestCharacterBase::SetTargetActorToNull()
 {
 	if (TargetActor)
 	{

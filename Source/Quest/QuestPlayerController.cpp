@@ -29,17 +29,6 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 	{
 		MoveToMouseCursor();
 	}
-	//if (!ControlledCharacter)
-	//{
-	//	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
-	//}
-	//if (ControlledCharacter->TargetActor)
-	//{	
-	//	if (ControlledCharacter->bIsTargetWithinInteractionSphere)
-	//	{
-	//		InteractWithTarget(ControlledCharacter->TargetActor);
-	//	}
-	//}
 }
 
 void AQuestPlayerController::SetupInputComponent()

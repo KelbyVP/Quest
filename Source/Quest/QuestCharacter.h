@@ -40,6 +40,7 @@ private:
 
 public:
 	void InteractWithTarget(AActor* InteractionTarget);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
 	void MoveToTarget(AActor* MoveTarget);
 
 	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;

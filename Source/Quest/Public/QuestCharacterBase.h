@@ -76,27 +76,41 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* EquippedWeaponMesh;
 
-
+	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
+
+	/** Function called by delegate when the character's health changes */
 	UFUNCTION()
 		void OnHealthChanged(float Health, float MaxHealth);
+
+	/** Blueprint function that will be called by OnHealthChanged when character's health changes */
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
+		void BP_OnHealthChanged(float Health, float MaxHealth);
+
+	/** Functions called when another actor moves into or out of the Interaction Sphere */
 	UFUNCTION()
 		virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
-		void BP_OnHealthChanged(float Health, float MaxHealth);
+
+	/** Function called when character wants to make a melee attack */
 	UFUNCTION()
 		void MeleeAttack();
+
+	/** Blueprint function called by MeleeAttack; the blueprint implementation should trigger the Melee gameplay ability */
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
 		void BP_MeleeAttack();
+
+	/** Blueprint event that gets called when the character dies */
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();
+
+	/** Function that clears the TargetActor value */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void SetTargetCharacterToNull();
+		void SetTargetActorToNull();
 };

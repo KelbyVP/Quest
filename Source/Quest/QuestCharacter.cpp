@@ -1,22 +1,25 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "QuestCharacter.h"
-#include "UObject/ConstructorHelpers.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "CollisionQueryParams.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/World.h"
+#include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
-#include "Engine/World.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "QuestMerchantCharacter.h"
-#include "QuestPlayerController.h"
+#include "Math/Vector.h"
 #include "Kismet/GameplayStatics.h"
 #include "QuestAttributeSet.h"
+#include "QuestMerchantCharacter.h"
+#include "QuestPlayerController.h"
 #include "QuestStorage.h"
+#include "UObject/ConstructorHelpers.h"
 
 AQuestCharacter::AQuestCharacter()
 {
@@ -65,6 +68,9 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
+	bIsIdle = false;
+	SetbIsIdle(true);
+	AttackCooldownTimer = 1.0f;
 
 
 }
@@ -97,6 +103,117 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 			FRotator CursorR = CursorFV.Rotation();
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
+		}
+	}
+
+	if (bIsIdle)
+	{
+		SelectTargetCharacterToAttack();
+	}
+}
+
+void AQuestCharacter::SelectTargetCharacterToAttack()
+{
+	/** See if we already have a valid character to attack */
+	if (TargetActor)
+	{
+		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+		{
+			if (TargetCharacter->bIsHostile)
+			{
+				if (TargetCharacter->bIsDead)
+				{
+					TargetActor = nullptr;
+				}
+				else
+				{
+					MoveToTarget(TargetCharacter);
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	/** Scan for nearby pawns */
+	TArray<FHitResult> OutHits;
+	FVector Start = GetActorLocation();
+	FVector End = Start + FVector(0, 0, 1);
+	float SweepSphereRadius = 500.0f;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredComponent(GetCapsuleComponent());
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+
+	GetWorld()->SweepMultiByObjectType(
+		OutHits,
+		Start,
+		End,
+		FQuat::Identity,
+		ObjParams,
+		FCollisionShape::MakeSphere(SweepSphereRadius),
+		QueryParams
+	);
+
+	if (OutHits.Num() > 0)
+	{
+		/** See which nearby pawns are live enemies */
+		TArray<AQuestCharacterBase*> LocalLiveEnemies;
+		for (auto& Hit : OutHits)
+		{
+			AQuestCharacterBase* Pawn = Cast<AQuestCharacterBase>(Hit.GetActor());
+			if (Pawn && Pawn->bIsHostile && !Pawn->bIsDead)
+			{
+				LocalLiveEnemies.AddUnique(Pawn);
+			}
+		}
+
+		/** See which live enemy is closest */
+		if (LocalLiveEnemies.Num() > 0)
+		{
+			AQuestCharacterBase* ClosestEnemy = LocalLiveEnemies[0];
+			float DistanceToClosestEnemy = FVector::Dist(GetActorLocation(), ClosestEnemy->GetActorLocation());
+			for (auto& Enemy : LocalLiveEnemies)
+			{
+				float DistanceToThisEnemy = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
+				if (DistanceToThisEnemy <= DistanceToClosestEnemy)
+				{
+					ClosestEnemy = Enemy;
+					DistanceToClosestEnemy = DistanceToThisEnemy;
+				}
+			}
+			TargetActor = ClosestEnemy;
+		}
+		else return;
+
+		/** Attack the closest live enemy*/
+		MoveToTarget(TargetActor);
+
+	}
+	else return;
+}
+
+void AQuestCharacter::AutoAttack()
+{
+	if (TargetActor)
+	{
+		if (AQuestCharacterBase* CharacterToAttack = Cast<AQuestCharacterBase>(TargetActor))
+		{
+			if (CharacterToAttack->bIsHostile && !CharacterToAttack->bIsDead)
+			{
+				MoveToTarget(CharacterToAttack);
+			}
 		}
 	}
 }
@@ -177,6 +294,21 @@ void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
 			return;
 		}
 	}
+}
+
+void AQuestCharacter::SetbIsIdle(bool NewbIsIdle)
+{
+	bool OldbIsIdle = bIsIdle;
+	bIsIdle = NewbIsIdle;
+	FString Old = OldbIsIdle? "true" : "false";
+	FString New = NewbIsIdle ? "true" : "false";
+
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SetbIsIdle - bIsIdle has been changed from %s to %s"), *Old, *New)
+}
+
+void AQuestCharacter::OnMeleeEnd()
+{
+	BP_OnMeleeEnd();
 }
 
 void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

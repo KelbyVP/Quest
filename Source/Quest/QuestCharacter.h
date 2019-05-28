@@ -38,10 +38,30 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 
+	void SelectTargetCharacterToAttack();
+	void AutoAttack();
+
 public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		bool bIsIdle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		float AttackCooldownTimer;
+
 	void InteractWithTarget(AActor* InteractionTarget);
+
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
 	void MoveToTarget(AActor* MoveTarget);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
+	void SetbIsIdle(bool NewbIsIdle);
+
+	UFUNCTION()
+		void OnMeleeEnd();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnMeleeEnd"))
+		void BP_OnMeleeEnd();
+
 
 	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;

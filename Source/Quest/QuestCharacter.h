@@ -44,7 +44,7 @@ private:
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
-		bool bIsIdle;
+		bool bIsReadyForNextAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		float AttackCooldownTimer;
 
@@ -54,14 +54,13 @@ public:
 	void MoveToTarget(AActor* MoveTarget);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
-	void SetbIsIdle(bool NewbIsIdle);
+	void SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack);
 
 	UFUNCTION()
-		void OnMeleeEnd();
+	void OnMeleeEnd();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnMeleeEnd"))
 		void BP_OnMeleeEnd();
-
 
 	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;

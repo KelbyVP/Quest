@@ -16,4 +16,12 @@ AQuestGameMode::AQuestGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	bIsCombatModeActive = false;
+}
+
+void AQuestGameMode::SetbIsCombatModeActive(bool NewValue)
+{
+	bIsCombatModeActive = NewValue;
+	OnCombatModeChange.Broadcast(bIsCombatModeActive);
 }

@@ -2,14 +2,16 @@
 
 #include "QuestPlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "Runtime/Engine/Classes/Components/DecalComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#include "QuestCharacter.h"
-#include "QuestMerchantCharacter.h"
-#include "Engine/World.h"
-#include "QuestStorage.h"
 #include "Engine.h"
+#include "Engine/World.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Math/Vector.h"
+#include "QuestCharacter.h"
+#include "QuestGameMode.h"
+#include "QuestMerchantCharacter.h"
+#include "QuestStorage.h"
+#include "Runtime/Engine/Classes/Components/DecalComponent.h"
+
 
 AQuestPlayerController::AQuestPlayerController()
 {
@@ -118,6 +120,7 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 			else
 			{
 				ControlledCharacter->TargetActor = nullptr;
+				ControlledCharacter->SetbIsReadyForNextAttack(false);
 				float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
 				if ((Distance > 120.0f))
 				{

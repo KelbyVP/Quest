@@ -68,11 +68,8 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
-	bIsIdle = false;
-	SetbIsIdle(true);
+	bIsReadyForNextAttack = false;
 	AttackCooldownTimer = 1.0f;
-
-
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)
@@ -105,10 +102,12 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
-
-	if (bIsIdle)
+	if (bIsCombatModeActive)
 	{
-		SelectTargetCharacterToAttack();
+		if (bIsReadyForNextAttack)
+		{
+			SelectTargetCharacterToAttack();
+		}
 	}
 }
 
@@ -199,9 +198,13 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 
 		/** Attack the closest live enemy*/
 		MoveToTarget(TargetActor);
-
 	}
-	else return;
+	else
+	{
+		/** We did not find any pawns in range, so disable auto-attack and return */
+		SetbIsReadyForNextAttack(false);
+		return;
+	}
 }
 
 void AQuestCharacter::AutoAttack()
@@ -222,55 +225,61 @@ void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 {
 	if (InteractionTarget && InteractionTarget == TargetActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with Target Actor!"))
-
-			//  Decide what to do if the target is a character
-			if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+		//  Decide what to do if the target is a character
+		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+		{
+			//  Check to see whether the character is dead
+			if (TargetCharacter->bIsDead)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Target is a Quest Character Base!"))
-					//  Check to see whether the character is dead
-					if (TargetCharacter->bIsDead)
-					{
-						UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with dead Quest Character Base!"))
-							// TODO:  Figure out what to do if the character is dead (eg. loot the body)
-					}
-					else
-					{
-						/**	If the target character is hostile, melee attack */
-						if (TargetCharacter->bIsHostile)
-						{
-							UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with hostile Quest Character Base!"))
-								MeleeAttack();
-						}
-
-						/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
-						else if (AQuestMerchantCharacter * Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter))
-						{
-							UE_LOG(LogTemp, Warning, TEXT("QuestCharacter is interacting with Merchant!"))
-								AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-							if (PlayerController)
-							{
-								Merchant->OnInteract(PlayerController);
-								TargetActor = nullptr;
-							}
-						}
-						else
-						{
-							/** TODO:  implement functionality for other types of characters (eg., dialogue for NPCs) */
-						}
-					}
-			}
-			/** If the target is a storage actor, open it */
-			else if (Cast<AQuestStorage>(TargetActor))
-			{
-				AQuestStorage* Storage = Cast<AQuestStorage>(TargetActor);
-				AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-				if (PlayerController)
+				if (TargetCharacter->bIsHostile)
 				{
-					Storage->OnInteract(PlayerController);
-					TargetActor = nullptr;
+					if (bIsCombatModeActive)
+					{
+						bIsReadyForNextAttack = true;
+					}
+				}
+					// TODO:  Figure out what to do if the character is dead (eg. loot the body)
+			}
+			else
+			{
+				/**	If the target character is hostile, melee attack */
+				if (TargetCharacter->bIsHostile)
+				{
+					if (!bIsCombatModeActive)
+					{
+						GameMode->SetbIsCombatModeActive(true);
+					}
+					SetbIsReadyForNextAttack(true);
+					MeleeAttack();
+				}
+
+				/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
+				else if (AQuestMerchantCharacter * Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter))
+				{
+					AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+					if (PlayerController)
+					{
+						Merchant->OnInteract(PlayerController);
+						TargetActor = nullptr;
+					}
+				}
+				else
+				{
+					/** TODO:  implement functionality for other types of characters (eg., dialogue for NPCs) */
 				}
 			}
+		}
+		/** If the target is a storage actor, open it */
+		else if (Cast<AQuestStorage>(TargetActor))
+		{
+			AQuestStorage* Storage = Cast<AQuestStorage>(TargetActor);
+			AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			if (PlayerController)
+			{
+				Storage->OnInteract(PlayerController);
+				TargetActor = nullptr;
+			}
+		}
 	}
 }
 
@@ -290,20 +299,21 @@ void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
 		else
 		{
 			bIsTargetWithinInteractionSphere = false;
+			bIsReadyForNextAttack = false;
 			UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), MoveTarget);
 			return;
 		}
 	}
 }
 
-void AQuestCharacter::SetbIsIdle(bool NewbIsIdle)
+void AQuestCharacter::SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack)
 {
-	bool OldbIsIdle = bIsIdle;
-	bIsIdle = NewbIsIdle;
-	FString Old = OldbIsIdle? "true" : "false";
-	FString New = NewbIsIdle ? "true" : "false";
+	bool OldbIsReadyForNextAttack = bIsReadyForNextAttack;
+	bIsReadyForNextAttack = NewbIsReadyForNextAttack;
+	FString Old = OldbIsReadyForNextAttack ? "true" : "false";
+	FString New = NewbIsReadyForNextAttack ? "true" : "false";
 
-	UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SetbIsIdle - bIsIdle has been changed from %s to %s"), *Old, *New)
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SetbIsIdle - bIsReadyForNextAttack has been changed from %s to %s"), *Old, *New)
 }
 
 void AQuestCharacter::OnMeleeEnd()
@@ -315,6 +325,10 @@ void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent*
 {
 	if (TargetActor && TargetActor == OtherActor)
 	{
+		if (bIsCombatModeActive)
+		{
+			bIsReadyForNextAttack = true;
+		}
 		bIsTargetWithinInteractionSphere = true;
 		InteractWithTarget(OtherActor);
 	}

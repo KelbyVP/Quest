@@ -4,6 +4,8 @@
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameModeBase.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -34,11 +36,17 @@ void AQuestCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged
+	/** Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged */
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
 
+	/** Subscribe to the Begin and End Overlap events broadcast from the Interaction Sphere */
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
+
+	/** Subscribe to the QuestGameMode delegate that tells us when we are entering or exiting combat mode */
+	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameMode->OnCombatModeChange.AddDynamic(this, &AQuestCharacterBase::OnCombatModeChanged);
+
 }
 
 // Called every frame
@@ -116,9 +124,15 @@ void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent
 	}
 }
 
+void AQuestCharacterBase::OnCombatModeChanged(bool NewbIsCombatModeActive)
+{
+		bIsCombatModeActive = NewbIsCombatModeActive;
+		UE_LOG(LogTemp, Warning, TEXT("bIsCombatModeActive changed to %s"), *FString(bIsCombatModeActive ? "true" : "false"))
+}
+
 void AQuestCharacterBase::MeleeAttack()
 {
-		BP_MeleeAttack();
+	BP_MeleeAttack();
 }
 
 void AQuestCharacterBase::SetTargetActorToNull()

@@ -8,6 +8,7 @@
 #include "QuestAbilitySystemComponent.h"
 #include "GameplayAbility.h"
 #include "QuestWeaponItem.h"
+#include "QuestGameMode.h"
 #include "QuestCharacterBase.generated.h"
 
 class UQuestAttributeSet;
@@ -68,6 +69,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 	bool bIsDead;
 
+	/** Tells us whether the game mode has shifted to combat mode, which allows characters to attack automatically */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		bool bIsCombatModeActive;
+
 	// The weapon that the character is currently wielding
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		UQuestWeaponItem *EquippedWeapon;
@@ -75,6 +80,10 @@ public:
 	// The static mesh component of the EquippedWeapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* EquippedWeaponMesh;
+
+	/** The Game Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestCharacterBase")
+		AQuestGameMode* GameMode;
 
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
@@ -97,6 +106,10 @@ public:
 		virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	/** Function called by delegate when the Combat Mode changes */
+	UFUNCTION()
+		void OnCombatModeChanged(bool NewbIsCombatModeActive);
 
 	/** Function called when character wants to make a melee attack */
 	UFUNCTION()

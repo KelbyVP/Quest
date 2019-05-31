@@ -1,10 +1,12 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "QuestPlayerController.h"
+#include "AITypes.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Engine.h"
 #include "Engine/World.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "QuestGameplayAbility.h"
 #include "Math/Vector.h"
 #include "QuestCharacter.h"
 #include "QuestGameMode.h"
@@ -27,18 +29,6 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 void AQuestPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	//SetPathFollowingComponent();
-
-	if (PathFollowingComponent)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Pathfollowing Component created!"))
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Pathfollowing Component NOT created!"))
-	}
-
-
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -127,25 +117,20 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 			if (PawnClicked)
 			{
 				ControlledCharacter->TargetActor = PawnClicked;
-				MoveToTarget(PawnClicked);
+				MoveToTargetActor(PawnClicked);
 			}
 			// If we clicked on a storage actor, set it as the TargetStorage
 			else if (StorageClicked)
 			{
 				ControlledCharacter->TargetActor = StorageClicked;
-				MoveToTarget(StorageClicked);
+				MoveToTargetActor(StorageClicked);
 			}
 			// If we did not click on a character or storage actor, move unless we're too close for the animation to play correctly
 			else
 			{
-				ControlledCharacter->TargetActor = nullptr;
-				ControlledCharacter->SetbIsReadyForNextAttack(false);
-				float const Distance = FVector::Dist(DestLocation, ControlledCharacter->GetActorLocation());
-				if ((Distance > 120.0f))
-				{
-					UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
-					DestinationLocation = DestLocation;
-				}
+				ControlledCharacter->AbilitySystemComponent->CurrentMontageStop(1.0f);
+				DestinationLocation = DestLocation;
+				MoveToTargetLocation();
 			}
 		}
 	}
@@ -182,10 +167,20 @@ void AQuestPlayerController::DecreaseGold(int Amount)
 
 void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move completed!"))
+	if (Result.IsSuccess())
+	{
+		if ((FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation()) < 150.0f))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move completed!"))
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move NOT completed!"))
+		}
+	}
 }
 
-void AQuestPlayerController::MoveToTarget(AActor *MoveTarget)
+void AQuestPlayerController::MoveToTargetActor(AActor *MoveTarget)
 {	
 	if (MoveTarget)
 	{
@@ -198,12 +193,33 @@ void AQuestPlayerController::MoveToTarget(AActor *MoveTarget)
 	return;
 }
 
+void AQuestPlayerController::MoveToTargetLocation()
+{
+	if (!PathFollowingComponent)
+	{
+		SetPathFollowingComponent();
+	}
+	ControlledCharacter->TargetActor = nullptr;
+	ControlledCharacter->SetbIsReadyForNextAttack(false);
+	float const Distance = FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation());
+	if ((Distance > 120.0f))
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestinationLocation);
+	}
+}
+
 void AQuestPlayerController::SetPathFollowingComponent()
 {
 	if (!PathFollowingComponent)
 	{
+		/** 
+		*	The SimpleMoveToLocation function creates a PathFollowingComponent with the right settings,
+		*	so moving to current location is a simple way to create the component 
+		*/
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ControlledCharacter->GetActorLocation());
 		PathFollowingComponent = FindComponentByClass<UPathFollowingComponent>();
+		
+		/** Bind the delegate that tells us when a move is finished */
 		PathFollowingComponent->OnRequestFinished.AddUObject(this, &AQuestPlayerController::OnMoveCompleted);
 	}
 

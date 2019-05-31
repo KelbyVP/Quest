@@ -202,6 +202,7 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 	else
 	{
 		/** We did not find any pawns in range, so disable auto-attack and return */
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SelectTargetToAttack did not find any pawns in range"))
 		SetbIsReadyForNextAttack(false);
 		return;
 	}
@@ -308,12 +309,12 @@ void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
 
 void AQuestCharacter::SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack)
 {
-	bool OldbIsReadyForNextAttack = bIsReadyForNextAttack;
 	bIsReadyForNextAttack = NewbIsReadyForNextAttack;
-	FString Old = OldbIsReadyForNextAttack ? "true" : "false";
-	FString New = NewbIsReadyForNextAttack ? "true" : "false";
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SetbIsIdle - bIsReadyForNextAttack has been changed from %s to %s"), *Old, *New)
+bool AQuestCharacter::GetbIsReadyForNextAttack()
+{
+	return bIsReadyForNextAttack;
 }
 
 void AQuestCharacter::OnMeleeEnd()

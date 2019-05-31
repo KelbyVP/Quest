@@ -56,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
 	void SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
+		bool GetbIsReadyForNextAttack();
+
 	UFUNCTION()
 	void OnMeleeEnd();
 

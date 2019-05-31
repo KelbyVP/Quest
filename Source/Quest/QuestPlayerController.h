@@ -81,7 +81,8 @@ public:
 
 private:
 	AQuestCharacter* ControlledCharacter;
-	void MoveToTarget(AActor *MoveTarget);
+	void MoveToTargetActor(AActor *MoveTarget);
+	void MoveToTargetLocation();
 	void SetPathFollowingComponent();
 
 	/** Component used for moving along a path. */

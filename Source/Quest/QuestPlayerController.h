@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AITypes.h"
 #include "GameFramework/PlayerController.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "UObject/UObjectGlobals.h"
 #include "QuestPlayerController.generated.h"
 
 class AQuestCharacter;
@@ -17,7 +20,8 @@ class AQuestPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	AQuestPlayerController();
+	AQuestPlayerController(const FObjectInitializer& ObjectInitialize);
+	virtual void BeginPlay() override;
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -72,9 +76,18 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta=(DisplayName = "UpdateGold"), Category = "QuestPlayerController")
 		void UpdateGold();
 
+	/** Called on completing current movement request */
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
+
 private:
 	AQuestCharacter* ControlledCharacter;
 	void MoveToTarget(AActor *MoveTarget);
+	void SetPathFollowingComponent();
+
+	/** Component used for moving along a path. */
+	UPROPERTY(VisibleAnywhere, Category = "QuestPlayerController")
+	UPathFollowingComponent* PathFollowingComponent;
+
 
 };
 

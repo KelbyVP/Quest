@@ -13,13 +13,32 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 
 
-AQuestPlayerController::AQuestPlayerController()
+
+AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get())
+	: Super(ObjectInitializer)
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerShouldMoveCharacter = true;
 	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 	Gold = 0;
+}
+
+void AQuestPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	//SetPathFollowingComponent();
+
+	if (PathFollowingComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pathfollowing Component created!"))
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pathfollowing Component NOT created!"))
+	}
+
+
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -161,12 +180,32 @@ void AQuestPlayerController::DecreaseGold(int Amount)
 	UpdateGold();
 }
 
+void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Move completed!"))
+}
+
 void AQuestPlayerController::MoveToTarget(AActor *MoveTarget)
 {	
 	if (MoveTarget)
 	{
+		if (!PathFollowingComponent)
+		{
+			SetPathFollowingComponent();
+		}
 		ControlledCharacter->MoveToTarget(MoveTarget);
 	}
 	return;
+}
+
+void AQuestPlayerController::SetPathFollowingComponent()
+{
+	if (!PathFollowingComponent)
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ControlledCharacter->GetActorLocation());
+		PathFollowingComponent = FindComponentByClass<UPathFollowingComponent>();
+		PathFollowingComponent->OnRequestFinished.AddUObject(this, &AQuestPlayerController::OnMoveCompleted);
+	}
+
 }
 

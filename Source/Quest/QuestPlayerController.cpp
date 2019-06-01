@@ -170,15 +170,34 @@ void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPath
 {
 	if (Result.IsSuccess())
 	{
-		if ((FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation()) < 150.0f))
+		if (ControlledCharacter->TargetActor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move completed!"))
-				//ControlledCharacter->SetbIsReadyForNextAttack(true);
-				bShouldResetIsReadyForNextAttack = true;
+			if ((FVector::Dist(ControlledCharacter->TargetActor->GetActorLocation(), ControlledCharacter->GetActorLocation()) < 150.0f))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move completed!"))
+					//ControlledCharacter->SetbIsReadyForNextAttack(true);
+					bShouldResetIsReadyForNextAttack = true;
+			}
+			else
+			{
+				float RemainingDistance = FVector::Dist(ControlledCharacter->TargetActor->GetActorLocation(), ControlledCharacter->GetActorLocation());
+				UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move NOT completed! Remaining Distance: %f"), RemainingDistance)
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move NOT completed!"))
+			if ((FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation()) < 150.0f))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move completed!"))
+					//ControlledCharacter->SetbIsReadyForNextAttack(true);
+					bShouldResetIsReadyForNextAttack = true;
+			}
+			else
+			{
+				float RemainingDistance = FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation());
+				UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move NOT completed! Remaining Distance: %f"), RemainingDistance)
+
+			}
 		}
 	}
 }

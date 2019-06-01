@@ -103,18 +103,44 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
-	if (bIsCombatModeActive)
+	if (bIsCombatModeActive && bIsReadyForNextAttack)
 	{
-		if (bIsReadyForNextAttack)
-		{
-			SelectTargetCharacterToAttack();
-		}
+		SelectTargetCharacterToAttack();
 	}
 }
 
 void AQuestCharacter::SelectTargetCharacterToAttack()
 {
-	/** See if we already have a valid character to attack */
+	/** If we do not have a Target Actor, find live enemies and attack the closest one */
+	if (!TargetActor)
+	{
+		TArray<FHitResult> NearbyPawns = ScanForNearbyPawns();
+
+		if (NearbyPawns.Num() > 0)
+		{
+			/** See which nearby pawns are live enemies */
+			FString PawnName = NearbyPawns[0].GetActor()->GetName();
+			TArray<AQuestCharacterBase*> LocalLiveEnemies = GetEnemiesFromPawnHits(NearbyPawns);
+
+			/** See which live enemy is closest */
+			TargetActor = SelectClosestEnemy(LocalLiveEnemies);
+			if (!TargetActor)
+			{return;}
+
+			/** Attack the closest live enemy*/
+			MoveToTarget(TargetActor);
+			return;
+		}
+		else
+		{
+			/** We did not find any pawns in range, so disable auto-attack and return */
+			UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SelectTargetToAttack did not find any pawns in range"))
+			SetbIsReadyForNextAttack(false);
+			return;
+		}
+	}
+
+	/** If we already have a valid target, attack it if it is a live enemy */
 	if (TargetActor)
 	{
 		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
@@ -141,59 +167,11 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 			return;
 		}
 	}
-
-	TArray<FHitResult> OutHits = ScanForNearbyPawns();
-
-	if (OutHits.Num() > 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter::SelectEnemyTarget: Pawns selected!"))
-		/** See which nearby pawns are live enemies */
-		TArray<AQuestCharacterBase*> LocalLiveEnemies;
-		for (auto& Hit : OutHits)
-		{
-			AQuestCharacterBase* Pawn = Cast<AQuestCharacterBase>(Hit.GetActor());
-			if (Pawn && Pawn->bIsHostile && !Pawn->bIsDead)
-			{
-				LocalLiveEnemies.AddUnique(Pawn);
-			}
-		}
-
-		/** See which live enemy is closest */
-		if (LocalLiveEnemies.Num() > 0)
-		{
-			AQuestCharacterBase* ClosestEnemy = LocalLiveEnemies[0];
-			float DistanceToClosestEnemy = FVector::Dist(GetActorLocation(), ClosestEnemy->GetActorLocation());
-			for (auto& Enemy : LocalLiveEnemies)
-			{
-				float DistanceToThisEnemy = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
-				if (DistanceToThisEnemy <= DistanceToClosestEnemy)
-				{
-					ClosestEnemy = Enemy;
-					DistanceToClosestEnemy = DistanceToThisEnemy;
-				}
-			}
-			TargetActor = ClosestEnemy;
-		}
-		else
-		{
-			return;
-		}
-
-		/** Attack the closest live enemy*/
-		MoveToTarget(TargetActor);
-	}
-	else
-	{
-		/** We did not find any pawns in range, so disable auto-attack and return */
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SelectTargetToAttack did not find any pawns in range"))
-		SetbIsReadyForNextAttack(false);
-		return;
-	}
 }
 
 TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
 {
-	TArray<FHitResult> OutHits;
+	TArray<FHitResult> NearbyPawns;
 	FVector Start = GetActorLocation();
 	FVector End = Start + FVector(0, 0, 1);
 	float SweepSphereRadius = 500.0f;
@@ -207,7 +185,7 @@ TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
 	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
 	GetWorld()->SweepMultiByObjectType(
-		OutHits,
+		NearbyPawns,
 		Start,
 		End,
 		FQuat::Identity,
@@ -216,7 +194,41 @@ TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
 		QueryParams
 	);
 
-	return OutHits;
+	return NearbyPawns;
+}
+
+TArray<AQuestCharacterBase*> AQuestCharacter::GetEnemiesFromPawnHits(TArray<FHitResult> OutHits)
+{
+	TArray<AQuestCharacterBase*> LocalLiveEnemies;
+	for (auto& Hit : OutHits)
+	{
+		AQuestCharacterBase* Pawn = Cast<AQuestCharacterBase>(Hit.GetActor());
+		if (Pawn && Pawn->bIsHostile && !Pawn->bIsDead)
+		{
+			LocalLiveEnemies.AddUnique(Pawn);
+		}
+	}
+	return LocalLiveEnemies;
+}
+
+AQuestCharacterBase* AQuestCharacter::SelectClosestEnemy(TArray<AQuestCharacterBase*> LocalLiveEnemies)
+{
+	if (LocalLiveEnemies.Num() > 0)
+	{
+		AQuestCharacterBase* ClosestEnemy = LocalLiveEnemies[0];
+		float DistanceToClosestEnemy = FVector::Dist(GetActorLocation(), ClosestEnemy->GetActorLocation());
+		for (auto& Enemy : LocalLiveEnemies)
+		{
+			float DistanceToThisEnemy = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
+			if (DistanceToThisEnemy <= DistanceToClosestEnemy)
+			{
+				ClosestEnemy = Enemy;
+				DistanceToClosestEnemy = DistanceToThisEnemy;
+			}
+		}
+		return ClosestEnemy;
+	}
+	return nullptr;
 }
 
 void AQuestCharacter::AutoAttack()
@@ -240,7 +252,6 @@ void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 		//  Decide what to do if the target is a character
 		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
 		{
-			//  Check to see whether the character is dead
 			if (TargetCharacter->bIsDead)
 			{
 				if (TargetCharacter->bIsHostile)

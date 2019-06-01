@@ -40,6 +40,13 @@ private:
 
 	void SelectTargetCharacterToAttack();
 	TArray<FHitResult> ScanForNearbyPawns();
+
+	/** Identifies which pawns are hostile and alive */
+	TArray<AQuestCharacterBase*> GetEnemiesFromPawnHits(TArray<FHitResult> OutHits);
+
+	/** Identifies which enemy is closest to this character */
+	AQuestCharacterBase* SelectClosestEnemy(TArray<AQuestCharacterBase*> LocalLiveEnemies);
+
 	void AutoAttack();
 
 public:
@@ -49,10 +56,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		float AttackCooldownTimer;
 
+
+
 	void InteractWithTarget(AActor* InteractionTarget);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
-	void MoveToTarget(AActor* MoveTarget);
+		void MoveToTarget(AActor* MoveTarget);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
 	void SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack);

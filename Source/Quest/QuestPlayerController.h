@@ -57,6 +57,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 	bool bControllerShouldMoveCharacter;
 
+	/** Determines whether gameplay abilities (such as melee attack) should trigger IsReadyForNextAttack when complete 
+	*	(This helps address a problem where clicking to move a character in the middle of a melee attack results in the
+	*	move getting interrupted because the end ability function resets IsReadyForNextAttack while the character is mid-move)
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
+		bool bShouldResetIsReadyForNextAttack;
+
 	/** Tracks the amount of gold the player has */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 		int Gold;

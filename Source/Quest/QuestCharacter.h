@@ -39,6 +39,7 @@ private:
 	class UDecalComponent* CursorToWorld;
 
 	void SelectTargetCharacterToAttack();
+	TArray<FHitResult> ScanForNearbyPawns();
 	void AutoAttack();
 
 public:

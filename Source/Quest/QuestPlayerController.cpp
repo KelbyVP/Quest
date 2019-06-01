@@ -19,6 +19,7 @@
 AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get())
 	: Super(ObjectInitializer)
 {
+	bShouldResetIsReadyForNextAttack = true;
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerShouldMoveCharacter = true;
@@ -172,6 +173,8 @@ void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPath
 		if ((FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation()) < 150.0f))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("QPC::OnMoveCompleted:  Move completed!"))
+				//ControlledCharacter->SetbIsReadyForNextAttack(true);
+				bShouldResetIsReadyForNextAttack = true;
 		}
 		else
 		{
@@ -188,6 +191,7 @@ void AQuestPlayerController::MoveToTargetActor(AActor *MoveTarget)
 		{
 			SetPathFollowingComponent();
 		}
+		bShouldResetIsReadyForNextAttack = false;
 		ControlledCharacter->MoveToTarget(MoveTarget);
 	}
 	return;
@@ -204,6 +208,7 @@ void AQuestPlayerController::MoveToTargetLocation()
 	float const Distance = FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation());
 	if ((Distance > 120.0f))
 	{
+		bShouldResetIsReadyForNextAttack = false;
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestinationLocation);
 	}
 }

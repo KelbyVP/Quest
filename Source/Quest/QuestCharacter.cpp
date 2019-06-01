@@ -68,8 +68,9 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
-	bIsReadyForNextAttack = false;
+	bIsReadyForNextAttack = true;
 	AttackCooldownTimer = 1.0f;
+	bIsCombatModeActive = true;
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)
@@ -141,32 +142,11 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 		}
 	}
 
-	/** Scan for nearby pawns */
-	TArray<FHitResult> OutHits;
-	FVector Start = GetActorLocation();
-	FVector End = Start + FVector(0, 0, 1);
-	float SweepSphereRadius = 500.0f;
-
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(GetOwner());
-	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredComponent(GetCapsuleComponent());
-
-	FCollisionObjectQueryParams ObjParams;
-	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
-
-	GetWorld()->SweepMultiByObjectType(
-		OutHits,
-		Start,
-		End,
-		FQuat::Identity,
-		ObjParams,
-		FCollisionShape::MakeSphere(SweepSphereRadius),
-		QueryParams
-	);
+	TArray<FHitResult> OutHits = ScanForNearbyPawns();
 
 	if (OutHits.Num() > 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter::SelectEnemyTarget: Pawns selected!"))
 		/** See which nearby pawns are live enemies */
 		TArray<AQuestCharacterBase*> LocalLiveEnemies;
 		for (auto& Hit : OutHits)
@@ -194,7 +174,10 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 			}
 			TargetActor = ClosestEnemy;
 		}
-		else return;
+		else
+		{
+			return;
+		}
 
 		/** Attack the closest live enemy*/
 		MoveToTarget(TargetActor);
@@ -206,6 +189,34 @@ void AQuestCharacter::SelectTargetCharacterToAttack()
 		SetbIsReadyForNextAttack(false);
 		return;
 	}
+}
+
+TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
+{
+	TArray<FHitResult> OutHits;
+	FVector Start = GetActorLocation();
+	FVector End = Start + FVector(0, 0, 1);
+	float SweepSphereRadius = 500.0f;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredComponent(GetCapsuleComponent());
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+
+	GetWorld()->SweepMultiByObjectType(
+		OutHits,
+		Start,
+		End,
+		FQuat::Identity,
+		ObjParams,
+		FCollisionShape::MakeSphere(SweepSphereRadius),
+		QueryParams
+	);
+
+	return OutHits;
 }
 
 void AQuestCharacter::AutoAttack()

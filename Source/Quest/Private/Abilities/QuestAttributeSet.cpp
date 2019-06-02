@@ -7,7 +7,7 @@
 #include "QuestCharacterBase.h"
 
 UQuestAttributeSet::UQuestAttributeSet()
-	: Health(100.f)
+	: Health(30.0f)
 	, MaxHealth(100.f)
 	, Level (5.0f)
 	, ArmorClass(6.f)

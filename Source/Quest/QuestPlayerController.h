@@ -64,18 +64,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 		int MaxGold = 999999999;
 
-	/** Increases the amount of gold the player has */
-	UFUNCTION(BlueprintCallable, Category = "QuestPlayerController")
-		void IncreaseGold(int Amount);
-
-	/** Decreases the amount of gold the player has */
-	UFUNCTION(BlueprintCallable, Category = "QuestPlayerController")
-		void DecreaseGold(int Amount);
-
-	/** A blueprint function that updates widgets that reflect the amount of gold the player has */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta=(DisplayName = "UpdateGold"), Category = "QuestPlayerController")
-		void UpdateGold();
-
 	/** Called on completing current movement request */
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
 

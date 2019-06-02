@@ -151,20 +151,6 @@ void AQuestPlayerController::OnSetTargetReleased()
 	bMoveToMouseCursor = false;
 }
 
-void AQuestPlayerController::IncreaseGold(int Amount)
-{
-	Gold += Amount;
-	FMath::Clamp(Gold, 0, MaxGold);
-	UpdateGold();
-}
-
-void AQuestPlayerController::DecreaseGold(int Amount)
-{
-	Gold -= Amount;
-	FMath::Clamp(Gold, 0, MaxGold);
-	UpdateGold();
-}
-
 void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	if (Result.IsSuccess() && ControlledCharacter->TargetActor && (FVector::Dist(ControlledCharacter->TargetActor->GetActorLocation(), ControlledCharacter->GetActorLocation()) < 150.0f))

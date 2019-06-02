@@ -71,6 +71,8 @@ AQuestCharacter::AQuestCharacter()
 	bIsReadyForNextAttack = true;
 	AttackCooldownTimer = 1.0f;
 	bIsCombatModeActive = true;
+
+	AttributeSetComponent->Strength = 30.0f;
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)

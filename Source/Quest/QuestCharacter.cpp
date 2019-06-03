@@ -280,8 +280,9 @@ void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 				}
 
 				/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
-				else if (AQuestMerchantCharacter * Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter))
+				else if (Cast<AQuestMerchantCharacter>(TargetCharacter))
 				{
+					Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter);
 					AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 					if (PlayerController)
 					{
@@ -352,6 +353,11 @@ void AQuestCharacter::OnLeaveStorage()
 	BP_OnLeaveStorage();
 }
 
+void AQuestCharacter::OnLeaveMerchant()
+{
+	BP_OnLeaveMerchant();
+}
+
 void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (TargetActor && TargetActor == OtherActor)
@@ -374,5 +380,9 @@ void AQuestCharacter::OnInteractonSphereEndOverlap(class UPrimitiveComponent* Ov
 	if (StorageChest && StorageChest == OtherActor)
 	{
 		OnLeaveStorage();
+	}
+	if (Merchant && Merchant == OtherActor)
+	{
+		OnLeaveMerchant();
 	}
 }

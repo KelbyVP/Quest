@@ -8,6 +8,7 @@
 #include "QuestCharacter.generated.h"
 
 class AQuestStorage;
+class AQuestMerchantCharacter;
 
 UCLASS(Blueprintable)
 class AQuestCharacter : public AQuestCharacterBase
@@ -59,6 +60,8 @@ public:
 		float AttackCooldownTimer;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		AQuestStorage* StorageChest;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		AQuestMerchantCharacter* Merchant;
 
 
 
@@ -83,6 +86,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLeaveStorage"))
 		void BP_OnLeaveStorage();
+
+	void OnLeaveMerchant();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLeaveMerchant"))
+		void BP_OnLeaveMerchant();
 
 	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;

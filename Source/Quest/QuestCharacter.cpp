@@ -71,6 +71,7 @@ AQuestCharacter::AQuestCharacter()
 	bIsReadyForNextAttack = true;
 	AttackCooldownTimer = 1.0f;
 	bIsCombatModeActive = true;
+	StorageChest = nullptr;
 
 	AttributeSetComponent->Strength = 30.0f;
 }
@@ -297,11 +298,11 @@ void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 		/** If the target is a storage actor, open it */
 		else if (Cast<AQuestStorage>(TargetActor))
 		{
-			AQuestStorage* Storage = Cast<AQuestStorage>(TargetActor);
+			StorageChest = Cast<AQuestStorage>(TargetActor);
 			AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			if (PlayerController)
+			if (PlayerController && StorageChest)
 			{
-				Storage->OnInteract(PlayerController);
+				StorageChest->OnInteract(PlayerController);
 				TargetActor = nullptr;
 			}
 		}
@@ -346,6 +347,11 @@ void AQuestCharacter::OnMeleeEnd()
 	BP_OnMeleeEnd();
 }
 
+void AQuestCharacter::OnLeaveStorage()
+{
+	BP_OnLeaveStorage();
+}
+
 void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (TargetActor && TargetActor == OtherActor)
@@ -364,5 +370,9 @@ void AQuestCharacter::OnInteractonSphereEndOverlap(class UPrimitiveComponent* Ov
 	if (TargetActor && TargetActor == OtherActor)
 	{
 		bIsTargetWithinInteractionSphere = false;
+	}
+	if (StorageChest && StorageChest == OtherActor)
+	{
+		OnLeaveStorage();
 	}
 }

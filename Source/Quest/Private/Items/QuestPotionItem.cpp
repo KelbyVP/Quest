@@ -10,5 +10,6 @@ UQuestPotionItem::UQuestPotionItem()
 	bCanBeStacked = true;
 	bCanBeThrownAway = true;
 	bCanBeCrafted = false;
+	bCanBeEquipped = true;
 	UseText = "Drink";
 }

@@ -10,5 +10,6 @@ UQuestMaterialItem::UQuestMaterialItem()
 	bCanBeStacked = true;
 	bCanBeThrownAway = false;
 	bCanBeCrafted = false;
+	bCanBeEquipped = false;
 	UseText = "Craft";
 }

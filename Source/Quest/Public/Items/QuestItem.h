@@ -63,6 +63,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		bool bIsUsable;
 
+	/** Can the item be equipped by a character? */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		bool bCanBeEquipped;
+
 	/** Ability to trigger upon consuming this item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		TSubclassOf<UQuestGameplayAbility> GrantedAbility;

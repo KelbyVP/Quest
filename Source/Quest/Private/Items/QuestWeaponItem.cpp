@@ -6,10 +6,11 @@
 UQuestWeaponItem::UQuestWeaponItem()
 {
 	ItemTypeEnum = EItemType::IT_Weapon;
-	bIsUsable = true;
+	bIsUsable = false;
 	bCanBeStacked = true;
 	bCanBeThrownAway = true;
 	bCanBeCrafted = false;
+	bCanBeEquipped = true;
 	SocketName = "swordSocket";
 	UseText = "Equip";
 }

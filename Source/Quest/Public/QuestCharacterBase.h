@@ -83,6 +83,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* EquippedWeaponMesh;
 
+
+
 	/** The Game Mode */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestCharacterBase")
 		AQuestGameMode* GameMode;

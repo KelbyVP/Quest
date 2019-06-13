@@ -16,7 +16,9 @@ enum class EItemType : uint8
 	IT_Potion UMETA(DisplayName = "Potion"),
 	IT_Weapon UMETA(DisplayName = "Weapon"),
 	IT_Ring UMETA(DisplayName = "Ring"),
-	IT_Material UMETA(DisplayName = "Material")
+	IT_Material UMETA(DisplayName = "Material"),
+	IT_Amulet UMETA(DisplayName = "Amulet"),
+	IT_Shield UMETA(DisplayName = "Shield")
 };
 
 /** Base class for all items; do not blueprint this class directly */

@@ -7,6 +7,8 @@
 #include "NameTypes.h"
 #include "QuestWeaponItem.generated.h"
 
+class USkeletalMesh;
+
 /**
  * 
  */

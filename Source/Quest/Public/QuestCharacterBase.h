@@ -8,6 +8,7 @@
 #include "QuestAbilitySystemComponent.h"
 #include "GameplayAbility.h"
 #include "QuestWeaponItem.h"
+#include "QuestShieldItem.h"
 #include "QuestGameMode.h"
 #include "QuestCharacterBase.generated.h"
 
@@ -83,6 +84,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* EquippedWeaponMesh;
 
+	// The shield that the character is currently wielding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+		UQuestShieldItem* EquippedShield;
+
+	// The static mesh component of the EquippedShield
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+		USkeletalMeshComponent* EquippedShieldMesh;
 
 
 	/** The Game Mode */

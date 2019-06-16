@@ -6,6 +6,7 @@
 #include "Items/QuestItem.h"
 #include "QuestShieldItem.generated.h"
 
+class USkeletalMesh;
 /**
  * 
  */
@@ -16,4 +17,16 @@ class QUEST_API UQuestShieldItem : public UQuestItem
 	
 public:
 	UQuestShieldItem();
+
+	/** The socket on the character's skeletal mesh where the shield will attach */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		FName SocketName;
+
+	/** The static mesh of the shield, determines its appearance */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		USkeletalMesh* ShieldMesh;
+
+	/** The location where the weapon will spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		FTransform RelativeSpawnLocation;
 };

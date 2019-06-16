@@ -11,5 +11,6 @@ UQuestShieldItem::UQuestShieldItem()
 	bCanBeThrownAway = true;
 	bCanBeCrafted = false;
 	bCanBeEquipped = true;
+	SocketName = "shieldSocket";
 	UseText = "Equip";
 }

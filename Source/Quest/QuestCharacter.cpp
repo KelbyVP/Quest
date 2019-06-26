@@ -72,8 +72,6 @@ AQuestCharacter::AQuestCharacter()
 	AttackCooldownTimer = 1.0f;
 	bIsCombatModeActive = true;
 	StorageChest = nullptr;
-
-	AttributeSetComponent->Strength = 30.0f;
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)

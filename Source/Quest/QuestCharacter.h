@@ -9,6 +9,7 @@
 
 class AQuestStorage;
 class AQuestMerchantCharacter;
+class UQuestCharacterAttributeSet;
 
 UCLASS(Blueprintable)
 class AQuestCharacter : public AQuestCharacterBase
@@ -53,7 +54,6 @@ private:
 	void AutoAttack();
 
 public:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		bool bIsReadyForNextAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")

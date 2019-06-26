@@ -14,6 +14,7 @@
 
 class UQuestAttributeSet;
 class USphereComponent;
+class UQuestGameplayAbility;
 
 UCLASS()
 class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -40,6 +41,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		TArray<TSubclassOf<UQuestGameplayAbility>> AbilitiesToAcquire;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAttributeSet* AttributeSetComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")

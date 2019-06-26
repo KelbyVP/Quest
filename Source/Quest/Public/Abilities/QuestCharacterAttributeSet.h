@@ -13,5 +13,9 @@ UCLASS()
 class QUEST_API UQuestCharacterAttributeSet : public UQuestAttributeSet
 {
 	GENERATED_BODY()
+
+public:
+
+
 	
 };

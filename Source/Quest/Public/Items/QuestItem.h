@@ -21,6 +21,17 @@ enum class EItemType : uint8
 	IT_Shield UMETA(DisplayName = "Shield")
 };
 
+UENUM(BlueprintType)
+enum class ERarity : uint8
+{
+	IT_Common UMETA(DisplayName = "Common"),
+	IT_Uncommon UMETA(DisplayName = "Uncommon"),
+	IT_Rare UMETA(DisplayName = "Rare"),
+	IT_VeryRare UMETA(DisplayName = "Very Rare"),
+	IT_Legendary UMETA(DisplayName = "Legendary"),
+	IT_Unique UMETA(DisplayName = "Unique")
+};
+
 /** Base class for all items; do not blueprint this class directly */
 UCLASS(Abstract, BlueprintType)
 class QUEST_API UQuestItem : public UPrimaryDataAsset
@@ -60,6 +71,9 @@ public:
 	/** Value of the item, which will determine price in gold at which it can be bought and sold */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		float Value;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		ERarity Rarity;
 
 	/** Is the item usable? */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)

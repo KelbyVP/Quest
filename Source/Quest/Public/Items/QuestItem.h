@@ -18,6 +18,8 @@ enum class EItemType : uint8
 	IT_Ring UMETA(DisplayName = "Ring"),
 	IT_Material UMETA(DisplayName = "Material"),
 	IT_Amulet UMETA(DisplayName = "Amulet"),
+	IT_Wand UMETA(DisplayName = "Wand"),
+	IT_Scroll UMETA(DisplayName = "Scroll"),
 	IT_Shield UMETA(DisplayName = "Shield")
 };
 

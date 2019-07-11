@@ -62,7 +62,10 @@ public:
 		AQuestStorage* StorageChest;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		AQuestMerchantCharacter* Merchant;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		int32 Experience;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		int32 NextLevelExperience;
 
 
 	void InteractWithTarget(AActor* InteractionTarget);
@@ -94,5 +97,14 @@ public:
 
 	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+
+	// If we have enough experience to level up, increment level and then call BP_OnLevelUp
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
+		void TryLevelUp();
+
+	// Trigger the Blueprint Event that gets called when we level up
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLevelUp"))
+		void BP_OnLevelUp();
+
 };
 

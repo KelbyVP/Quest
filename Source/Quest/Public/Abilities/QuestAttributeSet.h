@@ -54,4 +54,8 @@ public:
 
 	void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	UFUNCTION(BlueprintCallable, Category = "QuestAttributeSet")
+		void LevelUp();
+
+
 };

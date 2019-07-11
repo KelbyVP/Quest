@@ -16,6 +16,18 @@ class UQuestAttributeSet;
 class USphereComponent;
 class UQuestGameplayAbility;
 
+
+UENUM(BlueprintType)
+enum class ECharacterClass : uint8
+{
+	IT_Fighter UMETA(DisplayName = "Fighter"),
+	IT_Paladin UMETA(DisplayName = "Paladin"),
+	IT_Ranger UMETA(DisplayName = "Ranger"),
+	IT_Thief UMETA(DisplayName = "Thief"),
+	IT_Sorcerer UMETA(DisplayName = "Wizard"),
+	IT_Priest UMETA(DisplayName = "Priest")
+};
+
 UCLASS()
 class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -47,6 +59,8 @@ public:
 		UQuestAttributeSet* AttributeSetComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		FGameplayTag FullHealthTag;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		ECharacterClass CharacterClass;
 
 	// Creates a sphere around the character that tells us when the player can interact with (usually melee attack) the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestCharacterBase")

@@ -72,6 +72,7 @@ AQuestCharacter::AQuestCharacter()
 	AttackCooldownTimer = 1.0f;
 	bIsCombatModeActive = true;
 	StorageChest = nullptr;
+	Experience = 500000;
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)
@@ -382,5 +383,14 @@ void AQuestCharacter::OnInteractonSphereEndOverlap(class UPrimitiveComponent* Ov
 	if (Merchant && Merchant == OtherActor)
 	{
 		OnLeaveMerchant();
+	}
+}
+
+void AQuestCharacter::TryLevelUp()
+{
+	if (Experience >= NextLevelExperience)
+	{
+		AttributeSetComponent->LevelUp();
+		BP_OnLevelUp();
 	}
 }

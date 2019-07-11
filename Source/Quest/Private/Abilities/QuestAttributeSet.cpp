@@ -41,3 +41,9 @@ void UQuestAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectM
 	}
 }
 
+void UQuestAttributeSet::LevelUp()
+{
+	Level.SetCurrentValue(Level.GetCurrentValue() + 1.0f);
+	Level.SetBaseValue(Level.GetBaseValue() + 1.0f);
+}
+

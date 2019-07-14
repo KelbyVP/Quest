@@ -84,12 +84,8 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
 	AQuestCharacterBase* TargetQuestCharacter = Cast<AQuestCharacterBase>(TargetActor);
-
-
 	FName TagText = FName(TEXT("resistance.Fire"));
 	FGameplayTag ResistanceTag = UGameplayTagsManager::Get().RequestGameplayTag(TagText);
-
-
 
 	if (TargetQuestCharacter->DoesCharacterHaveTag(TagText))
 	{
@@ -98,6 +94,4 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 
 	// Output damage
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));
-
-	
 }

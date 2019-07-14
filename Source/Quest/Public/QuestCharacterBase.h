@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagAssetInterface.h"
 #include "QuestAbilitySystemComponent.h"
 #include "GameplayAbility.h"
 #include "QuestWeaponItem.h"
@@ -29,7 +30,7 @@ enum class ECharacterClass : uint8
 };
 
 UCLASS()
-class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface
+class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -48,6 +49,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
+		FGameplayTagContainer GameplayTags;
+
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
 
 
 
@@ -155,4 +161,7 @@ public:
 	/** Function that clears the TargetActor value */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetTargetActorToNull();
+
+	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
+	bool DoesCharacterHaveTag(FName const& Tag);
 };

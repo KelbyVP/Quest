@@ -4,7 +4,6 @@
 #include "QuestDamageExecutionCalculation.h"
 #include "QuestAttributeSet.h"
 
-UQuestDamageExecutionCalculation::UQuestDamageExecutionCalculation()
-{
 
-}
+UQuestDamageExecutionCalculation::UQuestDamageExecutionCalculation()
+{}

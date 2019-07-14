@@ -9,7 +9,7 @@
 UQuestAttributeSet::UQuestAttributeSet()
 	: Health(30.0f)
 	, MaxHealth(100.f)
-	, Level (5.0f)
+	, Level (3.0f)
 	, ArmorClass(6.f)
 	, Strength (16.f)
 	, Intelligence (11.f)

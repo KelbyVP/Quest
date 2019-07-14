@@ -15,8 +15,8 @@ class QUEST_API UQuestDamageExecutionCalculation : public UGameplayEffectExecuti
 	GENERATED_BODY()
 
 public:
+	// Default constructor
 		UQuestDamageExecutionCalculation();
-
 
 public:
 

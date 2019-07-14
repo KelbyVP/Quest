@@ -22,6 +22,7 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerShouldMoveCharacter = true;
+	bIsTargeting = false;
 	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 	Gold = 0;
 }
@@ -142,6 +143,10 @@ void AQuestPlayerController::OnSetTargetPressed()
 	{
 		// set flag to keep updating destination until released
 		bMoveToMouseCursor = true;
+	}
+	else if (bIsTargeting)
+	{
+		BP_OnTargetSelected();
 	}
 }
 

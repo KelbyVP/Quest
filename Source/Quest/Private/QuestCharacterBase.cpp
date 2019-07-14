@@ -143,5 +143,16 @@ void AQuestCharacterBase::SetTargetActorToNull()
 	}
 }
 
+bool AQuestCharacterBase::CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag)
+{
+	FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(Tag);
+	return EffectTags.HasTag(TagRequest);
+}
 
+bool AQuestCharacterBase::DoesCharacterHaveTag(FName const& Tag)
+{
+	FGameplayTagContainer TagContainer;
+	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+	return CompareTags(TagContainer, Tag);
+}
 

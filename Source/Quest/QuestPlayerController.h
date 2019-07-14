@@ -57,6 +57,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 	bool bControllerShouldMoveCharacter;
 
+	/** Set whether the controller is targeting */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
+		bool bIsTargeting;
+
 	/** Tracks the amount of gold the player has */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 		int Gold;
@@ -67,11 +71,15 @@ public:
 	/** Called on completing current movement request */
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
+		void BP_OnTargetSelected();
+
 private:
 	AQuestCharacter* ControlledCharacter;
 	void MoveToTargetActor(AActor *MoveTarget);
 	void MoveToTargetLocation();
 	void SetPathFollowingComponent();
+	
 
 	/** Component used for moving along a path. */
 	UPROPERTY(VisibleAnywhere, Category = "QuestPlayerController")

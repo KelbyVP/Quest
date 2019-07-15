@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameModeBase.h"
 #include "Components/SphereComponent.h"
+#include "QuestSpellbook.h"
+#include "QuestSpells.h"
 
 // Sets default values
 AQuestCharacterBase::AQuestCharacterBase()
@@ -29,6 +31,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 	bIsDead = false;
 	bIsTargetWithinInteractionSphere = false;
 	TargetActor = nullptr;
+	CharacterClass = ECharacterClass::IT_Wizard;
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +50,8 @@ void AQuestCharacterBase::BeginPlay()
 	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	GameMode->OnCombatModeChange.AddDynamic(this, &AQuestCharacterBase::OnCombatModeChanged);
 
+	/** Set up the right kind of spellbook */
+	//SetSpellbookType();
 }
 
 // Called every frame
@@ -140,6 +145,29 @@ void AQuestCharacterBase::SetTargetActorToNull()
 	if (TargetActor)
 	{
 		TargetActor = nullptr;
+	}
+}
+
+void AQuestCharacterBase::SetSpellbookType()
+{
+	if (Spellbook)
+	{
+		if (CharacterClass == ECharacterClass::IT_Paladin)
+		{
+			Spellbook->SpellbookType = ESpellType::IT_Paladin;
+		}
+		else if (CharacterClass == ECharacterClass::IT_Priest)
+		{
+			Spellbook->SpellbookType = ESpellType::IT_Priest;
+		}
+		else if (CharacterClass == ECharacterClass::IT_Wizard)
+		{
+			Spellbook->SpellbookType = ESpellType::IT_Wizard;
+		}
+		else
+		{
+			Spellbook->SpellbookType = ESpellType::IT_Other;
+		}
 	}
 }
 

@@ -13,7 +13,8 @@ enum class ESpellType : uint8
 {
 	IT_Paladin UMETA(DisplayName = "Paladin"),
 	IT_Priest UMETA(DisplayName = "Priest"),
-	IT_Wizard UMETA(DisplayName = "Wizard")
+	IT_Wizard UMETA(DisplayName = "Wizard"),
+	IT_Other UMETA(DisplayName = "Other")
 };
 
 

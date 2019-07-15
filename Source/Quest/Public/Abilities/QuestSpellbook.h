@@ -38,6 +38,7 @@ protected:
 
 public:	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
 	ESpellType SpellbookType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)

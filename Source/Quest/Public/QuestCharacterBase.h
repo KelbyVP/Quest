@@ -16,6 +16,7 @@
 class UQuestAttributeSet;
 class USphereComponent;
 class UQuestGameplayAbility;
+class AQuestSpellbook;
 
 
 UENUM(BlueprintType)
@@ -25,7 +26,7 @@ enum class ECharacterClass : uint8
 	IT_Paladin UMETA(DisplayName = "Paladin"),
 	IT_Ranger UMETA(DisplayName = "Ranger"),
 	IT_Thief UMETA(DisplayName = "Thief"),
-	IT_Sorcerer UMETA(DisplayName = "Wizard"),
+	IT_Wizard UMETA(DisplayName = "Wizard"),
 	IT_Priest UMETA(DisplayName = "Priest")
 };
 
@@ -53,8 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
 		FGameplayTagContainer GameplayTags;
 
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
@@ -65,6 +64,12 @@ public:
 		FGameplayTag FullHealthTag;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		ECharacterClass CharacterClass;
+	/** Used to track whether this character has a spellbook */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		bool bIsSpellcaster;
+	/** The Game Mode */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestCharacterBase")
+		AQuestGameMode* GameMode;
 
 	// Creates a sphere around the character that tells us when the player can interact with (usually melee attack) the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestCharacterBase")
@@ -113,10 +118,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* EquippedShieldMesh;
 
-
-	/** The Game Mode */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestCharacterBase")
-		AQuestGameMode* GameMode;
+	// The character's spellbook, if the character can cast spells
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
+		AQuestSpellbook* Spellbook;
 
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
@@ -125,6 +129,11 @@ public:
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
+	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
+	bool DoesCharacterHaveTag(FName const& Tag);
+
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
+
 
 	/** Function called by delegate when the character's health changes */
 	UFUNCTION()
@@ -160,6 +169,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetTargetActorToNull();
 
-	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
-	bool DoesCharacterHaveTag(FName const& Tag);
+	/** Basic functions to implement the spellcasting system */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetSpellbookType();
+
+
 };

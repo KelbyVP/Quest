@@ -18,9 +18,11 @@ public:
 	TSubclassOf<class UQuestGameplayAbility> Spell;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = LearnedSpellStruct)
-	bool bCanBeCast;
+	bool bCanBeCast = false;
 
-	FMemorizedSpellStruct();
+	FMemorizedSpellStruct()
+	{
+	};
 };
 
 UCLASS()
@@ -46,5 +48,21 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
 	TArray<FMemorizedSpellStruct> MemorizedSpells;
+
+	//  Adds the spell to the Spellbook as a learned spell
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellToLearn);
+
+	//  Adds the spell to the memorized spell slots if we have learned this spell
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool MemorizeSpell(TSubclassOf<class UQuestGameplayAbility> SpellToMemorize);
+
+	// Removes the spell from the memorized spell slots
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> SpellToRemove);
+
+	// Checks whether this spell is already in the spellbook as a learned spell
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Spell);
 
 };

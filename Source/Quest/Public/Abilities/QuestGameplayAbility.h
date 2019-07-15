@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "QuestSpells.h"
 #include "QuestGameplayAbility.generated.h"
 
 class AQuestCharacterBase;
@@ -18,4 +19,8 @@ class QUEST_API UQuestGameplayAbility : public UGameplayAbility
 
 public:
 	
+	UQuestGameplayAbility();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		ESpellType SpellType;
 };

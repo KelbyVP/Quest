@@ -6,13 +6,13 @@
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 
-struct DamageStatics
+struct FireballDamageStatics
 {
 	//	These macros create a Property and Def for each attribute (eg., StrengthProperty and StrengthDef)
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Agility)
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Level)
 
-	DamageStatics()
+	FireballDamageStatics()
 	{
 		/**	These macros take (S, P, T, B) and set up the Def (eg., StrengthDef) for each property
 		*	S = class
@@ -25,9 +25,9 @@ struct DamageStatics
 };
 
 //	returns an instance of the DamageStatics struct
-static DamageStatics& GetDamageStatics()
+static FireballDamageStatics& GetFireballDamageStatics()
 {
-	static DamageStatics DamageStaticsVar;
+	static FireballDamageStatics DamageStaticsVar;
 	return DamageStaticsVar;
 }
 
@@ -42,8 +42,8 @@ UQuestFireballDamageExecution::UQuestFireballDamageExecution()
 	HealthDef = FGameplayEffectAttributeCaptureDefinition(HealthProperty, EGameplayEffectAttributeCaptureSource::Target, true);
 
 	RelevantAttributesToCapture.Add(HealthDef);
-	RelevantAttributesToCapture.Add(GetDamageStatics().AgilityDef);
-	RelevantAttributesToCapture.Add(GetDamageStatics().LevelDef);
+	RelevantAttributesToCapture.Add(GetFireballDamageStatics().AgilityDef);
+	RelevantAttributesToCapture.Add(GetFireballDamageStatics().LevelDef);
 };
 
 void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -53,8 +53,8 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 	float SourceLevel = 0.0f;
 
 	//	Sets the variables to a reference to the value of the relevant attributes
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().AgilityDef, FAggregatorEvaluateParameters(), SourceAgility);
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetFireballDamageStatics().AgilityDef, FAggregatorEvaluateParameters(), SourceAgility);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetFireballDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
 
 	//  Checks saving throw based on agility
 	bool bMadeSavingThrow = false;

@@ -16,6 +16,8 @@ enum class ESpellType : uint8
 	IT_Wizard UMETA(DisplayName = "Wizard")
 };
 
+
+
  /** This base class holds an inventory of all available spells for a given spell type */
  /** Since this is a base class, do not blueprint this class directly */
 UCLASS()

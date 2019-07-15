@@ -20,6 +20,9 @@ public:
 	// Class constructor and overrides
 		AQuestEnemyCharacter();
 
+	// Is this enemy a regular character class (as opposed to a monster)
+		bool bIsCharacterClass;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

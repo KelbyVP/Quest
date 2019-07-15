@@ -92,6 +92,19 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
 	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
 }
 
+bool AQuestCharacterBase::CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag)
+{
+	FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(Tag);
+	return EffectTags.HasTag(TagRequest);
+}
+
+bool AQuestCharacterBase::DoesCharacterHaveTag(FName const& Tag)
+{
+	FGameplayTagContainer TagContainer;
+	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+	return CompareTags(TagContainer, Tag);
+}
+
 /** Called when the AttributeSet broadcasts an OnHealthChanged delegate; */
 
 void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
@@ -143,16 +156,5 @@ void AQuestCharacterBase::SetTargetActorToNull()
 	}
 }
 
-bool AQuestCharacterBase::CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag)
-{
-	FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(Tag);
-	return EffectTags.HasTag(TagRequest);
-}
 
-bool AQuestCharacterBase::DoesCharacterHaveTag(FName const& Tag)
-{
-	FGameplayTagContainer TagContainer;
-	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
-	return CompareTags(TagContainer, Tag);
-}
 

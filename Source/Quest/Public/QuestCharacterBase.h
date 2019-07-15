@@ -26,7 +26,7 @@ enum class ECharacterClass : uint8
 	IT_Ranger UMETA(DisplayName = "Ranger"),
 	IT_Thief UMETA(DisplayName = "Thief"),
 	IT_Sorcerer UMETA(DisplayName = "Wizard"),
-	IT_Priest UMETA(DisplayName = "Priest")
+	IT_Priest UMETA(DisplayName = "Priest"),
 };
 
 UCLASS()
@@ -127,6 +127,8 @@ public:
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
+	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
+	bool DoesCharacterHaveTag(FName const& Tag);
 
 	/** Function called by delegate when the character's health changes */
 	UFUNCTION()
@@ -162,6 +164,4 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetTargetActorToNull();
 
-	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
-	bool DoesCharacterHaveTag(FName const& Tag);
 };

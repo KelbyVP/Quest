@@ -18,7 +18,6 @@ public:
 	// Default constructor
 		UQuestDamageExecutionCalculation();
 
-public:
 
 protected:
 

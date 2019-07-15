@@ -10,3 +10,8 @@ UQuestGameplayAbility::UQuestGameplayAbility()
 {
 	SpellType = ESpellType::IT_Other;
 }
+
+ESpellType UQuestGameplayAbility::GetSpellType()
+{
+	return SpellType;
+}

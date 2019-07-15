@@ -16,6 +16,34 @@ void AQuestSpellbook::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+bool AQuestSpellbook::FindEmptyMemorizedSpellSlot(int &SlotIndex)
+{
+	int Size = MemorizedSpells.Num();
+	for (int i = 0; i < Size; i++)
+	{
+		if (!MemorizedSpells[i].Spell)
+		{
+			SlotIndex = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AQuestSpellbook::IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck)
+{
+	if (SpellToCheck)
+	{
+		ESpellType SpellType = SpellToCheck->GetDefaultObject<UQuestGameplayAbility>()->GetSpellType();
+		if (SpellType == SpellbookType)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 //  Adds the spell to the Spellbook as a learned spell
 bool AQuestSpellbook::LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellToLearn)
 {
@@ -34,20 +62,35 @@ bool AQuestSpellbook::LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellT
 //  Adds the spell to the memorized spell slots if we have learned this spell
 bool AQuestSpellbook::MemorizeSpell(TSubclassOf<class UQuestGameplayAbility> SpellToMemorize)
 {
-	if (SpellToMemorize && IsSpellLearned(SpellToMemorize))
+	int EmptySlot = 0;
+	if (FindEmptyMemorizedSpellSlot(EmptySlot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Empty slot found!"))
+		if (SpellToMemorize && IsSpellLearned(SpellToMemorize))
 		{
 			FMemorizedSpellStruct SpellStruct = FMemorizedSpellStruct();
 			SpellStruct.Spell = SpellToMemorize;
-			MemorizedSpells.Add(SpellStruct);
+			MemorizedSpells[EmptySlot] = SpellStruct;
 			return true;
 		}
+	}
+	if (!FindEmptyMemorizedSpellSlot(EmptySlot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Empty slot found!"))
+	}
 	return false;
 }
 
 // Removes the spell from the memorized spell slots
 bool AQuestSpellbook::RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> SpellToRemove)
 {
-	// First try to remove a spell struct that has already been cast
+	//  First check to see whether this is even the right type of spell
+	if(!IsCorrectSpellTypeForThisSpellbook(SpellToRemove))
+	{
+		return false;
+	}
+
+	// If it is the right type of spell, try to remove a spell struct that has already been cast
 	for (auto s : MemorizedSpells)
 	{
 		if (!s.bCanBeCast && s.Spell == SpellToRemove)
@@ -56,7 +99,7 @@ bool AQuestSpellbook::RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbili
 				return true;
 			}
 	}
-	//  Otherwise, remove any available matching spell struct
+	//  Otherwise, remove any available matching spell struct if one exists
 	for (auto s : MemorizedSpells)
 	{
 		if (s.Spell == SpellToRemove)

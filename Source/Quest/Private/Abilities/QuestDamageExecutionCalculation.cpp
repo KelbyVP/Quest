@@ -7,3 +7,4 @@
 
 UQuestDamageExecutionCalculation::UQuestDamageExecutionCalculation()
 {}
+

@@ -49,6 +49,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
 	TArray<FMemorizedSpellStruct> MemorizedSpells;
 
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool FindEmptyMemorizedSpellSlot(int& SlotIndex);
+
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
+
 	//  Adds the spell to the Spellbook as a learned spell
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellToLearn);

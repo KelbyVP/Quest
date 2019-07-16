@@ -17,7 +17,22 @@ enum class ESpellType : uint8
 	IT_Other UMETA(DisplayName = "Other")
 };
 
+USTRUCT(BlueprintType)
+struct FMasterSpellStruct
+{
+public:
+	GENERATED_USTRUCT_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MasterSpellStruct")
+		TSubclassOf<class UQuestGameplayAbility> Spell;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MasterSpellStruct")
+		bool bIsDefaultSpell;
+
+	FMasterSpellStruct()
+	{
+	};
+};
 
  /** This base class holds an inventory of all available spells for a given spell type */
  /** Since this is a base class, do not blueprint this class directly */
@@ -34,5 +49,5 @@ public:
 
 	/** Array of spells */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		TArray<TSubclassOf<class UGameplayAbility>> Spells;
+		TArray<FMasterSpellStruct> Spells;
 };

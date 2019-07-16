@@ -19,7 +19,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MemorizedSpellStruct")
 	TSubclassOf<class UQuestGameplayAbility> Spell;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = LearnedSpellStruct)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MemorizedSpellStruct)
 	bool bCanBeCast = false;
 
 	FMemorizedSpellStruct()
@@ -41,6 +41,25 @@ public:
 	};
 
 	FMemorizedSpellStruct GetSpellStructAtIndex(int Index)
+	{
+		return Spells[Index];
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FLearnedSpellsArrayStruct
+{
+public:
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LearnedSpellStruct")
+		TArray < TSubclassOf<class UQuestGameplayAbility>> Spells;
+
+	FLearnedSpellsArrayStruct()
+	{
+	};
+
+	TSubclassOf<class UQuestGameplayAbility> GetSpellSAtIndex(int Index)
 	{
 		return Spells[Index];
 	}
@@ -68,7 +87,7 @@ public:
 	ESpellType SpellbookType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
-	TArray<TSubclassOf<class UQuestGameplayAbility>> LearnedSpells;
+	TArray<FLearnedSpellsArrayStruct> LearnedSpells;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
 	TArray<FMemorizedSpellsArrayStruct> MemorizedSpells;
@@ -78,6 +97,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		void SetMemorizedArraySizes();
+
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		void SetSizeOfLearnedSpells();
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotIndex);

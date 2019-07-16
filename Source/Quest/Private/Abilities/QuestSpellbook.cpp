@@ -28,6 +28,21 @@ void AQuestSpellbook::SetMemorizedArraySizes()
 	}
 }
 
+void AQuestSpellbook::SetSizeOfLearnedSpells()
+{
+	int HighestSpellLevel = 0;
+	if (NumberOfMemorizedSpellsByLevel.Num() > 0)
+		for (int i=0; i < NumberOfMemorizedSpellsByLevel.Num(); i++)
+		{
+			if (NumberOfMemorizedSpellsByLevel[i] > 0)
+			{
+				HighestSpellLevel = i + 1;
+			}
+			else break;
+		}
+	LearnedSpells.SetNum(HighestSpellLevel);
+}
+
 bool AQuestSpellbook::FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotIndex)
 {
 	int Index = Level - 1;
@@ -76,15 +91,20 @@ int AQuestSpellbook::GetSpellLevel(TSubclassOf<class UQuestGameplayAbility> Spel
 //  Adds the spell to the Spellbook as a learned spell
 bool AQuestSpellbook::LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellToLearn)
 {
-	if (SpellToLearn)
-	{
-		if (IsSpellLearned(SpellToLearn))
+	if (SpellToLearn && IsCorrectSpellTypeForThisSpellbook(SpellToLearn))
 		{
+			if (IsSpellLearned(SpellToLearn))
+			{
 				return false;
+			}
+			int SpellLevel = GetSpellLevel(SpellToLearn);
+			int SpellLevelIndex = SpellLevel - 1;
+			if (LearnedSpells.IsValidIndex(SpellLevelIndex))
+			{
+				LearnedSpells[SpellLevelIndex].Spells.AddUnique(SpellToLearn);
+				return true;
+			}
 		}
-		LearnedSpells.AddUnique(SpellToLearn);
-		return true;
-	}
 	return false;
 }
 
@@ -155,13 +175,29 @@ bool AQuestSpellbook::IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Sp
 		{
 			return false;
 		}
-		for (const auto s : LearnedSpells)
+		else
 		{
-			if (s && s == Spell)
+			int SpellLevel = GetSpellLevel(Spell);
+			int SpellLevelIndex = SpellLevel - 1;
+			if (LearnedSpells.IsValidIndex(SpellLevelIndex) && LearnedSpells[SpellLevelIndex].Spells.Num() > 0)
 			{
-				return true;
+				for (const auto s : LearnedSpells[SpellLevelIndex].Spells)
+				{
+					if (s && s == Spell)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				return false;
 			}
 		}
+	}
+	else 
+	{
+		return false;
 	}
 	return false;
 }

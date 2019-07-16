@@ -65,6 +65,54 @@ bool AQuestSpellbook::FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotInd
 	return false;
 }
 
+bool AQuestSpellbook::IsMemorizedSlotEmpty(int Level, int SlotIndex)
+{
+	if (MemorizedSpells.IsValidIndex(Level - 1))
+	{
+		FMemorizedSpellsArrayStruct SpellsStructAtLevel = MemorizedSpells[Level - 1];
+		if (SpellsStructAtLevel.Spells.IsValidIndex(SlotIndex))
+		{
+			TSubclassOf<UQuestGameplayAbility> Slot = SpellsStructAtLevel.Spells[SlotIndex].Spell;
+			if (Slot)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool AQuestSpellbook::GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, FMemorizedSpellStruct &SpellStruct)
+{
+	if (MemorizedSpells.IsValidIndex(Level - 1))
+	{
+		FMemorizedSpellsArrayStruct SpellsStructAtLevel = MemorizedSpells[Level - 1];
+		if (SpellsStructAtLevel.Spells.IsValidIndex(SlotIndex))
+		{
+			TSubclassOf<UQuestGameplayAbility> SlottedAbility = SpellsStructAtLevel.Spells[SlotIndex].Spell;
+			if (SlottedAbility)
+			{
+				SpellStruct = SpellsStructAtLevel.Spells[SlotIndex];
+				if (SpellStruct.bCanBeCast == true)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Level %d, slot %d spell is enabled!"), Level, SlotIndex)
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Level %d, slot %d spell is NOT enabled!"), Level, SlotIndex)
+				}
+				return true;
+			}
+		}
+	}
+	SpellStruct = FMemorizedSpellStruct();
+	return false;
+}
+
 bool AQuestSpellbook::IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck)
 {
 	if (SpellToCheck)
@@ -124,6 +172,7 @@ bool AQuestSpellbook::MemorizeSpell(TSubclassOf<class UQuestGameplayAbility> Spe
 			if (MemorizedSpells.IsValidIndex(SpellLevelIndex))
 			{
 				MemorizedSpells[SpellLevelIndex].Spells[EmptySlot] = SpellStruct;
+				BP_OnSpellMemorized(SpellLevel, EmptySlot);
 				return true;
 			}
 		}
@@ -200,4 +249,18 @@ bool AQuestSpellbook::IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Sp
 		return false;
 	}
 	return false;
+}
+
+void AQuestSpellbook::EnableCastingOnMemorizedSpells()
+{
+	for (auto &SpellsAtLevelStruct : MemorizedSpells)
+	{
+		for (auto &SpellStruct : SpellsAtLevelStruct.Spells)
+		{
+			if (SpellStruct.Spell)
+			{
+				SpellStruct.bCanBeCast = true;
+			}
+		}
+	}
 }

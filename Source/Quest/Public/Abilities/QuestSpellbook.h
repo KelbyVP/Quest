@@ -105,6 +105,13 @@ public:
 		bool FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotIndex);
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool IsMemorizedSlotEmpty(int Level, int SlotIndex);
+
+	// If there is a spell in the slot, returns an out reference to the spell struct in the slot
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, FMemorizedSpellStruct &SpellStruct);
+
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
 
 		int GetSpellLevel(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
@@ -117,6 +124,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool MemorizeSpell(TSubclassOf<class UQuestGameplayAbility> SpellToMemorize);
 
+	//  Triggers blueprint function when spell memorized so blueprint can update widget
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestSpellbook)
+		void BP_OnSpellMemorized(int Level, int SpellSlot);
+
 	// Removes the spell from the memorized spell slots
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> SpellToRemove);
@@ -124,5 +135,10 @@ public:
 	// Checks whether this spell is already in the spellbook as a learned spell
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Spell);
+
+	// Enables casting on all memorized spells, primarily used when character rests
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		void EnableCastingOnMemorizedSpells();
+
 
 };

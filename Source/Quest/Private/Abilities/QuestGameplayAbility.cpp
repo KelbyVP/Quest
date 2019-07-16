@@ -15,3 +15,8 @@ ESpellType UQuestGameplayAbility::GetSpellType()
 {
 	return SpellType;
 }
+
+int UQuestGameplayAbility::GetSpellLevel()
+{
+	return SpellLevel;
+}

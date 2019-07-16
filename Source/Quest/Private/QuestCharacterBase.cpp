@@ -49,9 +49,6 @@ void AQuestCharacterBase::BeginPlay()
 	/** Subscribe to the QuestGameMode delegate that tells us when we are entering or exiting combat mode */
 	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	GameMode->OnCombatModeChange.AddDynamic(this, &AQuestCharacterBase::OnCombatModeChanged);
-
-	/** Set up the right kind of spellbook */
-	//SetSpellbookType();
 }
 
 // Called every frame

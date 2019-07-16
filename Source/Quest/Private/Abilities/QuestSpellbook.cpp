@@ -9,6 +9,7 @@
 // Sets default values
 AQuestSpellbook::AQuestSpellbook()
 {
+	//NumberOfMemorizedSpellsByLevel.SetNum(9);
 }
 
 // Called when the game starts or when spawned
@@ -17,15 +18,33 @@ void AQuestSpellbook::BeginPlay()
 	Super::BeginPlay();
 }
 
-bool AQuestSpellbook::FindEmptyMemorizedSpellSlot(int &SlotIndex)
+void AQuestSpellbook::SetMemorizedArraySizes()
 {
-	int Size = MemorizedSpells.Num();
-	for (int i = 0; i < Size; i++)
+	int NumberOfLevels = NumberOfMemorizedSpellsByLevel.Num();
+	MemorizedSpells.SetNum(NumberOfLevels);
+	for (int i = 0; i < NumberOfLevels; i++)
 	{
-		if (!MemorizedSpells[i].Spell)
+		MemorizedSpells[i].Spells.SetNum(NumberOfMemorizedSpellsByLevel[i]);
+	}
+}
+
+bool AQuestSpellbook::FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotIndex)
+{
+	int Index = Level - 1;
+	if (MemorizedSpells.IsValidIndex(Index))
+	{
+		TArray<FMemorizedSpellStruct> SpellsAtLevel = MemorizedSpells[Index].Spells;
+		int Size = SpellsAtLevel.Num();
+		for (int i = 0; i < Size; i++)
 		{
-			SlotIndex = i;
-			return true;
+			if (SpellsAtLevel.IsValidIndex(i))
+			{
+				if (!SpellsAtLevel[i].Spell)
+				{
+					SlotIndex = i;
+					return true;
+				}
+			}
 		}
 	}
 	return false;
@@ -42,6 +61,16 @@ bool AQuestSpellbook::IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQues
 		}
 	}
 	return false;
+}
+
+int AQuestSpellbook::GetSpellLevel(TSubclassOf<class UQuestGameplayAbility> SpellToCheck)
+{
+	if (SpellToCheck)
+	{
+		int SpellLevel = SpellToCheck->GetDefaultObject<UQuestGameplayAbility>()->GetSpellLevel();
+		return SpellLevel;
+	}
+	return 0;
 }
 
 //  Adds the spell to the Spellbook as a learned spell
@@ -62,21 +91,22 @@ bool AQuestSpellbook::LearnSpell(TSubclassOf<class UQuestGameplayAbility> SpellT
 //  Adds the spell to the memorized spell slots if we have learned this spell
 bool AQuestSpellbook::MemorizeSpell(TSubclassOf<class UQuestGameplayAbility> SpellToMemorize)
 {
+	int SpellLevel = GetSpellLevel(SpellToMemorize);
+	int SpellLevelIndex = SpellLevel - 1;
+
 	int EmptySlot = 0;
-	if (FindEmptyMemorizedSpellSlot(EmptySlot))
+	if (FindEmptyMemorizedSpellSlotAtLevel(SpellLevel, EmptySlot))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Empty slot found!"))
 		if (SpellToMemorize && IsSpellLearned(SpellToMemorize))
 		{
 			FMemorizedSpellStruct SpellStruct = FMemorizedSpellStruct();
 			SpellStruct.Spell = SpellToMemorize;
-			MemorizedSpells[EmptySlot] = SpellStruct;
-			return true;
+			if (MemorizedSpells.IsValidIndex(SpellLevelIndex))
+			{
+				MemorizedSpells[SpellLevelIndex].Spells[EmptySlot] = SpellStruct;
+				return true;
+			}
 		}
-	}
-	if (!FindEmptyMemorizedSpellSlot(EmptySlot))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No Empty slot found!"))
 	}
 	return false;
 }
@@ -91,21 +121,26 @@ bool AQuestSpellbook::RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbili
 	}
 
 	// If it is the right type of spell, try to remove a spell struct that has already been cast
-	for (auto s : MemorizedSpells)
+	int SpellLevel = GetSpellLevel(SpellToRemove);
+	int SpellLevelIndex = SpellLevel - 1;
+	if (MemorizedSpells.IsValidIndex(SpellLevelIndex))
 	{
-		if (!s.bCanBeCast && s.Spell == SpellToRemove)
+		for (auto s : MemorizedSpells[SpellLevelIndex].Spells)
+		{
+			if (!s.bCanBeCast && s.Spell == SpellToRemove)
 			{
 				s = FMemorizedSpellStruct();
 				return true;
 			}
-	}
-	//  Otherwise, remove any available matching spell struct if one exists
-	for (auto s : MemorizedSpells)
-	{
-		if (s.Spell == SpellToRemove)
+		}
+		//  Otherwise, remove any available matching spell struct if one exists
+		for (auto s : MemorizedSpells[SpellLevelIndex].Spells)
 		{
-			s = FMemorizedSpellStruct();
-			return true;
+			if (s.Spell == SpellToRemove)
+			{
+				s = FMemorizedSpellStruct();
+				return true;
+			}
 		}
 	}
 	return false;
@@ -116,6 +151,10 @@ bool AQuestSpellbook::IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Sp
 {
 	if (Spell)
 	{
+		if (!IsCorrectSpellTypeForThisSpellbook(Spell))
+		{
+			return false;
+		}
 		for (const auto s : LearnedSpells)
 		{
 			if (s && s == Spell)

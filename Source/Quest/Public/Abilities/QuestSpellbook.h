@@ -8,13 +8,15 @@
 #include "QuestGameplayAbility.h"
 #include "QuestSpellbook.generated.h"
 
+class AQuestCharacterBase;
+
 USTRUCT(BlueprintType)
 struct FMemorizedSpellStruct
 {
 public:
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LearnedSpellStruct")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MemorizedSpellStruct")
 	TSubclassOf<class UQuestGameplayAbility> Spell;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = LearnedSpellStruct)
@@ -23,6 +25,25 @@ public:
 	FMemorizedSpellStruct()
 	{
 	};
+};
+
+USTRUCT(BlueprintType)
+struct FMemorizedSpellsArrayStruct
+{
+public:
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MemorizedSpellStruct")
+		TArray<FMemorizedSpellStruct> Spells;
+
+	FMemorizedSpellsArrayStruct()
+	{
+	};
+
+	FMemorizedSpellStruct GetSpellStructAtIndex(int Index)
+	{
+		return Spells[Index];
+	}
 };
 
 UCLASS()
@@ -40,6 +61,9 @@ protected:
 
 public:	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = QuestSpellbook)
+	AQuestCharacterBase *OwningCharacter;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
 	ESpellType SpellbookType;
 
@@ -47,13 +71,21 @@ public:
 	TArray<TSubclassOf<class UQuestGameplayAbility>> LearnedSpells;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
-	TArray<FMemorizedSpellStruct> MemorizedSpells;
+	TArray<FMemorizedSpellsArrayStruct> MemorizedSpells;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestSpellbook)
+		TArray<int> NumberOfMemorizedSpellsByLevel;
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
-		bool FindEmptyMemorizedSpellSlot(int& SlotIndex);
+		void SetMemorizedArraySizes();
+
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool FindEmptyMemorizedSpellSlotAtLevel(int Level, int& SlotIndex);
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
+
+		int GetSpellLevel(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
 
 	//  Adds the spell to the Spellbook as a learned spell
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)

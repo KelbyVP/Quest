@@ -29,4 +29,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		ESpellType GetSpellType();
+
+	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
+		int GetSpellLevel();
 };

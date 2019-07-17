@@ -90,7 +90,16 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 	if (TargetQuestCharacter->DoesCharacterHaveTag(TagText))
 	{
 		Damage = Damage / 2;
+		UE_LOG(LogTemp, Warning, TEXT("Character has resistance"))
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Character does NOT have resistance"))
+	}
+
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	float TestVariable1 = Spec.GetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Tag.Test.One")), true, -1.0f);
+	UE_LOG(LogTemp, Warning, TEXT("TestVariable1 is equal to %f"), TestVariable1)
 
 	// Output damage
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));

@@ -32,7 +32,7 @@ void AQuestSpellbook::SetSizeOfLearnedSpells()
 {
 	int HighestSpellLevel = 0;
 	if (NumberOfMemorizedSpellsByLevel.Num() > 0)
-		for (int i=0; i < NumberOfMemorizedSpellsByLevel.Num(); i++)
+		for (int i = 0; i < NumberOfMemorizedSpellsByLevel.Num(); i++)
 		{
 			if (NumberOfMemorizedSpellsByLevel[i] > 0)
 			{
@@ -86,7 +86,7 @@ bool AQuestSpellbook::IsMemorizedSlotEmpty(int Level, int SlotIndex)
 	return false;
 }
 
-bool AQuestSpellbook::GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, FMemorizedSpellStruct &SpellStruct)
+bool AQuestSpellbook::GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, FMemorizedSpellStruct& SpellStruct)
 {
 	if (MemorizedSpells.IsValidIndex(Level - 1))
 	{
@@ -97,19 +97,28 @@ bool AQuestSpellbook::GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, F
 			if (SlottedAbility)
 			{
 				SpellStruct = SpellsStructAtLevel.Spells[SlotIndex];
-				if (SpellStruct.bCanBeCast == true)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Level %d, slot %d spell is enabled!"), Level, SlotIndex)
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Level %d, slot %d spell is NOT enabled!"), Level, SlotIndex)
-				}
 				return true;
 			}
 		}
 	}
 	SpellStruct = FMemorizedSpellStruct();
+	return false;
+}
+
+bool AQuestSpellbook::GetLearnedSpellAtIndex(int Level, int SlotIndex, TSubclassOf<class UQuestGameplayAbility>& Spell)
+{
+	if (LearnedSpells.IsValidIndex(Level - 1))
+	{
+		FLearnedSpellsArrayStruct SpellsArrayStruct = LearnedSpells[Level - 1];
+		if (SpellsArrayStruct.Spells.IsValidIndex(SlotIndex))
+		{
+			Spell = SpellsArrayStruct.GetSpellAtIndex(SlotIndex);
+			if (Spell)
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -194,20 +203,52 @@ bool AQuestSpellbook::RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbili
 	int SpellLevelIndex = SpellLevel - 1;
 	if (MemorizedSpells.IsValidIndex(SpellLevelIndex))
 	{
-		for (auto s : MemorizedSpells[SpellLevelIndex].Spells)
+		TArray<FMemorizedSpellStruct> SpellsAtLevel = MemorizedSpells[SpellLevelIndex].Spells;
+		for (int i = 0; i < SpellsAtLevel.Num(); i++)
 		{
-			if (!s.bCanBeCast && s.Spell == SpellToRemove)
+			if (SpellsAtLevel.IsValidIndex(i))
 			{
-				s = FMemorizedSpellStruct();
-				return true;
+				if (SpellsAtLevel[i].bCanBeCast && SpellsAtLevel[i].Spell == SpellToRemove)
+				{
+					RemoveMemorizedSpellAtIndex(SpellToRemove, SpellLevel, i);
+					return true;
+				}
 			}
 		}
 		//  Otherwise, remove any available matching spell struct if one exists
-		for (auto s : MemorizedSpells[SpellLevelIndex].Spells)
+		for (int i = 0; i < SpellsAtLevel.Num(); i++)
 		{
-			if (s.Spell == SpellToRemove)
+			if (SpellsAtLevel.IsValidIndex(i))
 			{
-				s = FMemorizedSpellStruct();
+				if (SpellsAtLevel[i].Spell == SpellToRemove)
+				{
+					RemoveMemorizedSpellAtIndex(SpellToRemove, SpellLevel, i);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool AQuestSpellbook::RemoveMemorizedSpellAtIndex(TSubclassOf<class UQuestGameplayAbility> SpellToRemove, int Level, int Index)
+{
+	//  First check to see whether this is even the right type of spell
+	if (!IsCorrectSpellTypeForThisSpellbook(SpellToRemove))
+	{
+		return false;
+	}
+
+	// Remove the spell if the level and index are valid and if they contain the spell we are trying to remove
+	if (MemorizedSpells.IsValidIndex(Level - 1))
+	{
+		TArray<FMemorizedSpellStruct> &SpellsAtLevel = MemorizedSpells[Level - 1].Spells;
+		if (SpellsAtLevel.IsValidIndex(Index))
+		{
+			if (SpellsAtLevel[Index].Spell == SpellToRemove)
+			{
+				SpellsAtLevel[Index] = FMemorizedSpellStruct();
+				BP_OnSpellRemoved(SpellToRemove, Level, Index);
 				return true;
 			}
 		}

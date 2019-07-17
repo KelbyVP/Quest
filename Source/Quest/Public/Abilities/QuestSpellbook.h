@@ -59,9 +59,16 @@ public:
 	{
 	};
 
-	TSubclassOf<class UQuestGameplayAbility> GetSpellSAtIndex(int Index)
+	TSubclassOf<class UQuestGameplayAbility> GetSpellAtIndex(int Index)
 	{
-		return Spells[Index];
+		if (Spells.IsValidIndex(Index))
+		{
+			return Spells[Index];
+		}
+		else
+		{
+			return TSubclassOf<UQuestGameplayAbility>();
+		}
 	}
 };
 
@@ -107,9 +114,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsMemorizedSlotEmpty(int Level, int SlotIndex);
 
-	// If there is a spell in the slot, returns an out reference to the spell struct in the slot
+	// If there is a memorized spell in the slot, returns an out reference to the spell struct in the slot
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, FMemorizedSpellStruct &SpellStruct);
+
+	// If there is a learned spell in the slot, returns an out reference to the spell in the slot
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool GetLearnedSpellAtIndex(int Level, int SlotIndex, TSubclassOf<class UQuestGameplayAbility>& Spell);
 
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsCorrectSpellTypeForThisSpellbook(TSubclassOf<class UQuestGameplayAbility> SpellToCheck);
@@ -131,6 +142,14 @@ public:
 	// Removes the spell from the memorized spell slots
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool RemoveMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> SpellToRemove);
+
+	// Removes the spell at index from the memorized spell slots
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		bool RemoveMemorizedSpellAtIndex(TSubclassOf<class UQuestGameplayAbility> SpellToRemove, int Level, int Index);
+
+	//  Triggers blueprint function when spell removed  so blueprint can update widget
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestSpellbook)
+		void BP_OnSpellRemoved(TSubclassOf<class UQuestGameplayAbility> SpellToRemove, int SpellLevel, int IndexOfRemovedSpell);
 
 	// Checks whether this spell is already in the spellbook as a learned spell
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)

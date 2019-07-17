@@ -22,10 +22,21 @@ public:
 	UQuestGameplayAbility();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		FText Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		ESpellType SpellType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		int SpellLevel = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		FText Effects;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		FText Description;
+
+
 
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		ESpellType GetSpellType();

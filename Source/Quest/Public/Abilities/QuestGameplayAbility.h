@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		FText Description;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		TArray<FGameplayTag> ResistanceTags;
+
 
 
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)

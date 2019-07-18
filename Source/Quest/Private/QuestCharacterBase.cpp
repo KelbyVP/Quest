@@ -86,7 +86,6 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 void AQuestCharacterBase::AddGameplayTag(FGameplayTag TagToAdd)
 {
 	GetAbilitySystemComponent()->AddLooseGameplayTag(TagToAdd);
-	GetAbilitySystemComponent()->SetTagMapCount(TagToAdd, 1);
 }
 
 void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
@@ -168,25 +167,15 @@ void AQuestCharacterBase::SetSpellbookType()
 	}
 }
 
-bool AQuestCharacterBase::CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag)
+bool AQuestCharacterBase::DoesCharacterHaveTag(FGameplayTag const& Tag)
 {
-	FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(Tag);
-	return EffectTags.HasTag(TagRequest);
-}
-
-bool AQuestCharacterBase::DoesCharacterHaveTag(FName const& Tag)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Checking whether character has tag"))
 	FGameplayTagContainer TagContainer;
 	GetOwnedGameplayTags(TagContainer);
-	//  Note:  This next (commented out) line is what we need to use if the tag is on the ability system component; may need to re-implement at some point
-	//AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
-	FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(Tag);
-	if (TagContainer.HasTag(TagRequest))
+	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+	if (TagContainer.HasTag(Tag))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found matching tag"))
+		return true;
 	}
-	return TagContainer.HasTag(TagRequest);
-	//return CompareTags(TagContainer, Tag);
+	return false;
 }
 

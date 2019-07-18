@@ -3,6 +3,7 @@
 
 #include "QuestFireballDamageExecution.h"
 #include "GameplayTagsModule.h"
+#include "QuestGameplayAbility.h"
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 
@@ -80,27 +81,35 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 		Damage = int(Damage / 2);
 	}
 
-	// Cut damage in half if target has resistance tag
+	/** Cut damage in half for each relevant resistance tag that the target has */
+
+	/** Start by getting the owning ability's array of resistance tags */
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	const UQuestGameplayAbility* OwningAbility = Cast<UQuestGameplayAbility>(Spec.GetContext().GetAbility());
+	TArray<FGameplayTag> RelevantResistanceTags;
+	if (OwningAbility)
+	{
+		RelevantResistanceTags = OwningAbility->ResistanceTags;
+	}
+	
+	/** Cut damage in half for each resistance tag that target character has */
 	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
-	AQuestCharacterBase* TargetQuestCharacter = Cast<AQuestCharacterBase>(TargetActor);
-	FName TagText = FName(TEXT("resistance.Fire"));
-	FGameplayTag ResistanceTag = UGameplayTagsManager::Get().RequestGameplayTag(TagText);
-
-	if (TargetQuestCharacter->DoesCharacterHaveTag(TagText))
+	if (TargetActor)
 	{
-		Damage = Damage / 2;
-		UE_LOG(LogTemp, Warning, TEXT("Character has resistance"))
+		AQuestCharacterBase* TargetQuestCharacter = Cast<AQuestCharacterBase>(TargetActor);
+		if (TargetQuestCharacter)
+		{
+			for (auto TagToCheck : RelevantResistanceTags)
+			{
+				if (TargetQuestCharacter->DoesCharacterHaveTag(TagToCheck))
+				{
+					Damage = Damage / 2;
+				}
+			}
+		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Character does NOT have resistance"))
-	}
-
-	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
-	float TestVariable1 = Spec.GetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Tag.Test.One")), true, -1.0f);
-	UE_LOG(LogTemp, Warning, TEXT("TestVariable1 is equal to %f"), TestVariable1)
 
 	// Output damage
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));	
 }

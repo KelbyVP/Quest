@@ -129,8 +129,8 @@ public:
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
-	bool CompareTags(FGameplayTagContainer const& EffectTags, FName const& Tag);
-	bool DoesCharacterHaveTag(FName const& Tag);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+	bool DoesCharacterHaveTag(FGameplayTag const& Tag);
 
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
 

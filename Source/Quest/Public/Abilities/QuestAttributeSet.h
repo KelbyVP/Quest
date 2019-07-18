@@ -9,6 +9,7 @@
 #include "QuestAttributeSet.generated.h"
 
 
+
 /**
  This holds all of the attributes used by abilities, and it instantiates a copy of this on every character
  */

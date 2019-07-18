@@ -9,6 +9,10 @@
 /**
  * 
  */
+
+class UQuestGameplayAbility; 
+class AQuestCharacterBase;
+
 UCLASS()
 class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalculation
 {
@@ -18,6 +22,10 @@ class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalc
 		UQuestSpellDamageExecCalcBase();
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const;
+
 	UProperty* HealthProperty;
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
+	//UQuestGameplayAbility* OwningAbility;
+
+	bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility , AQuestCharacterBase* TargetCharacter) const;
 };

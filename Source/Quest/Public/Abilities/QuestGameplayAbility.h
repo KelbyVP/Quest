@@ -54,6 +54,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		ESavingsThrowType SavingThrowAbilityType;
 
+	//* variables that determine the amount of damage done by a damaging ability */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BaseDamageNumberOfRolls = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BaseDamageDieSize = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BonusDamageBeginningLevel = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BonusDamageDieSize = 1;
+
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		ESpellType GetSpellType();
 

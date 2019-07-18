@@ -79,27 +79,11 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 		TargetQuestCharacter = Cast<AQuestCharacterBase>(TargetActor);
 	}
 
-	if (OwningAbility)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability found!"))
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability NOT found!"))
-	}
-
 	//	Sets the variables to a reference to the value of the relevant attributes
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetSpellDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
 
 	// Calculate Damage
-	int Damage = 0;
-	int Level = int(SourceLevel);
-	for (int a = 1; a <= Level; a = a + 1)
-	{
-		Damage = Damage + ((rand() % 6) + 1);
-	}
-
-	// Half damage if saving throw made
+	int Damage = CalculateBaseDamageAmount(OwningAbility, SourceLevel);
 	if (DoesMakeSavingThrow(OwningAbility, TargetQuestCharacter))
 	{
 		Damage = int(Damage / 2);
@@ -122,7 +106,6 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 			{
 				if (TargetQuestCharacter->DoesCharacterHaveTag(TagToCheck))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Character has tag!"))
 					Damage = Damage / 2;
 				}
 			}
@@ -171,10 +154,26 @@ bool UQuestSpellDamageExecCalcBase::DoesMakeSavingThrow(const UQuestGameplayAbil
 		float AbilityCheck = TargetCharacter->AttributeSetComponent->Level.GetCurrentValue() + (trunc(AgilityModifier));
 		if (AbilityCheck >= SavingThrow)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Saving throw made!  Score = %f"), (trunc(TargetAbilityScore)))
 			return true;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Saving throw failed !  Score = %f"), (trunc(TargetAbilityScore)))
 	}
 	return false;
+}
+
+int UQuestSpellDamageExecCalcBase::CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const
+{
+	int Damage = 0;
+	if (OwningAbility->BaseDamageDieSize >= 1)
+	{
+		for (int i = 1; i <= OwningAbility->BaseDamageNumberOfRolls; i++)
+		{
+			Damage = Damage + rand() % OwningAbility->BaseDamageDieSize + 1;
+		}
+	}
+	if (SourceCharacterLevel >= OwningAbility->BonusDamageBeginningLevel && OwningAbility->BonusDamageDieSize >= 1)
+	for (int i = OwningAbility->BonusDamageBeginningLevel; i <= SourceCharacterLevel; i++)
+	{
+		Damage = Damage + rand() % (OwningAbility->BonusDamageDieSize) + 1;
+	}
+	return Damage;
 }

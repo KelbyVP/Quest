@@ -27,5 +27,6 @@ class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalc
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
 	//UQuestGameplayAbility* OwningAbility;
 
-	bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility , AQuestCharacterBase* TargetCharacter) const;
+	bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility, AQuestCharacterBase* TargetCharacter) const;
+	int CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const;
 };

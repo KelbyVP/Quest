@@ -4,21 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/QuestDamageExecutionCalculation.h"
-#include "QuestFireballDamageExecution.generated.h"
+#include "QuestSpellDamageExecCalcBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class QUEST_API UQuestFireballDamageExecution : public UQuestDamageExecutionCalculation
+class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalculation
 {
 	GENERATED_BODY()
 
-	// Default constructor
-	UQuestFireballDamageExecution();
+		// Default constructor
+		UQuestSpellDamageExecCalcBase();
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const;
 	UProperty* HealthProperty;
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
-	
 };

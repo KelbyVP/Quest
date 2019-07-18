@@ -1,19 +1,19 @@
 // Copyright 2019 Kelby Van Patten, All Rights Reserved
 
 
-#include "QuestFireballDamageExecution.h"
+#include "QuestSpellDamageExecCalcBase.h"
 #include "GameplayTagsModule.h"
 #include "QuestGameplayAbility.h"
 #include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
 
-struct FireballDamageStatics
+struct SpellDamageStatics
 {
 	//	These macros create a Property and Def for each attribute (eg., StrengthProperty and StrengthDef)
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Agility)
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Level)
 
-	FireballDamageStatics()
+	SpellDamageStatics()
 	{
 		/**	These macros take (S, P, T, B) and set up the Def (eg., StrengthDef) for each property
 		*	S = class
@@ -26,13 +26,13 @@ struct FireballDamageStatics
 };
 
 //	returns an instance of the DamageStatics struct
-static FireballDamageStatics& GetFireballDamageStatics()
+static SpellDamageStatics& GetSpellDamageStatics()
 {
-	static FireballDamageStatics DamageStaticsVar;
+	static SpellDamageStatics DamageStaticsVar;
 	return DamageStaticsVar;
 }
 
-UQuestFireballDamageExecution::UQuestFireballDamageExecution()
+UQuestSpellDamageExecCalcBase::UQuestSpellDamageExecCalcBase()
 {
 	//	Note:  The following does the same thing for the Health attribute as the macros in the struct above do for AC, Agility, and Strength
 //	Sets HealthProperty pointer to the Health attribute
@@ -43,19 +43,19 @@ UQuestFireballDamageExecution::UQuestFireballDamageExecution()
 	HealthDef = FGameplayEffectAttributeCaptureDefinition(HealthProperty, EGameplayEffectAttributeCaptureSource::Target, true);
 
 	RelevantAttributesToCapture.Add(HealthDef);
-	RelevantAttributesToCapture.Add(GetFireballDamageStatics().AgilityDef);
-	RelevantAttributesToCapture.Add(GetFireballDamageStatics().LevelDef);
+	RelevantAttributesToCapture.Add(GetSpellDamageStatics().AgilityDef);
+	RelevantAttributesToCapture.Add(GetSpellDamageStatics().LevelDef);
 };
 
-void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	//	Creates variables to contain the relevant attributes
 	float SourceAgility = 0.0f;
 	float SourceLevel = 0.0f;
 
 	//	Sets the variables to a reference to the value of the relevant attributes
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetFireballDamageStatics().AgilityDef, FAggregatorEvaluateParameters(), SourceAgility);
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetFireballDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetSpellDamageStatics().AgilityDef, FAggregatorEvaluateParameters(), SourceAgility);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetSpellDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
 
 	//  Checks saving throw based on agility
 	bool bMadeSavingThrow = false;
@@ -91,7 +91,7 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 	{
 		RelevantResistanceTags = OwningAbility->ResistanceTags;
 	}
-	
+
 	/** Cut damage in half for each resistance tag that target character has */
 	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
@@ -104,6 +104,7 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 			{
 				if (TargetQuestCharacter->DoesCharacterHaveTag(TagToCheck))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("Character has tag!"))
 					Damage = Damage / 2;
 				}
 			}
@@ -111,5 +112,5 @@ void UQuestFireballDamageExecution::Execute_Implementation(const FGameplayEffect
 	}
 
 	// Output damage
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));	
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));
 }

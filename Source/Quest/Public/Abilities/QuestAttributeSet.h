@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "GameFramework/Actor.h"
+#include "QuestGameplayAbility.h"
 #include "QuestAbilitySystemComponent.h"
 #include "QuestAttributeSet.generated.h"
 
@@ -57,6 +58,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestAttributeSet")
 		void LevelUp();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestAttributeSet")
+		bool DoesMakeSavingThrow(ESavingsThrowType SavingThrowType);
 
 
 };

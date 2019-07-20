@@ -167,13 +167,13 @@ int UQuestSpellDamageExecCalcBase::CalculateBaseDamageAmount(const UQuestGamepla
 	{
 		for (int i = 1; i <= OwningAbility->BaseDamageNumberOfRolls; i++)
 		{
-			Damage = Damage + rand() % OwningAbility->BaseDamageDieSize + 1;
+			Damage = Damage + rand() % OwningAbility->BaseDamageDieSize + 1 + OwningAbility->BaseDamageModifierPerRoll;
 		}
 	}
 	if (SourceCharacterLevel >= OwningAbility->BonusDamageBeginningLevel && OwningAbility->BonusDamageDieSize >= 1)
 	for (int i = OwningAbility->BonusDamageBeginningLevel; i <= SourceCharacterLevel; i++)
 	{
-		Damage = Damage + rand() % (OwningAbility->BonusDamageDieSize) + 1;
+		Damage = Damage + rand() % (OwningAbility->BonusDamageDieSize) + 1 + OwningAbility->BonusDamageModifierPerRoll;
 	}
 	return Damage;
 }

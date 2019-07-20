@@ -60,9 +60,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		int BaseDamageDieSize = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BaseDamageModifierPerRoll = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		int BonusDamageBeginningLevel = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		int BonusDamageDieSize = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int BonusDamageModifierPerRoll = 0;
 
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		ESpellType GetSpellType();

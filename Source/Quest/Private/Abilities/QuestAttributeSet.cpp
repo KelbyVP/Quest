@@ -47,3 +47,48 @@ void UQuestAttributeSet::LevelUp()
 	Level.SetBaseValue(Level.GetBaseValue() + 1.0f);
 }
 
+bool UQuestAttributeSet::DoesMakeSavingThrow(ESavingsThrowType SavingThrowType)
+{
+	float TargetAbilityScore = 0.0f;
+	bool bCanSave = true;
+
+	switch (SavingThrowType)
+	{
+	case ESavingsThrowType::IT_None:
+		bCanSave = false;
+		break;
+	case ESavingsThrowType::IT_Agility:
+		TargetAbilityScore = Agility.GetCurrentValue();
+		break;
+	case ESavingsThrowType::IT_Constitution:
+		TargetAbilityScore = Constitution.GetCurrentValue();
+		break;
+	case ESavingsThrowType::IT_Charm:
+		TargetAbilityScore = Charm.GetCurrentValue();
+		break;
+	case ESavingsThrowType::IT_Intelligence:
+		TargetAbilityScore = Intelligence.GetCurrentValue();
+		break;
+	case ESavingsThrowType::IT_Strength:
+		TargetAbilityScore = Strength.GetCurrentValue();
+		break;
+	case ESavingsThrowType::IT_Wisdom:
+		TargetAbilityScore = Wisdom.GetCurrentValue();
+		break;
+	}
+
+	//  Checks saving throw based on TargetAbilityScore
+	if (bCanSave)
+	{
+		int SavingThrow = rand() % 20 + 1;
+		float AgilityModifier = (TargetAbilityScore - 10) / 2;
+		float AbilityCheck = Level.GetCurrentValue() + (trunc(AgilityModifier));
+		if (AbilityCheck >= SavingThrow)
+		{
+			return true;
+		}
+	}
+	UE_LOG(LogTemp)
+	return false;
+}
+

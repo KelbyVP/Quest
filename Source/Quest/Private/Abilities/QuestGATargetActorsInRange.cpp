@@ -44,6 +44,7 @@ void AQuestGATargetActorsInRange::ConfirmTargetingAndContinue()
 			}
 		}
 	}
+	// Put the array and cursor location in a Data Handle and broadcast the Data Handle
 
 	if (CharactersInRange.Num() > 0)
 

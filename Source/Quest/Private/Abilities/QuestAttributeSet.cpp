@@ -88,7 +88,6 @@ bool UQuestAttributeSet::DoesMakeSavingThrow(ESavingsThrowType SavingThrowType)
 			return true;
 		}
 	}
-	UE_LOG(LogTemp)
 	return false;
 }
 

@@ -3,6 +3,7 @@
 
 #include "QuestCharacterRotationActor.h"
 #include "Math/Vector.h"
+#include "GameFramework/Pawn.h"
 
 // Sets default values
 AQuestCharacterRotationActor::AQuestCharacterRotationActor()
@@ -99,5 +100,18 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 		bShouldMoveToStartingPosition = true;
 		CurrentPosition = InitialLocation;
 	}
+}
+
+void AQuestCharacterRotationActor::EjectCharacter()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Eject character called"))
+	bShouldRotate = false;
+	APawn* PawnToEject = Cast<APawn>(CharacterToRotate);
+	FVector NormalCharacter = CharacterToRotate->GetActorLocation().GetSafeNormal();
+	FVector NormalCenter = (ActorAtCenter->GetActorLocation() + FVector(0, 0, RotationHeight)).GetSafeNormal();
+	FVector DirectionToEject = (NormalCenter - NormalCharacter).RotateAngleAxis(90, FVector(0, 0, 1));
+	PawnToEject->AddMovementInput(DirectionToEject, 525, true);
+	UE_LOG(LogTemp, Warning, TEXT("direction to eject is %f, %f, %f"), DirectionToEject.X, DirectionToEject.Y, DirectionToEject.Z)
+	Destroy();
 }
 

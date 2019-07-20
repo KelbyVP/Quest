@@ -60,4 +60,7 @@ public:
 
 	// Finds the tangent point at the center actor's radius so the transition from movement to rotation will be smooth
 	void GetStartingRotationPosition();
+
+	//  Ejects the character from the rotation
+	void EjectCharacter();
 };

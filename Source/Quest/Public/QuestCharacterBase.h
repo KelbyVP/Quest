@@ -17,6 +17,7 @@ class UQuestAttributeSet;
 class USphereComponent;
 class UQuestGameplayAbility;
 class AQuestSpellbook;
+class AQuestCharacterRotationActor;
 
 
 UENUM(BlueprintType)
@@ -93,6 +94,10 @@ public:
 	//  Tells us whether this character is within range of the character that this character is trying to melee attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		bool bIsTargetWithinInteractionSphere;
+
+	//  Tells us whether this character is currently spinning in a rotation actor, so that it does not get picked up by another
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
+		bool bIsCapturedByRotationActor;
 
 	// Tells us whether the character is dead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
@@ -172,6 +177,9 @@ public:
 	/** Basic functions to implement the spellcasting system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetSpellbookType();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
+		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
 
 
 };

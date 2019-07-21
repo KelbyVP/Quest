@@ -4,6 +4,7 @@
 #include "QuestCharacterRotationActor.h"
 #include "Math/Vector.h"
 #include "GameFramework/Pawn.h"
+#include "QuestCharacterBase.h"
 
 // Sets default values
 AQuestCharacterRotationActor::AQuestCharacterRotationActor()
@@ -47,8 +48,8 @@ void AQuestCharacterRotationActor::RotateActorAroundPoint()
 	{
 		// Rotate the character around the center axis
 		FVector CenterCharacterLocation = ActorAtCenter->GetActorLocation();
-		CenterCharacterLocation.Z += RotationHeight;
-		FVector RotatedVectorAroundAxis = FVector(Radius, 0, RotationHeight);
+		CenterCharacterLocation.Z = RotationHeight;
+		FVector RotatedVectorAroundAxis = FVector(Radius, 0, 0);
 		CharacterToRotate->SetActorLocation(CenterCharacterLocation + RotatedVectorAroundAxis.RotateAngleAxis((StartingAngle + CurrentRotation), FVector(0, 0, 1)));
 
 		// Rotate the character around its own axis
@@ -62,18 +63,10 @@ void AQuestCharacterRotationActor::RotateActorAroundPoint()
 void AQuestCharacterRotationActor::MoveActorToStartingRotationPosition(float DeltaTime)
 {	
 	if (CharacterToRotate)
-
 	{
-		CurrentPosition = FMath::VInterpTo(CharacterToRotate->GetActorLocation(), StartingRotationPosition, DeltaTime, MovementSpeedToStartingRotationPosition);
-		CharacterToRotate->SetActorLocation(CurrentPosition, true);
-	}
-
-	//  If the character is close enough to the starting rotation position, stop moving and start rotating
-	FVector RemainingDistance = CharacterToRotate->GetActorLocation() - StartingRotationPosition;
-	if (RemainingDistance.Size() < 30)
-	{
+		AQuestCharacterBase* QuestCharacter = Cast<AQuestCharacterBase>(CharacterToRotate);
+		QuestCharacter->BP_MoveToStartPositionForRotationActor(StartingRotationPosition, this);
 		bShouldMoveToStartingPosition = false;
-		bShouldRotate = true;
 	}
 }
 
@@ -81,10 +74,12 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 {
 	if (ActorAtCenter && CharacterToRotate)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Height: %f"), CharacterToRotate->GetActorLocation().Z)
 		// Adjust rotation height based on the fact that the character's Z position is different than the center's Z position
-		RotationHeight = RotationHeight + (CharacterToRotate->GetActorLocation().Z - ActorAtCenter->GetActorLocation().Z);
+		RotationHeight = RotationHeight + (CharacterToRotate->GetActorLocation().Z);
 		FVector CharacterLocation = CharacterToRotate->GetActorLocation();
-		FVector CenterLocation = ActorAtCenter->GetActorLocation() + FVector(0, 0, RotationHeight);
+		FVector CenterLocation = ActorAtCenter->GetActorLocation();
+		CenterLocation.Z = CharacterLocation.Z;
 
 
 		// Get the starting angle for rotation
@@ -93,25 +88,15 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 		StartingAngle = FMath::RadiansToDegrees(acosf(FVector::DotProduct(NormalCenter, NormalCharacter))) + 180;
 
 		// Set the starting position based on a tangent to the radius of the center actor
-		FVector RotatedVectorAroundAxis = FVector(Radius, 0, RotationHeight);
+		FVector RotatedVectorAroundAxis = FVector(Radius, 0, 0);
 		StartingRotationPosition = CenterLocation + RotatedVectorAroundAxis.RotateAngleAxis(StartingAngle, FVector(0, 0, 1));
+		StartingRotationPosition.Z = RotationHeight;
 
+		UE_LOG(LogTemp, Warning, TEXT("Starting Height: %f"), StartingRotationPosition.Z)
 		bHasStartingRotationPosition = true;
 		bShouldMoveToStartingPosition = true;
 		CurrentPosition = InitialLocation;
 	}
 }
 
-void AQuestCharacterRotationActor::EjectCharacter()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Eject character called"))
-	bShouldRotate = false;
-	APawn* PawnToEject = Cast<APawn>(CharacterToRotate);
-	FVector NormalCharacter = CharacterToRotate->GetActorLocation().GetSafeNormal();
-	FVector NormalCenter = (ActorAtCenter->GetActorLocation() + FVector(0, 0, RotationHeight)).GetSafeNormal();
-	FVector DirectionToEject = (NormalCenter - NormalCharacter).RotateAngleAxis(90, FVector(0, 0, 1));
-	PawnToEject->AddMovementInput(DirectionToEject, 525, true);
-	UE_LOG(LogTemp, Warning, TEXT("direction to eject is %f, %f, %f"), DirectionToEject.X, DirectionToEject.Y, DirectionToEject.Z)
-	Destroy();
-}
 

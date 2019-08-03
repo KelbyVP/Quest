@@ -23,5 +23,5 @@ protected:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const;
 	UProperty* HealthProperty;
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
-	float CalculateHealthBoost() const;
+	float CalculateHealthBoost(const UQuestGameplayAbility* OwningAbility, float Level) const;
 };

@@ -327,6 +327,7 @@ void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
 			bIsTargetWithinInteractionSphere = false;
 			bIsReadyForNextAttack = false;
 			UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), MoveTarget);
+			
 			return;
 		}
 	}

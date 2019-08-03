@@ -3,6 +3,8 @@
 
 #include "QuestHealthBoostExecCalc.h"
 #include "QuestAttributeSet.h"
+#include "QuestGameplayAbility.h"
+#include "GameplayTagsModule.h"
 
 UQuestHealthBoostExecCalc::UQuestHealthBoostExecCalc()
 {
@@ -18,11 +20,29 @@ UQuestHealthBoostExecCalc::UQuestHealthBoostExecCalc()
 
 void UQuestHealthBoostExecCalc::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	float HealthBoost = CalculateHealthBoost();
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	const UGameplayAbility* AbilityRef = Spec.GetContext().GetAbility();
+	const UQuestGameplayAbility* OwningAbility = Cast<UQuestGameplayAbility>(Spec.GetContext().GetAbility());
+	float Level = Spec.GetLevel();
+
+	float HealthBoost = CalculateHealthBoost(OwningAbility, Level);
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, HealthBoost));
 }
 
-float UQuestHealthBoostExecCalc::CalculateHealthBoost() const
+float UQuestHealthBoostExecCalc::CalculateHealthBoost(const UQuestGameplayAbility* OwningAbility, float Level) const
 {
-	return (FMath::RandRange(1, 8));
+	float MaxBonusLevel = OwningAbility->MaxHealingBonusLevel;
+	FMath::Clamp(Level, 1.0f, MaxBonusLevel);
+
+	float NumberOfDice = OwningAbility->NumberOfHealingDice;
+	int DieSize = OwningAbility->HealingDieSize;
+
+	float HealingAmount = 0.0f;
+	for (int i = 0; i < NumberOfDice; i++)
+	{
+		HealingAmount += FMath::RandRange(1, DieSize);
+	}
+	HealingAmount += OwningAbility->HealingBonus;
+	HealingAmount += OwningAbility->HealingBonusPerLevel * Level;
+	return HealingAmount;
 }

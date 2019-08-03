@@ -21,12 +21,14 @@ void AQuestGATargetActorClicked::StartTargeting(UGameplayAbility* Ability)
 	PlayerController = Cast<AQuestPlayerController>(MasterPC);
 	PlayerController->bControllerShouldMoveCharacter = false;
 	PlayerController->bIsTargeting = true;
+	PlayerController->CurrentMouseCursor = EMouseCursor::Hand;
 }
 
 void AQuestGATargetActorClicked::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	PlayerController->bControllerShouldMoveCharacter = true;
+	PlayerController->CurrentMouseCursor = EMouseCursor::Default;
 }
 
 void AQuestGATargetActorClicked::ConfirmTargetingAndContinue()

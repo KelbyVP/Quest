@@ -68,6 +68,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		int BonusDamageModifierPerRoll = 0;
 
+	//* variables that determine the amount of healing done by a healing ability */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int NumberOfHealingDice = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int HealingDieSize = 6;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int HealingBonus = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int HealingBonusPerLevel = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		int MaxHealingBonusLevel = 99;
+
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		ESpellType GetSpellType();
 

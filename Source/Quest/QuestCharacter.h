@@ -10,6 +10,7 @@
 class AQuestStorage;
 class AQuestMerchantCharacter;
 class UQuestCharacterAttributeSet;
+class UQuestSelectableComponent;
 
 UCLASS(Blueprintable)
 class AQuestCharacter : public AQuestCharacterBase
@@ -41,6 +42,10 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
+
+	/** Handles the functions applicable when a character in the party is selected */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		UQuestSelectableComponent* SelectableComponent;
 
 	void SelectTargetCharacterToAttack();
 	TArray<FHitResult> ScanForNearbyPawns();

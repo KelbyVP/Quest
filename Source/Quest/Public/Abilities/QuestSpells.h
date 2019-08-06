@@ -27,7 +27,7 @@ public:
 		TSubclassOf<class UQuestGameplayAbility> Spell;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MasterSpellStruct")
-		bool bIsDefaultSpell;
+		bool bIsDefaultSpell = false;
 
 	FMasterSpellStruct()
 	{

@@ -18,6 +18,7 @@ class USphereComponent;
 class UQuestGameplayAbility;
 class AQuestSpellbook;
 class AQuestCharacterRotationActor;
+class UQuestOrderComponent;
 
 
 UENUM(BlueprintType)
@@ -126,6 +127,11 @@ public:
 	// The character's spellbook, if the character can cast spells
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
 		AQuestSpellbook* Spellbook;
+
+	// The character's order component, which handles orders and directs movement and abilities
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = QuestOrderComponent)
+		UQuestOrderComponent* OrderComponent;
+
 
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")

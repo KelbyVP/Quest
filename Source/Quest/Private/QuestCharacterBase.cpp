@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameModeBase.h"
 #include "Components/SphereComponent.h"
+#include "QuestOrderComponent.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
 
@@ -27,6 +28,9 @@ AQuestCharacterBase::AQuestCharacterBase()
 	InteractionSphereRadius = 130.f;
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
+
+	// Add an order component
+	OrderComponent = CreateDefaultSubobject<UQuestOrderComponent>("OrderComponent");
 
 	bIsDead = false;
 	bIsTargetWithinInteractionSphere = false;

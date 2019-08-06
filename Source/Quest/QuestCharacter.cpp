@@ -18,6 +18,7 @@
 #include "QuestAttributeSet.h"
 #include "QuestMerchantCharacter.h"
 #include "QuestPlayerController.h"
+#include "QuestSelectableComponent.h"
 #include "QuestStorage.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -62,6 +63,9 @@ AQuestCharacter::AQuestCharacter()
 	}
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+
+	// Create a selectable component...
+	SelectableComponent = CreateDefaultSubobject<UQuestSelectableComponent>("SelectableComponent");
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;

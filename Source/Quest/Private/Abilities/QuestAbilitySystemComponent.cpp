@@ -3,3 +3,7 @@
 
 #include "QuestAbilitySystemComponent.h"
 
+UQuestAbilitySystemComponent::UQuestAbilitySystemComponent()
+{
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
+}

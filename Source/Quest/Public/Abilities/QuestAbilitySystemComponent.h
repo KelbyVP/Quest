@@ -13,5 +13,7 @@ UCLASS()
 class QUEST_API UQuestAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+		UQuestAbilitySystemComponent();
 };

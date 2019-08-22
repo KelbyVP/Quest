@@ -9,6 +9,7 @@
 #include "QuestOrderData.h"
 #include "QuestAIController.generated.h"
 
+class AQuestGameMode;
 class UQuestOrder;
 /**
  *  Base AI class for controlling all character movement and orders
@@ -18,8 +19,11 @@ class QUEST_API AQuestAIController : public AAIController
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
+public:
 
 	/** Default constructor */
 	AQuestAIController();
@@ -48,6 +52,10 @@ protected:
 
 private:
 
+	/** Tells us whether the character is in combat and should therefore follow combat orders */
+	UPROPERTY(BlueprintReadWrite, Category = "QuestAIController", meta = (AllowPrivateAccess = true))
+		bool bIsInCombat;
+
 	/** Order that stops the character and sets at idle */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestAIController", meta = (AllowPrivateAccess = true))
 		TSoftClassPtr<UQuestOrder> StopOrder;
@@ -56,8 +64,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestAIController", meta = (AllowPrivateAccess = true))
 		UBlackboardData* CharacterBlackboardAsset;
 
-	/** Checks whether we have a valid Blackboard */
-	bool VerifyBlackboard() const;
+	/** Pointer to the current game mode */
+	AQuestGameMode *GameMode;
 
 	/** Caches result of behavior tree */
 	EBTNodeResult::Type BehaviorTreeResult;
@@ -65,10 +73,16 @@ private:
 	/** A delegate from the QuestOrder class that gets called when the Behavior Tree is complete */
 	FQuestOrderCallback CurrentOrderResultCallback;
 
+	/** Checks whether we have a valid Blackboard */
+	bool VerifyBlackboard() const;
+
 	/** Set the value of blackboard keys to be used for the order we are about to execute */
 	void SetBlackboardValues(const FQuestOrderData& Order, const FVector& HomeLocation);
 
 	/** Begins execution of new order */
 	void ApplyOrder(const FQuestOrderData& Order, UBehaviorTree* BehaviorTree);
+
+	/** Called when combat mode begins or ends */
+	void OnCombatEnd();
 
 };

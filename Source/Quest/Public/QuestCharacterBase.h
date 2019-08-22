@@ -172,6 +172,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
 		void BP_MeleeAttack();
 
+	/** Called when character dies */
+	UFUNCTION()
+		void OnDeath();
+
 	/** Blueprint event that gets called when the character dies */
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();

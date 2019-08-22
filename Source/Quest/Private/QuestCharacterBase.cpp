@@ -49,10 +49,6 @@ void AQuestCharacterBase::BeginPlay()
 	/** Subscribe to the Begin and End Overlap events broadcast from the Interaction Sphere */
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
-
-	/** Subscribe to the QuestGameMode delegate that tells us when we are entering or exiting combat mode */
-	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	GameMode->OnCombatModeChange.AddDynamic(this, &AQuestCharacterBase::OnCombatModeChanged);
 }
 
 // Called every frame
@@ -104,8 +100,7 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	// Check to see whether the character is dead
 	if (Health <= 0)
 	{
-		bIsDead = true;
-		BP_Die();
+		OnDeath();
 	}
 
 	// call the Blueprint function that determines what happens when health changed
@@ -138,6 +133,13 @@ void AQuestCharacterBase::OnCombatModeChanged(bool NewbIsCombatModeActive)
 void AQuestCharacterBase::MeleeAttack()
 {
 	BP_MeleeAttack();
+}
+
+void AQuestCharacterBase::OnDeath()
+{
+	bIsDead = true;
+	GameMode->RemoveEnemyInCombat(this);
+	BP_Die();
 }
 
 void AQuestCharacterBase::SetTargetActorToNull()

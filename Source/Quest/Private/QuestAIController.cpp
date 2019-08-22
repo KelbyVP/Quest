@@ -4,13 +4,27 @@
 #include "QuestAIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "QuestBlackboardHelper.h"
+#include "QuestGameMode.h"
 #include "QuestOrderHelper.h"
+
+
 
 AQuestAIController::AQuestAIController()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bIsInCombat = false;
 }
+
+void AQuestAIController::BeginPlay()
+{
+	/** Subscribe to the QuestGameMode delegate that tells us when we are entering or exiting combat mode */
+	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameMode->OnCombatEnd.AddDynamic(this, &AQuestAIController::OnCombatEnd);
+}
+
+
 
 void AQuestAIController::Tick(float DeltaTime)
 {
@@ -158,4 +172,10 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 			BehaviorTreeComponent->StartTree(*BehaviorTree, EBTExecutionMode::SingleRun);
 		}
 	}
+}
+
+void AQuestAIController::OnCombatEnd()
+{
+	bIsInCombat = false;
+	// TODO:  Need to issue stop order when combat ends
 }

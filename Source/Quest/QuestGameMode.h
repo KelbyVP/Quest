@@ -7,7 +7,7 @@
 #include "QuestGameMode.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCombatModeChange, bool, bIsCombatModeActive);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCombatEnd);
 
 class AQuestCharacterBase;
 
@@ -25,24 +25,21 @@ public:
 
 
 	/** 
-	*	During combat mode, this array tracks all enemy characters that have been seen by the party
-	*	All enemies in this array must be killed before the game exits Combat Mode 
+	*	This array tracks all enemy characters that are in combat with the party
+	*	When all enemies in this array are dead, the Game Mode sends a delegate stating that combat is over
 	*/
 	UPROPERTY()
-	TArray<AQuestCharacterBase*> SpottedEnemies;
-
-	FOnCombatModeChange OnCombatModeChange;
+	FOnCombatEnd OnCombatEnd;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestGameMode")
-		void SetbIsCombatModeActive(bool NewValue);
+		void AddEnemyInCombat(AQuestCharacterBase* EnemyToAdd);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestGameMode")
+		void RemoveEnemyInCombat(AQuestCharacterBase* EnemyToRemove);
 
 private:
 
-	/**
-	*	Determines whether in combat mode
-	*	Combat mode means that characters perform default combat behavior when not assigned other actions
-	*/
-	bool bIsCombatModeActive;
+	TArray<AQuestCharacterBase*> EnemiesInCombat;
 
 };
 

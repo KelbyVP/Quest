@@ -17,11 +17,21 @@ AQuestGameMode::AQuestGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	bIsCombatModeActive = false;
 }
 
-void AQuestGameMode::SetbIsCombatModeActive(bool NewValue)
+void AQuestGameMode::AddEnemyInCombat(AQuestCharacterBase* EnemyToAdd)
 {
-	bIsCombatModeActive = NewValue;
-	OnCombatModeChange.Broadcast(bIsCombatModeActive);
+	EnemiesInCombat.AddUnique(EnemyToAdd);
+}
+
+void AQuestGameMode::RemoveEnemyInCombat(AQuestCharacterBase* EnemyToRemove)
+{
+	if (EnemiesInCombat.Contains(EnemyToRemove))
+	{
+		EnemiesInCombat.Remove(EnemyToRemove);
+	}
+	if (EnemiesInCombat.Num() <= 0)
+	{
+		OnCombatEnd.Broadcast();
+	}
 }

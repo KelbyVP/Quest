@@ -276,7 +276,7 @@ void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 				{
 					if (!bIsCombatModeActive)
 					{
-						GameMode->SetbIsCombatModeActive(true);
+						//GameMode->SetbIsCombatModeActive(true);
 					}
 					SetbIsReadyForNextAttack(true);
 					MeleeAttack();

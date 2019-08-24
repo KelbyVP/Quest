@@ -118,10 +118,10 @@ void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveCompon
 
 void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (TargetActor && TargetActor == OtherActor)
-	{
-		bIsTargetWithinInteractionSphere = false;
-	}
+	//if (TargetActor && TargetActor == OtherActor)
+	//{
+	//	bIsTargetWithinInteractionSphere = false;
+	//}
 }
 
 void AQuestCharacterBase::OnCombatModeChanged(bool NewbIsCombatModeActive)
@@ -132,7 +132,7 @@ void AQuestCharacterBase::OnCombatModeChanged(bool NewbIsCombatModeActive)
 
 void AQuestCharacterBase::MeleeAttack()
 {
-	BP_MeleeAttack();
+	//BP_MeleeAttack();
 }
 
 void AQuestCharacterBase::OnDeath()
@@ -144,10 +144,10 @@ void AQuestCharacterBase::OnDeath()
 
 void AQuestCharacterBase::SetTargetActorToNull()
 {
-	if (TargetActor)
-	{
-		TargetActor = nullptr;
-	}
+	//if (TargetActor)
+	//{
+	//	TargetActor = nullptr;
+	//}
 }
 
 void AQuestCharacterBase::SetSpellbookType()

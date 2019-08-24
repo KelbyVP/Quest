@@ -83,7 +83,7 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	if (CursorToWorld != nullptr)
+	/*if (CursorToWorld != nullptr)
 	{
 		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
 		{
@@ -112,93 +112,93 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 	if (bIsCombatModeActive && bIsReadyForNextAttack)
 	{
 		SelectTargetCharacterToAttack();
-	}
+	}*/
 }
 
 void AQuestCharacter::SelectTargetCharacterToAttack()
 {
-	/** If we do not have a Target Actor, find live enemies and attack the closest one */
-	if (!TargetActor)
-	{
-		TArray<FHitResult> NearbyPawns = ScanForNearbyPawns();
+	///** If we do not have a Target Actor, find live enemies and attack the closest one */
+	//if (!TargetActor)
+	//{
+	//	TArray<FHitResult> NearbyPawns = ScanForNearbyPawns();
 
-		if (NearbyPawns.Num() > 0)
-		{
-			/** See which nearby pawns are live enemies */
-			FString PawnName = NearbyPawns[0].GetActor()->GetName();
-			TArray<AQuestCharacterBase*> LocalLiveEnemies = GetEnemiesFromPawnHits(NearbyPawns);
+	//	if (NearbyPawns.Num() > 0)
+	//	{
+	//		/** See which nearby pawns are live enemies */
+	//		FString PawnName = NearbyPawns[0].GetActor()->GetName();
+	//		TArray<AQuestCharacterBase*> LocalLiveEnemies = GetEnemiesFromPawnHits(NearbyPawns);
 
-			/** See which live enemy is closest */
-			TargetActor = SelectClosestEnemy(LocalLiveEnemies);
-			if (!TargetActor)
-			{return;}
+	//		/** See which live enemy is closest */
+	//		TargetActor = SelectClosestEnemy(LocalLiveEnemies);
+	//		if (!TargetActor)
+	//		{return;}
 
-			/** Attack the closest live enemy*/
-			MoveToTarget(TargetActor);
-			return;
-		}
-		else
-		{
-			/** We did not find any pawns in range, so disable auto-attack and return */
-			UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SelectTargetToAttack did not find any pawns in range"))
-			SetbIsReadyForNextAttack(false);
-			return;
-		}
-	}
+	//		/** Attack the closest live enemy*/
+	//		MoveToTarget(TargetActor);
+	//		return;
+	//	}
+	//	else
+	//	{
+	//		/** We did not find any pawns in range, so disable auto-attack and return */
+	//		UE_LOG(LogTemp, Warning, TEXT("QuestCharacter:SelectTargetToAttack did not find any pawns in range"))
+	//		SetbIsReadyForNextAttack(false);
+	//		return;
+	//	}
+	//}
 
-	/** If we already have a valid target, attack it if it is a live enemy */
-	if (TargetActor)
-	{
-		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
-		{
-			if (TargetCharacter->bIsHostile)
-			{
-				if (TargetCharacter->bIsDead)
-				{
-					TargetActor = nullptr;
-				}
-				else
-				{
-					MoveToTarget(TargetCharacter);
-					return;
-				}
-			}
-			else
-			{
-				return;
-			}
-		}
-		else
-		{
-			return;
-		}
-	}
+	///** If we already have a valid target, attack it if it is a live enemy */
+	//if (TargetActor)
+	//{
+	//	if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+	//	{
+	//		if (TargetCharacter->bIsHostile)
+	//		{
+	//			if (TargetCharacter->bIsDead)
+	//			{
+	//				TargetActor = nullptr;
+	//			}
+	//			else
+	//			{
+	//				MoveToTarget(TargetCharacter);
+	//				return;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			return;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		return;
+	//	}
+	//}
 }
 
 TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
 {
 	TArray<FHitResult> NearbyPawns;
-	FVector Start = GetActorLocation();
-	FVector End = Start + FVector(0, 0, 1);
-	float SweepSphereRadius = 500.0f;
+	//FVector Start = GetActorLocation();
+	//FVector End = Start + FVector(0, 0, 1);
+	//float SweepSphereRadius = 500.0f;
 
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(GetOwner());
-	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredComponent(GetCapsuleComponent());
+	//FCollisionQueryParams QueryParams;
+	//QueryParams.AddIgnoredActor(GetOwner());
+	//QueryParams.AddIgnoredActor(this);
+	//QueryParams.AddIgnoredComponent(GetCapsuleComponent());
 
-	FCollisionObjectQueryParams ObjParams;
-	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	//FCollisionObjectQueryParams ObjParams;
+	//ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
-	GetWorld()->SweepMultiByObjectType(
-		NearbyPawns,
-		Start,
-		End,
-		FQuat::Identity,
-		ObjParams,
-		FCollisionShape::MakeSphere(SweepSphereRadius),
-		QueryParams
-	);
+	//GetWorld()->SweepMultiByObjectType(
+	//	NearbyPawns,
+	//	Start,
+	//	End,
+	//	FQuat::Identity,
+	//	ObjParams,
+	//	FCollisionShape::MakeSphere(SweepSphereRadius),
+	//	QueryParams
+	//);
 
 	return NearbyPawns;
 }
@@ -206,140 +206,140 @@ TArray<FHitResult> AQuestCharacter::ScanForNearbyPawns()
 TArray<AQuestCharacterBase*> AQuestCharacter::GetEnemiesFromPawnHits(TArray<FHitResult> OutHits)
 {
 	TArray<AQuestCharacterBase*> LocalLiveEnemies;
-	for (auto& Hit : OutHits)
-	{
-		AQuestCharacterBase* Pawn = Cast<AQuestCharacterBase>(Hit.GetActor());
-		if (Pawn && Pawn->bIsHostile && !Pawn->bIsDead)
-		{
-			LocalLiveEnemies.AddUnique(Pawn);
-		}
-	}
+	//for (auto& Hit : OutHits)
+	//{
+	//	AQuestCharacterBase* Pawn = Cast<AQuestCharacterBase>(Hit.GetActor());
+	//	if (Pawn && Pawn->bIsHostile && !Pawn->bIsDead)
+	//	{
+	//		LocalLiveEnemies.AddUnique(Pawn);
+	//	}
+	//}
 	return LocalLiveEnemies;
 }
 
 AQuestCharacterBase* AQuestCharacter::SelectClosestEnemy(TArray<AQuestCharacterBase*> LocalLiveEnemies)
 {
-	if (LocalLiveEnemies.Num() > 0)
-	{
-		AQuestCharacterBase* ClosestEnemy = LocalLiveEnemies[0];
-		float DistanceToClosestEnemy = FVector::Dist(GetActorLocation(), ClosestEnemy->GetActorLocation());
-		for (auto& Enemy : LocalLiveEnemies)
-		{
-			float DistanceToThisEnemy = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
-			if (DistanceToThisEnemy <= DistanceToClosestEnemy)
-			{
-				ClosestEnemy = Enemy;
-				DistanceToClosestEnemy = DistanceToThisEnemy;
-			}
-		}
-		return ClosestEnemy;
-	}
+	//if (LocalLiveEnemies.Num() > 0)
+	//{
+	//	AQuestCharacterBase* ClosestEnemy = LocalLiveEnemies[0];
+	//	float DistanceToClosestEnemy = FVector::Dist(GetActorLocation(), ClosestEnemy->GetActorLocation());
+	//	for (auto& Enemy : LocalLiveEnemies)
+	//	{
+	//		float DistanceToThisEnemy = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
+	//		if (DistanceToThisEnemy <= DistanceToClosestEnemy)
+	//		{
+	//			ClosestEnemy = Enemy;
+	//			DistanceToClosestEnemy = DistanceToThisEnemy;
+	//		}
+	//	}
+	//	return ClosestEnemy;
+	//}
 	return nullptr;
 }
 
 void AQuestCharacter::AutoAttack()
 {
-	if (TargetActor)
-	{
-		if (AQuestCharacterBase* CharacterToAttack = Cast<AQuestCharacterBase>(TargetActor))
-		{
-			if (CharacterToAttack->bIsHostile && !CharacterToAttack->bIsDead)
-			{
-				MoveToTarget(CharacterToAttack);
-			}
-		}
-	}
+	//if (TargetActor)
+	//{
+	//	if (AQuestCharacterBase* CharacterToAttack = Cast<AQuestCharacterBase>(TargetActor))
+	//	{
+	//		if (CharacterToAttack->bIsHostile && !CharacterToAttack->bIsDead)
+	//		{
+	//			MoveToTarget(CharacterToAttack);
+	//		}
+	//	}
+	//}
 }
 
 void AQuestCharacter::InteractWithTarget(AActor* InteractionTarget)
 {
-	if (InteractionTarget && InteractionTarget == TargetActor)
-	{
-		//  Decide what to do if the target is a character
-		if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
-		{
-			if (TargetCharacter->bIsDead)
-			{
-				if (TargetCharacter->bIsHostile)
-				{
-					if (bIsCombatModeActive)
-					{
-						bIsReadyForNextAttack = true;
-					}
-				}
-					// TODO:  Figure out what to do if the character is dead (eg. loot the body)
-			}
-			else
-			{
-				/**	If the target character is hostile, melee attack */
-				if (TargetCharacter->bIsHostile)
-				{
-					if (!bIsCombatModeActive)
-					{
-						//GameMode->SetbIsCombatModeActive(true);
-					}
-					SetbIsReadyForNextAttack(true);
-					MeleeAttack();
-				}
+	//if (InteractionTarget && InteractionTarget == TargetActor)
+	//{
+	//	//  Decide what to do if the target is a character
+	//	if (AQuestCharacterBase * TargetCharacter = Cast<AQuestCharacterBase>(TargetActor))
+	//	{
+	//		if (TargetCharacter->bIsDead)
+	//		{
+	//			if (TargetCharacter->bIsHostile)
+	//			{
+	//				if (bIsCombatModeActive)
+	//				{
+	//					bIsReadyForNextAttack = true;
+	//				}
+	//			}
+	//				// TODO:  Figure out what to do if the character is dead (eg. loot the body)
+	//		}
+	//		else
+	//		{
+	//			/**	If the target character is hostile, melee attack */
+	//			if (TargetCharacter->bIsHostile)
+	//			{
+	//				if (!bIsCombatModeActive)
+	//				{
+	//					//GameMode->SetbIsCombatModeActive(true);
+	//				}
+	//				SetbIsReadyForNextAttack(true);
+	//				MeleeAttack();
+	//			}
 
-				/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
-				else if (Cast<AQuestMerchantCharacter>(TargetCharacter))
-				{
-					Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter);
-					AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-					if (PlayerController)
-					{
-						Merchant->OnInteract(PlayerController);
-						TargetActor = nullptr;
-					}
-				}
-				else
-				{
-					/** TODO:  implement functionality for other types of characters (eg., dialogue for NPCs) */
-				}
-			}
-		}
-		/** If the target is a storage actor, open it */
-		else if (Cast<AQuestStorage>(TargetActor))
-		{
-			StorageChest = Cast<AQuestStorage>(TargetActor);
-			AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			if (PlayerController && StorageChest)
-			{
-				StorageChest->OnInteract(PlayerController);
-				TargetActor = nullptr;
-			}
-		}
-	}
+	//			/** If the Target Character is a Merchant, begin a buy/sell dialogue with the merchant */
+	//			else if (Cast<AQuestMerchantCharacter>(TargetCharacter))
+	//			{
+	//				Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter);
+	//				AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//				if (PlayerController)
+	//				{
+	//					Merchant->OnInteract(PlayerController);
+	//					TargetActor = nullptr;
+	//				}
+	//			}
+	//			else
+	//			{
+	//				/** TODO:  implement functionality for other types of characters (eg., dialogue for NPCs) */
+	//			}
+	//		}
+	//	}
+	//	/** If the target is a storage actor, open it */
+	//	else if (Cast<AQuestStorage>(TargetActor))
+	//	{
+	//		StorageChest = Cast<AQuestStorage>(TargetActor);
+	//		AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//		if (PlayerController && StorageChest)
+	//		{
+	//			StorageChest->OnInteract(PlayerController);
+	//			TargetActor = nullptr;
+	//		}
+	//	}
+	//}
 }
 
 void AQuestCharacter::MoveToTarget(AActor* MoveTarget)
 {
-	if (MoveTarget)
-	{
-		// See whether we are in range, and if we are, interact with the target actor
-		if (IsOverlappingActor(MoveTarget))
-		{
-			bIsTargetWithinInteractionSphere = true;
-			InteractWithTarget(MoveTarget);
-			return;
-		}
+	//if (MoveTarget)
+	//{
+	//	// See whether we are in range, and if we are, interact with the target actor
+	//	if (IsOverlappingActor(MoveTarget))
+	//	{
+	//		bIsTargetWithinInteractionSphere = true;
+	//		InteractWithTarget(MoveTarget);
+	//		return;
+	//	}
 
-		// If we are not in range, move to the target
-		else
-		{
-			bIsTargetWithinInteractionSphere = false;
-			bIsReadyForNextAttack = false;
-			UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), MoveTarget);
-			
-			return;
-		}
-	}
+	//	// If we are not in range, move to the target
+	//	else
+	//	{
+	//		bIsTargetWithinInteractionSphere = false;
+	//		bIsReadyForNextAttack = false;
+	//		UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), MoveTarget);
+	//		
+	//		return;
+	//	}
+	//}
 }
 
 void AQuestCharacter::SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack)
 {
-	bIsReadyForNextAttack = NewbIsReadyForNextAttack;
+	//bIsReadyForNextAttack = NewbIsReadyForNextAttack;
 }
 
 bool AQuestCharacter::GetbIsReadyForNextAttack()
@@ -349,46 +349,46 @@ bool AQuestCharacter::GetbIsReadyForNextAttack()
 
 void AQuestCharacter::OnMeleeEnd()
 {
-	BP_OnMeleeEnd();
+	//BP_OnMeleeEnd();
 }
 
 void AQuestCharacter::OnLeaveStorage()
 {
-	BP_OnLeaveStorage();
+	//BP_OnLeaveStorage();
 }
 
 void AQuestCharacter::OnLeaveMerchant()
 {
-	BP_OnLeaveMerchant();
+	//BP_OnLeaveMerchant();
 }
 
 void AQuestCharacter::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (TargetActor && TargetActor == OtherActor)
-	{
-		if (bIsCombatModeActive)
-		{
-			bIsReadyForNextAttack = true;
-		}
-		bIsTargetWithinInteractionSphere = true;
-		InteractWithTarget(OtherActor);
-	}
+	//if (TargetActor && TargetActor == OtherActor)
+	//{
+	//	if (bIsCombatModeActive)
+	//	{
+	//		bIsReadyForNextAttack = true;
+	//	}
+	//	bIsTargetWithinInteractionSphere = true;
+	//	InteractWithTarget(OtherActor);
+	//}
 }
 
 void AQuestCharacter::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (TargetActor && TargetActor == OtherActor)
-	{
-		bIsTargetWithinInteractionSphere = false;
-	}
-	if (StorageChest && StorageChest == OtherActor)
-	{
-		OnLeaveStorage();
-	}
-	if (Merchant && Merchant == OtherActor)
-	{
-		OnLeaveMerchant();
-	}
+	//if (TargetActor && TargetActor == OtherActor)
+	//{
+	//	bIsTargetWithinInteractionSphere = false;
+	//}
+	//if (StorageChest && StorageChest == OtherActor)
+	//{
+	//	OnLeaveStorage();
+	//}
+	//if (Merchant && Merchant == OtherActor)
+	//{
+	//	OnLeaveMerchant();
+	//}
 }
 
 void AQuestCharacter::TryLevelUp()

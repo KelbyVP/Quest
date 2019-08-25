@@ -34,9 +34,6 @@ protected:
 
 	/** Navigate player to the current mouse cursor location. */
 	void MoveToMouseCursor();
-
-	/** Navigate player to the current touch location. */
-	void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
 	
 	/** Navigate player to the given world location. */
 	void SetNewMoveDestination(FHitResult &Hit);
@@ -68,18 +65,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 		int MaxGold = 999999999;
 
-	/** Called on completing current movement request */
-	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
 		void BP_OnTargetSelected();
 
 private:
 	AQuestCharacter* ControlledCharacter;
-	void MoveToTargetActor(AActor *MoveTarget);
-	void MoveToTargetLocation();
 	void SetPathFollowingComponent();
-	
+	void MovetoTargetLocation();
 
 	/** Component used for moving along a path. */
 	UPROPERTY(VisibleAnywhere, Category = "QuestPlayerController")

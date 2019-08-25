@@ -20,17 +20,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
 
-	//  Acquire basic abilities
-
-	// Create InteractionSphere that tells us whether character is close enough to attack or interact with another character
-	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeAttackSphere"));
-	InteractionSphereRadius = 130.f;
-	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(InteractionSphereRadius);
-
 	bIsDead = false;
-	bIsTargetWithinInteractionSphere = false;
-	TargetActor = nullptr;
 	CharacterClass = ECharacterClass::IT_Wizard;
 }
 
@@ -41,14 +31,6 @@ void AQuestCharacterBase::BeginPlay()
 
 	/** Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged */
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
-
-	/** Subscribe to the Begin and End Overlap events broadcast from the Interaction Sphere */
-	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractionSphereBeginOverlap);
-	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AQuestCharacterBase::OnInteractonSphereEndOverlap);
-
-	/** Subscribe to the QuestGameMode delegate that tells us when we are entering or exiting combat mode */
-	GameMode = Cast<AQuestGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	GameMode->OnCombatModeChange.AddDynamic(this, &AQuestCharacterBase::OnCombatModeChanged);
 }
 
 // Called every frame
@@ -109,39 +91,9 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	BP_OnHealthChanged(Health, MaxHealth);
 }
 
-void AQuestCharacterBase::OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (TargetActor && TargetActor == OtherActor)
-	{
-		bIsTargetWithinInteractionSphere = true;
-	}
-}
-
-void AQuestCharacterBase::OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (TargetActor && TargetActor == OtherActor)
-	{
-		bIsTargetWithinInteractionSphere = false;
-	}
-}
-
-void AQuestCharacterBase::OnCombatModeChanged(bool NewbIsCombatModeActive)
-{
-		bIsCombatModeActive = NewbIsCombatModeActive;
-		UE_LOG(LogTemp, Warning, TEXT("bIsCombatModeActive changed to %s"), *FString(bIsCombatModeActive ? "true" : "false"))
-}
-
 void AQuestCharacterBase::MeleeAttack()
 {
 	BP_MeleeAttack();
-}
-
-void AQuestCharacterBase::SetTargetActorToNull()
-{
-	if (TargetActor)
-	{
-		TargetActor = nullptr;
-	}
 }
 
 void AQuestCharacterBase::SetSpellbookType()

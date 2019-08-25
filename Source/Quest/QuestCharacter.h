@@ -47,22 +47,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		UQuestSelectableComponent* SelectableComponent;
 
-	void SelectTargetCharacterToAttack();
-	TArray<FHitResult> ScanForNearbyPawns();
-
-	/** Identifies which pawns are hostile and alive */
-	TArray<AQuestCharacterBase*> GetEnemiesFromPawnHits(TArray<FHitResult> OutHits);
-
-	/** Identifies which enemy is closest to this character */
-	AQuestCharacterBase* SelectClosestEnemy(TArray<AQuestCharacterBase*> LocalLiveEnemies);
-
-	void AutoAttack();
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
-		bool bIsReadyForNextAttack;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
-		float AttackCooldownTimer;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		AQuestStorage* StorageChest;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
@@ -75,21 +62,6 @@ public:
 
 	void InteractWithTarget(AActor* InteractionTarget);
 
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
-		void MoveToTarget(AActor* MoveTarget);
-
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
-	void SetbIsReadyForNextAttack(bool NewbIsReadyForNextAttack);
-
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
-		bool GetbIsReadyForNextAttack();
-
-	UFUNCTION()
-	void OnMeleeEnd();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnMeleeEnd"))
-		void BP_OnMeleeEnd();
-
 	void OnLeaveStorage();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLeaveStorage"))
@@ -99,9 +71,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLeaveMerchant"))
 		void BP_OnLeaveMerchant();
-
-	virtual void OnInteractionSphereBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	virtual void OnInteractonSphereEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	// If we have enough experience to level up, increment level and then call BP_OnLevelUp
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")

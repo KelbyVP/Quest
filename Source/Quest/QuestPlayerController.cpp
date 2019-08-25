@@ -50,10 +50,6 @@ void AQuestPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetTarget", IE_Pressed, this, &AQuestPlayerController::OnSetTargetPressed);
 	InputComponent->BindAction("SetTarget", IE_Released, this, &AQuestPlayerController::OnSetTargetReleased);
-
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AQuestPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AQuestPlayerController::MoveToTouchLocation);
 }
 
 
@@ -83,20 +79,6 @@ void AQuestPlayerController::MoveToMouseCursor()
 	}
 }
 
-void AQuestPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	FVector2D ScreenSpaceLocation(Location);
-
-	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult);
-	}
-}
-
 void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 {
 	FVector DestLocation = Hit.ImpactPoint;
@@ -117,21 +99,19 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 			//  If we clicked on a character, set it as the TargetCharacter, move to it, and then interact
 			if (PawnClicked)
 			{
-				ControlledCharacter->TargetActor = PawnClicked;
-				MoveToTargetActor(PawnClicked);
+				// TODO:  Call appropriate order when clicking on a character
 			}
 			// If we clicked on a storage actor, set it as the TargetStorage
 			else if (StorageClicked)
 			{
-				ControlledCharacter->TargetActor = StorageClicked;
-				MoveToTargetActor(StorageClicked);
+				// TODO:  call appropriate order when clicking on a storage
 			}
 			// If we did not click on a character or storage actor, move unless we're too close for the animation to play correctly
 			else
 			{
 				ControlledCharacter->AbilitySystemComponent->CurrentMontageStop(1.0f);
 				DestinationLocation = DestLocation;
-				MoveToTargetLocation();
+				//MoveToTargetLocation();
 			}
 		}
 	}
@@ -139,57 +119,14 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 
 void AQuestPlayerController::OnSetTargetPressed()
 {
-	if (bControllerShouldMoveCharacter)
-	{
 		// set flag to keep updating destination until released
 		bMoveToMouseCursor = true;
-	}
-	else if (bIsTargeting)
-	{
-		BP_OnTargetSelected();
-	}
 }
 
 void AQuestPlayerController::OnSetTargetReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
-}
-
-void AQuestPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
-	if (Result.IsSuccess() && ControlledCharacter->TargetActor && (FVector::Dist(ControlledCharacter->TargetActor->GetActorLocation(), ControlledCharacter->GetActorLocation()) < 150.0f))
-	{
-		ControlledCharacter->SetbIsReadyForNextAttack(true);
-	}
-}
-
-void AQuestPlayerController::MoveToTargetActor(AActor *MoveTarget)
-{	
-	if (MoveTarget)
-	{
-		if (!PathFollowingComponent)
-		{
-			SetPathFollowingComponent();
-		}
-		ControlledCharacter->MoveToTarget(MoveTarget);
-	}
-	return;
-}
-
-void AQuestPlayerController::MoveToTargetLocation()
-{
-	if (!PathFollowingComponent)
-	{
-		SetPathFollowingComponent();
-	}
-	ControlledCharacter->TargetActor = nullptr;
-	ControlledCharacter->SetbIsReadyForNextAttack(false);
-	float const Distance = FVector::Dist(DestinationLocation, ControlledCharacter->GetActorLocation());
-	if ((Distance > 120.0f))
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestinationLocation);
-	}
 }
 
 void AQuestPlayerController::SetPathFollowingComponent()
@@ -204,7 +141,7 @@ void AQuestPlayerController::SetPathFollowingComponent()
 		PathFollowingComponent = FindComponentByClass<UPathFollowingComponent>();
 		
 		/** Bind the delegate that tells us when a move is finished */
-		PathFollowingComponent->OnRequestFinished.AddUObject(this, &AQuestPlayerController::OnMoveCompleted);
+		//PathFollowingComponent->OnRequestFinished.AddUObject(this, &AQuestPlayerController::OnMoveCompleted);
 	}
 
 }

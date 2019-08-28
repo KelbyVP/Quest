@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "QuestSelectableComponent.generated.h"
 
+class AQuestCharacterBase;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSelected);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -29,4 +31,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = QuestSelectableComponent)
 		void ExecuteOnSelected();
+
+
 };

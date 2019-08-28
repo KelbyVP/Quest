@@ -5,12 +5,13 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Engine.h"
 #include "Engine/World.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "QuestGameplayAbility.h"
 #include "Math/Vector.h"
 #include "QuestCharacter.h"
 #include "QuestGameMode.h"
 #include "QuestMerchantCharacter.h"
+#include "QuestSpectatorPawn.h"
 #include "QuestStorage.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 
@@ -30,6 +31,7 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 void AQuestPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	ControlledPawn = Cast<AQuestSpectatorPawn>(GetPawn());
 }
 
 void AQuestPlayerController::PlayerTick(float DeltaTime)
@@ -55,18 +57,6 @@ void AQuestPlayerController::SetupInputComponent()
 
 void AQuestPlayerController::MoveToMouseCursor()
 {
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	{
-		if (AQuestCharacter* MyPawn = Cast<AQuestCharacter>(GetPawn()))
-		{
-			if (MyPawn->GetCursorToWorld())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-			}
-		}
-	}
-	else
-	{
 		// Trace to see what is under the mouse cursor
 		 FHitResult Hit;
 		 GetHitResultUnderCursor(ECC_Visibility, false, Hit);
@@ -76,7 +66,6 @@ void AQuestPlayerController::MoveToMouseCursor()
 			// We hit something, move there
 			SetNewMoveDestination(Hit);
 		}
-	}
 }
 
 void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)

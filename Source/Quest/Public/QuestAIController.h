@@ -24,5 +24,8 @@ public:
 	/** Called every tick */
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
+
 
 };

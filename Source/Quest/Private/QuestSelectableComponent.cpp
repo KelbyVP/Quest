@@ -2,6 +2,7 @@
 
 
 #include "QuestSelectableComponent.h"
+#include "QuestCharacterBase.h"
 
 // Sets default values for this component's properties
 UQuestSelectableComponent::UQuestSelectableComponent()
@@ -34,6 +35,7 @@ void UQuestSelectableComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 void UQuestSelectableComponent::ExecuteOnSelected()
 {
+	// TODO:  This is interesting, but so far I don't think anyone is subscribing to this broadcast.  Might want to delete?  If so, we could delete the class?
 	OnSelected.Broadcast();
 }
 

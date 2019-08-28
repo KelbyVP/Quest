@@ -12,6 +12,7 @@
 class AQuestCharacter;
 class AQuestCharacterBase;
 class AQuestMerchantCharacter;
+class AQuestSpectatorPawn;
 class AQuestStorage;
 
 UCLASS()
@@ -49,6 +50,11 @@ public:
 	AQuestCharacterBase* PawnClicked;
 	AQuestStorage* StorageClicked;
 
+	/** The invisible Spectator Pawn that controls the camera */
+	UPROPERTY(BlueprintReadOnly, Category = "QuestPlayerController")
+	AQuestSpectatorPawn* ControlledPawn;
+
+
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
@@ -69,7 +75,10 @@ public:
 		void BP_OnTargetSelected();
 
 private:
+	// TODO:  Delete this because the player controller no longer controls a Quest Character
 	AQuestCharacter* ControlledCharacter;
+
+
 	void SetPathFollowingComponent();
 	void MovetoTargetLocation();
 

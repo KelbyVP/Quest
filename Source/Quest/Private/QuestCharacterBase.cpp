@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameModeBase.h"
 #include "Components/SphereComponent.h"
+#include "QuestAutoOrderComponent.h"
+#include "QuestOrderHandlingComponent.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
 
@@ -19,6 +21,10 @@ AQuestCharacterBase::AQuestCharacterBase()
 	// Create ability and attribute components
 	AbilitySystemComponent = CreateDefaultSubobject<UQuestAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetComponent = CreateDefaultSubobject<UQuestAttributeSet>("AttributeSet");
+
+	// Create order system components
+	OrderHandlingComponent = CreateDefaultSubobject<UQuestOrderHandlingComponent>("OrderHandlingComponent");
+	AutoOrderComponent = CreateDefaultSubobject<UQuestAutoOrderComponent>("AutoOrderComponent");
 
 	bIsDead = false;
 	CharacterClass = ECharacterClass::IT_Wizard;
@@ -49,6 +55,11 @@ void AQuestCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 UAbilitySystemComponent* AQuestCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+TSoftClassPtr<UQuestDefaultOrder> AQuestCharacterBase::GetDefaultOrder() const
+{
+	return DefaultOrder;
 }
 
 // Gives this character an ability

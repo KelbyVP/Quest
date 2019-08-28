@@ -11,6 +11,7 @@
 #include "QuestWeaponItem.h"
 #include "QuestShieldItem.h"
 #include "QuestGameMode.h"
+#include "QuestOrderData.h"
 #include "QuestCharacterBase.generated.h"
 
 class UQuestAttributeSet;
@@ -18,6 +19,10 @@ class USphereComponent;
 class UQuestGameplayAbility;
 class AQuestSpellbook;
 class AQuestCharacterRotationActor;
+class UQuestAutoOrderComponent;
+class UQuestDefaultOrder;
+class UQuestOrder;
+class UQuestOrderHandlingComponent;
 
 UENUM(BlueprintType)
 enum class ECharacterClass : uint8
@@ -42,8 +47,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
 
 public:	
 	
@@ -103,6 +106,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
 		AQuestSpellbook* Spellbook;
 
+	// Variable to cache the character that this character's actions are directed toward
+// TODO:  Delete this here and incorporate into AI system
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		AQuestCharacterBase* TargetActor;
+
+	// Variable to cache the character's distance from intended location
+	//  TODO:: Delete this here and incorporate into the AI system
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		float DistanceFromDestination;
+
+	/** Variables for Order System */
+	UQuestOrderHandlingComponent* OrderHandlingComponent;
+	UQuestAutoOrderComponent* AutoOrderComponent;
+	TArray<FQuestOrderData> AutoOrderArray;
+
+	/** Default order, puts character at idle */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestCharacterBase)
+	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
+
+	UFUNCTION()
+		TSoftClassPtr<UQuestDefaultOrder> GetDefaultOrder() const;
+
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
@@ -143,15 +168,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
 		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
 
-	// Variable to cache the character that this character's actions are directed toward
-	// TODO:  Delete this here and incorporate into AI system
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
-		AQuestCharacterBase* TargetActor;
 
-	// Variable to cache the character's distance from intended location
-	//  TODO:: Delete this here and incorporate into the AI system
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
-	float DistanceFromDestination;
+
+
 
 
 

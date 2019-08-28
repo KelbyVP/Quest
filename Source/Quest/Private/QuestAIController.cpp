@@ -15,3 +15,10 @@ void AQuestAIController::Tick(float DeltaTime)
 
 }
 
+void AQuestAIController::OnPossess(APawn* InPawn)
+{
+	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::OnPosses: function called!"))
+
+
+}
+

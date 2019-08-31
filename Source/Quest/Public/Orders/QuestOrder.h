@@ -29,8 +29,13 @@ public:
 	/** Gets the order's target type */
 	EQuestOrderTargetType GetTargetType();
 
+	/** Gets the max range for the target; if 0, no max range */
+	float GetTargetRange();
+
 	/** Gets the order's cancellation policy */
 	EQuestOrderCancellationPolicy GetCancellationPolicy();
+
+
 
 	/** The order's tag requirements in order for the character to executed the order */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
@@ -43,5 +48,10 @@ public:
 	///** How the order interacts with other orders */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		EQuestOrderCancellationPolicy CancellationPolicy;
+
+	/** */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder")
+		float TargetRange;
+
 
 };

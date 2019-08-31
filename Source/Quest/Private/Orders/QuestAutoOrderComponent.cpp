@@ -62,7 +62,7 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 	//	UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::IssueAutoOrder: calling order %s"), *Name)
 	//		return true;
 	//}
-	OrderComponent->SetNextOrder(FQuestOrderData(Order));
+	OrderComponent->SetCurrentOrder(FQuestOrderData(Order));
 	return true;
 }
 

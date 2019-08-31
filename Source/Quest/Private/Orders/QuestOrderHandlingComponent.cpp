@@ -2,6 +2,7 @@
 
 
 #include "QuestOrderHandlingComponent.h"
+#include "QuestAIController.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
@@ -26,7 +27,6 @@ void UQuestOrderHandlingComponent::BeginPlay()
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 {
-	FString PolicyText;
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
 	switch (CancellationPolicy)
 	{
@@ -39,6 +39,9 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 		break;
 	case EQuestOrderCancellationPolicy::INSTANT:
 		IssueOrder(NewOrder);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -52,6 +55,23 @@ void UQuestOrderHandlingComponent::SetCurrentOrder(const FQuestOrderData &NewOrd
 
 void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 {
+	APawn* Pawn = Cast<APawn>(GetOwner());
+	AController* AIController = Cast<AController>(Pawn->GetController());
+	if (AIController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder:  Controller NOT found for character %s"), *GetOwner()->GetName())
+			return;
+	}
 
+
+	AQuestAIController* Controller = Cast<AQuestAIController>(Pawn->GetController());
+	if (Controller != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder:  Controller found for %s!"), *GetName())
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder:  Controller NOT found for character %s"), *GetOwner()->GetName())
+	}
 }
 

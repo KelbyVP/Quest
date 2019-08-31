@@ -125,8 +125,20 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestCharacterBase)
 	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
 
+	/** Variables for the AI perception component */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		float AISightRadius;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		float AILoseSightRadius;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		float AISightAge;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+		float AIFieldOfView;
+
 	UFUNCTION()
 		TSoftClassPtr<UQuestDefaultOrder> GetDefaultOrder() const;
+
+
 
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")

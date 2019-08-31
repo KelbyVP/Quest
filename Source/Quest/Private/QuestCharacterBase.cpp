@@ -28,6 +28,12 @@ AQuestCharacterBase::AQuestCharacterBase()
 
 	bIsDead = false;
 	CharacterClass = ECharacterClass::IT_Wizard;
+
+	// Variables for the AI Perception Component
+	AISightRadius = 500.0f;
+	AISightAge = 5.0f;
+	AILoseSightRadius = 550.0f;
+	AIFieldOfView = 180.0f;
 }
 
 // Called when the game starts or when spawned

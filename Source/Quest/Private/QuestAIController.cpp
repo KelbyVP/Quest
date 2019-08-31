@@ -4,6 +4,8 @@
 #include "QuestAIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "QuestAutoOrderComponent.h"
 #include "QuestBlackboardHelperLibrary.h"
 #include "QuestCharacterBase.h"
@@ -11,9 +13,33 @@
 #include "QuestOrderHelperLibrary.h"
 #include "QuestDefaultOrder.h"
 #include "QuestCharacterBase.h"
+#include "UObjectGlobals.h"
 
 AQuestAIController::AQuestAIController()
 {
+	/** Create AI Perception Component and configuration */
+
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
+
+	SightConfig->SightRadius = AISightRadius;
+	SightConfig->LoseSightRadius = AILoseSightRadius;
+	SightConfig->PeripheralVisionAngleDegrees = AIFieldOfView;
+	SightConfig->SetMaxAge(AISightAge);
+
+	/** Detect all types of characters */
+	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+	/** Set dominant sense as sight */
+	GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
+
+	/** Function called when perception component perceives something */
+	GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &AQuestAIController::OnPawnDetected);
+
+	GetPerceptionComponent()->ConfigureSense(*SightConfig);
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -39,11 +65,14 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 	
 	TSoftClassPtr<UQuestOrder> DefaultOrder;
 	AQuestCharacterBase* ControlledPawn = Cast<AQuestCharacterBase>(GetPawn());
+
+	InitializePerceptionComponent(ControlledPawn);
+
+	/** Set the default order */
 	if (ControlledPawn)
 	{
 		DefaultOrder = ControlledPawn->GetDefaultOrder();
 	}
-
 	DefaultOrder.LoadSynchronous();
 
 	/** Set up the blackboard */
@@ -51,10 +80,29 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 	if (UseBlackboard(CharacterBlackboard, BlackboardComponent))
 	{
 		SetBlackboardValues(FQuestOrderData(DefaultOrder.Get()));
-
 	}
 	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(DefaultOrder.Get());
 	RunBehaviorTree(BehaviorTree);
+}
+
+void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn)
+{
+	/** Set up the perception component */
+	
+	if (ControlledPawn && SightConfig)
+	{
+		SightConfig->SightRadius = ControlledPawn->AISightRadius;
+		SightConfig->LoseSightRadius = ControlledPawn->AILoseSightRadius;
+		SightConfig->PeripheralVisionAngleDegrees = ControlledPawn->AIFieldOfView;
+		SightConfig->SetMaxAge(ControlledPawn->AISightAge);
+
+		/** Detect all types of characters */
+		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+		GetPerceptionComponent()->ConfigureSense(*SightConfig);
+	}
 }
 
 bool AQuestAIController::VerifyBlackboard() const
@@ -121,5 +169,10 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 			BehaviorTreeComponent->StartTree(*BehaviorTree, EBTExecutionMode::SingleRun);
 		}
 	}
+}
+
+void AQuestAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
+{
+	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::OnPawnDetected: Pawn sensed!"))
 }
 

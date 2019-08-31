@@ -48,6 +48,7 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
+	Affiliation = ECharacterAffiliation::IT_Friendly;
 	StorageChest = nullptr;
 	Experience = 500000;
 }

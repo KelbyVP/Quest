@@ -2,12 +2,17 @@
 
 
 #include "QuestCharacterBase.h"
-#include "QuestAttributeSet.h"
-#include "GameFramework/Actor.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/GameModeBase.h"
+#include "CollisionQueryParams.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/GameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "QuestAttributeSet.h"
 #include "QuestAutoOrderComponent.h"
+#include "QuestCharacterGroup.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
@@ -28,12 +33,17 @@ AQuestCharacterBase::AQuestCharacterBase()
 
 	bIsDead = false;
 	CharacterClass = ECharacterClass::IT_Wizard;
+	bIsLeader = false;
+	CharacterGroup = nullptr;
+	GroupRange = 2000.0f;
 
 	// Variables for the AI Perception Component
 	AISightRadius = 500.0f;
 	AISightAge = 5.0f;
 	AILoseSightRadius = 550.0f;
 	AIFieldOfView = 180.0f;
+
+	Affiliation = ECharacterAffiliation::IT_Neutral;
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +53,15 @@ void AQuestCharacterBase::BeginPlay()
 
 	/** Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged */
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
+
+	if (bIsLeader)
+	{
+		if (CharacterGroup == nullptr)		
+		{
+			InitializeCharacterGroup();
+			AddMembersToCharacterGroup();
+		}
+	}
 }
 
 // Called every frame
@@ -136,8 +155,60 @@ void AQuestCharacterBase::SetSpellbookType()
 	}
 }
 
+void AQuestCharacterBase::InitializeCharacterGroup()
+{
+	CharacterGroup = GetWorld()->SpawnActor<AQuestCharacterGroup>(AQuestCharacterGroup::StaticClass(), FVector(0, 0, 0), FRotator(), FActorSpawnParameters());
+	CharacterGroup->AddCharacter(this);
+	CharacterGroup->SetLeader(this);
+}
+
+void AQuestCharacterBase::AddMembersToCharacterGroup()
+{
+	/** Set variables for sweep */
+	TArray<FHitResult> CharactersInRange;
+	FVector Start = GetActorLocation();
+	FVector End = Start + FVector(0, 0, 1);
+	float SweepSphereRadius = GroupRange;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredComponent(GetCapsuleComponent());
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+
+	/** Run sweep */
+	GetWorld()->SweepMultiByObjectType(
+		CharactersInRange,
+		Start,
+		End,
+		FQuat::Identity,
+		ObjParams,
+		FCollisionShape::MakeSphere(SweepSphereRadius),
+		QueryParams
+	);
+
+	/** Add found characters with same affiliation  to the character group */
+	if (CharactersInRange.Num() > 0)
+	{
+		for (auto& Hit : CharactersInRange)
+		{
+			AQuestCharacterBase* PossibleMember = Cast<AQuestCharacterBase>(Hit.GetActor());
+			if (PossibleMember && PossibleMember->CharacterGroup == nullptr && Affiliation == PossibleMember->Affiliation)
+			{
+				CharacterGroup->AddCharacter(PossibleMember);
+				FString NewCharacterName = PossibleMember->GetName();
+				UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::AddMembersToCharacterGroup: %s added to group!"), *NewCharacterName)
+			}
+		}
+
+	}
+}
+
 bool AQuestCharacterBase::DoesCharacterHaveTag(FGameplayTag const& Tag)
 {
+	
 	FGameplayTagContainer TagContainer;
 	GetOwnedGameplayTags(TagContainer);
 	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);

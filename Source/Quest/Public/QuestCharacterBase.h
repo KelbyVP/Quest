@@ -14,15 +14,16 @@
 #include "QuestOrderData.h"
 #include "QuestCharacterBase.generated.h"
 
-class UQuestAttributeSet;
-class USphereComponent;
-class UQuestGameplayAbility;
+class AQuestCharacterGroup;
 class AQuestSpellbook;
 class AQuestCharacterRotationActor;
+class UQuestAttributeSet;
 class UQuestAutoOrderComponent;
 class UQuestDefaultOrder;
+class UQuestGameplayAbility;
 class UQuestOrder;
 class UQuestOrderHandlingComponent;
+class USphereComponent;
 
 UENUM(BlueprintType)
 enum class ECharacterClass : uint8
@@ -33,6 +34,15 @@ enum class ECharacterClass : uint8
 	IT_Thief UMETA(DisplayName = "Thief"),
 	IT_Wizard UMETA(DisplayName = "Wizard"),
 	IT_Priest UMETA(DisplayName = "Priest")
+};
+
+/** Describes the character's affiliation to the player's party */
+UENUM(BlueprintType)
+enum class ECharacterAffiliation : uint8
+{
+	IT_Hostile UMETA(DisplayName = "Hostile"),
+	IT_Neutral UMETA(DisplayName = "Neutral"),
+	IT_Friendly UMETA(DisplayName = "Friendly")
 };
 
 UCLASS()
@@ -75,8 +85,25 @@ public:
 		AQuestGameMode* GameMode;
 
 	// Determines whether this character is hostile to the player
+	// TODO:  Remove this as it should be irrelevant given the Affiliation ENUM
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		bool bIsHostile;
+
+	// Describes the character's relationship with the player's party
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		ECharacterAffiliation Affiliation;
+
+	// Sets the group of characters that fight with this character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		AQuestCharacterGroup* CharacterGroup;
+
+	// Tells us whether this character is the leader of its CharacterGroup
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		bool bIsLeader;
+
+	// If this character is the leader of its CharacterGroup, how far to look for other group members
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		float GroupRange;
 
 	//  Tells us whether this character is currently spinning in a rotation actor, so that it does not get picked up by another
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
@@ -177,10 +204,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetSpellbookType();
 
+	/** Moves character to start point on rotation actor such as whirlwind */
 	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
 		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
 
+private:
 
+	void InitializeCharacterGroup();
+	void AddMembersToCharacterGroup();
 
 
 

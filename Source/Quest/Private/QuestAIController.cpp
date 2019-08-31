@@ -87,7 +87,7 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 
 void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn)
 {
-	/** Set up the perception component */
+	/** Set the perception component to use the controlled pawn's settings */
 	
 	if (ControlledPawn && SightConfig)
 	{
@@ -173,6 +173,6 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 
 void AQuestAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
 {
-	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::OnPawnDetected: Pawn sensed!"))
+	
 }
 

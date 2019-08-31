@@ -6,4 +6,5 @@
 AQuestMerchantCharacter::AQuestMerchantCharacter()
 {
 	bIsHostile = false;
+	Affiliation = ECharacterAffiliation::IT_Neutral;
 }

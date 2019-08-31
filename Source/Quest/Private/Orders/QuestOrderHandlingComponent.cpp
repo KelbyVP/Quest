@@ -2,6 +2,7 @@
 
 
 #include "QuestOrderHandlingComponent.h"
+#include "QuestAIController.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
@@ -26,7 +27,6 @@ void UQuestOrderHandlingComponent::BeginPlay()
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 {
-	FString PolicyText;
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
 	switch (CancellationPolicy)
 	{
@@ -52,6 +52,15 @@ void UQuestOrderHandlingComponent::SetCurrentOrder(const FQuestOrderData &NewOrd
 
 void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 {
-
+	AQuestAIController* Controller = Cast<AQuestAIController>(Cast<APawn>(GetOwner())->GetController());
+	if (Controller)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: controller found for %s!"), *GetOwner()->GetName());
+		Controller->IssueOrder(Order);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: controller NOT found for %s!"), *GetOwner()->GetName());
+	}
 }
 

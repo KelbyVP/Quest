@@ -22,15 +22,18 @@ class QUEST_API UQuestAutoOrderComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UQuestAutoOrderComponent();
+	bool IssueAutoOrder(const TSoftClassPtr<UQuestOrder> Order);
+
+	// Stores the character's default order 
+	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-	// Stores the character's default order 
-	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
 
-	bool IssueAutoOrder(const TSoftClassPtr<UQuestOrder> Order);
+
+
 		
 };

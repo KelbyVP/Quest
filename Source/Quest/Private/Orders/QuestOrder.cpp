@@ -7,6 +7,7 @@ UQuestOrder::UQuestOrder()
 {
 	TargetType = EQuestOrderTargetType::NONE;
 	CancellationPolicy = EQuestOrderCancellationPolicy::CAN_BE_CANCELLED;
+	bShouldRestartBehaviorTree = true;
 }
 
 void UQuestOrder::GetTagRequirements(const AActor* OrderedActor, FQuestOrderTagRequirements& OutTagRequirements) const
@@ -22,4 +23,19 @@ EQuestOrderTargetType UQuestOrder::GetTargetType()
 EQuestOrderCancellationPolicy UQuestOrder::GetCancellationPolicy()
 {
 	return CancellationPolicy;
+}
+
+float UQuestOrder::GetRange()
+{
+	return Range;
+}
+
+UBehaviorTree* UQuestOrder::GetBehaviorTree()
+{
+	return BehaviorTree;
+}
+
+bool UQuestOrder::ShouldRestartBehaviorTree()
+{
+	return bShouldRestartBehaviorTree;
 }

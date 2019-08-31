@@ -9,11 +9,12 @@
 #include "QuestOrderTargetType.h"
 #include "QuestOrder.generated.h"
 
+class UBehaviorTree;
 
 /**
  * An order type that can be given to a character to execute
  */
-UCLASS()
+UCLASS(BlueprintType, Abstract, Blueprintable, const)
 class QUEST_API UQuestOrder : public UObject
 {
 	GENERATED_BODY()
@@ -32,6 +33,15 @@ public:
 	/** Gets the order's cancellation policy */
 	EQuestOrderCancellationPolicy GetCancellationPolicy();
 
+	/** Gets the order's range */
+	float GetRange();
+
+	/** Gets the order's behavior tree */
+	UBehaviorTree* GetBehaviorTree();
+
+	/** Tells whether to restart the behavior tree when new order of same type issued */
+	bool ShouldRestartBehaviorTree();
+
 	/** The order's tag requirements in order for the character to executed the order */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		FQuestOrderTagRequirements TagRequirements;
@@ -40,8 +50,21 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		EQuestOrderTargetType TargetType;
 
-	///** How the order interacts with other orders */
+	/** How the order interacts with other orders */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		EQuestOrderCancellationPolicy CancellationPolicy;
+
+	/** Maximum range for targets */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
+		float Range;
+
+	/** The behavior tree associated with the order */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
+		UBehaviorTree* BehaviorTree;
+
+	/** Whether to restart the behavior tree when a new order of same type is issued */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
+		bool bShouldRestartBehaviorTree;
+
 
 };

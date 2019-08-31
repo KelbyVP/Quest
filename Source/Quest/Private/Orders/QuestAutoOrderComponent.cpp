@@ -20,9 +20,9 @@ UQuestAutoOrderComponent::UQuestAutoOrderComponent()
 void UQuestAutoOrderComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	AQuestCharacterBase* Owner = Cast<AQuestCharacterBase>(GetOwner());
-	DefaultOrder = Owner->GetDefaultOrder();
-	IssueAutoOrder(DefaultOrder);
+	//AQuestCharacterBase* Owner = Cast<AQuestCharacterBase>(GetOwner());
+	//DefaultOrder = Owner->GetDefaultOrder();
+	//IssueAutoOrder(DefaultOrder);
 }
 
 bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> Order)

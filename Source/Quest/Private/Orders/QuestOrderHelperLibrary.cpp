@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/Actor.h"
 #include "QuestAbilitySystemHelper.h"
+#include "QuestOrder.h"
 #include "QuestOrderErrorTags.h"
 
 
@@ -88,4 +89,40 @@ EQuestOrderCancellationPolicy UQuestOrderHelperLibrary::GetCancellationPolicy(TS
 	}
 
 	return OrderType->GetDefaultObject<UQuestOrder>()->GetCancellationPolicy();
+}
+
+float UQuestOrderHelperLibrary::GetRange(TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+	return OrderType->GetDefaultObject<UQuestOrder>()->GetRange();
+}
+
+UBehaviorTree* UQuestOrderHelperLibrary::GetBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (OrderType == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::GetBehaviorTree: no valid order type!"))
+			return nullptr;
+	}
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+	return OrderType->GetDefaultObject<UQuestOrder>()->GetBehaviorTree();
+}
+
+bool UQuestOrderHelperLibrary::ShouldRestartBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (OrderType == nullptr)
+	{
+		return true;
+	}
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+	return OrderType->GetDefaultObject<UQuestOrder>()->ShouldRestartBehaviorTree();
 }

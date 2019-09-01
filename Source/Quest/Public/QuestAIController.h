@@ -28,15 +28,16 @@ public:
 	/** Called every tick */
 	virtual void Tick(float DeltaTime) override;
 
-	/** Issues the order specified */
-	void IssueOrder(const FQuestOrderData& Order);
-
-
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	UFUNCTION()
-	void InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn);
+		void InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn);
+
+
+
+
+
 
 private:
 	/** Blackboard that holds data used by the AI */
@@ -67,6 +68,9 @@ public:
 		float AILoseSightRadius = AISightRadius + 50.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestAIController")
 		float AIFieldOfView = 90.0f;
+
+	/** Issues the order specified */
+	void IssueOrder(const FQuestOrderData& Order);
 
 
 };

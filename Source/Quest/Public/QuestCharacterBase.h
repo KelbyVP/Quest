@@ -208,6 +208,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
 		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void EnterCombat();
+
 private:
 
 	/** Sets up the character group, but is overriden for QuestCharacter class, which uses the Party instead */

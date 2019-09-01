@@ -48,25 +48,14 @@ void AQuestAIController::Tick(float DeltaTime)
 {
 }
 
-void AQuestAIController::IssueOrder(const FQuestOrderData& Order)
-{
-	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(Order.OrderType.Get());
-	if (BehaviorTree == nullptr)
-	{
-		return;
-	}
-
-	SetBlackboardValues(Order);
-	ApplyOrder(Order, BehaviorTree);
-}
-
 void AQuestAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	
+
 	TSoftClassPtr<UQuestOrder> DefaultOrder;
 	AQuestCharacterBase* ControlledPawn = Cast<AQuestCharacterBase>(GetPawn());
 
+	/** Updates the PerceptionComponent's variables based on the character settings */
 	InitializePerceptionComponent(ControlledPawn);
 
 	/** Set the default order */
@@ -86,10 +75,11 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 	RunBehaviorTree(BehaviorTree);
 }
 
+
 void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn)
 {
 	/** Set the perception component to use the controlled pawn's settings */
-	
+
 	if (ControlledPawn && SightConfig)
 	{
 		SightConfig->SightRadius = ControlledPawn->AISightRadius;
@@ -105,6 +95,19 @@ void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* Cont
 		GetPerceptionComponent()->ConfigureSense(*SightConfig);
 	}
 }
+
+void AQuestAIController::IssueOrder(const FQuestOrderData& Order)
+{
+	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(Order.OrderType.Get());
+	if (BehaviorTree == nullptr)
+	{
+		return;
+	}
+
+	SetBlackboardValues(Order);
+	ApplyOrder(Order, BehaviorTree);
+}
+
 
 bool AQuestAIController::VerifyBlackboard() const
 {

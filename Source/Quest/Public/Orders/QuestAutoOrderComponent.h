@@ -27,6 +27,14 @@ public:
 	// Stores the character's default order 
 	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
 
+	/** Tells us whether the character is in combat */
+	bool bIsInCombat = false;
+
+	UFUNCTION()
+		void EnterCombat();
+
+	void SelectOrder();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

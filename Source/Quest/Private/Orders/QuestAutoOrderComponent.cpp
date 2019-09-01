@@ -20,9 +20,6 @@ UQuestAutoOrderComponent::UQuestAutoOrderComponent()
 void UQuestAutoOrderComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	//AQuestCharacterBase* Owner = Cast<AQuestCharacterBase>(GetOwner());
-	//DefaultOrder = Owner->GetDefaultOrder();
-	//IssueAutoOrder(DefaultOrder);
 }
 
 bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> Order)
@@ -64,5 +61,16 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 	//}
 	OrderComponent->SetNextOrder(FQuestOrderData(Order));
 	return true;
+}
+
+void UQuestAutoOrderComponent::EnterCombat()
+{
+	bIsInCombat = true;
+	SelectOrder(); 
+}
+
+void UQuestAutoOrderComponent::SelectOrder()
+{
+	// TODO:  create order selection process
 }
 

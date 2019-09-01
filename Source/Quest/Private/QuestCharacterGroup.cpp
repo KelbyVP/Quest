@@ -19,22 +19,27 @@ void AQuestCharacterGroup::BeginPlay()
 void AQuestCharacterGroup::AddCharacter(AQuestCharacterBase* CharacterToAdd)
 {
 	Members.AddUnique(CharacterToAdd);
-	CharacterToAdd->CharacterGroup = this;
+	CharacterToAdd->SetCharacterGroup(this);
 }
 
 void AQuestCharacterGroup::SetLeader(AQuestCharacterBase* NewLeader)
 {
 	Leader = NewLeader;
 	Affiliation = Leader->Affiliation;
+	FString LeaderName = Leader->GetName();
+	FString GroupName = GetName();
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterGroup::SetLeader: %s has been set as leader of group %s!"), *LeaderName, *GroupName)
 }
 
 void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* CharacterToFight)
 {
-	/** Don't start fighting if other character is neutral or on our side */
+	/** Don't start fighting if other character is neutral, on our side, or dead */
 	if (CharacterToFight != nullptr && Leader != nullptr)
 	{
-		if (CharacterToFight->Affiliation == ECharacterAffiliation::IT_Neutral 
-			|| CharacterToFight->Affiliation == Leader->Affiliation)
+		if (CharacterToFight->Affiliation == ECharacterAffiliation::IT_Neutral || 
+			CharacterToFight->Affiliation == Leader->Affiliation ||
+			CharacterToFight->bIsDead
+			)
 		{
 			return;
 		}
@@ -47,19 +52,12 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 
 		/** Start fighting this group */
 		AdverseGroupsInCombat.Add(CharacterToFight->CharacterGroup);
-		FString LeaderName;
+		bIsInCombat = true;
+		OnEnterCombat.Broadcast();
 		if (Leader)
 		{
-			LeaderName = Leader->GetName();
+			CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
 		}
-		else
-		{
-			LeaderName = FString(TEXT("NoName"));
-		}
-
-		FString OtherName = CharacterToFight->GetName();
-		FString ThisGroup = GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterGFroup::ShouldStartFighting %s added %s to an AdverseGroupsInCombat array called %s!"), *LeaderName, *OtherName, *ThisGroup);
 	}
 
 }

@@ -118,6 +118,7 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	// Check to see whether the character is dead
 	if (Health <= 0)
 	{
+		// TODO:  If the character is a leader and dies, we need to see whether there are any other characters in the character group, and if so, make one of them the leader
 		bIsDead = true;
 		BP_Die();
 	}
@@ -152,6 +153,31 @@ void AQuestCharacterBase::SetSpellbookType()
 		{
 			Spellbook->SpellbookType = ESpellType::IT_Other;
 		}
+	}
+}
+
+void AQuestCharacterBase::SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup)
+{
+	CharacterGroup = InCharacterGroup;
+	CharacterGroup->OnEnterCombat.AddDynamic(this, &AQuestCharacterBase::EnterCombat);
+}
+
+void AQuestCharacterBase::EnterCombat()
+{
+	if (AutoOrderComponent)
+	{
+		/** if we are already in combat, do nothing */
+		if (AutoOrderComponent->bIsInCombat)
+		{
+			return;
+		}
+
+		/** If we are not already in combat, begin */
+		AutoOrderComponent->EnterCombat();
+
+
+		FString ThisName = GetName();
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::EnterCombat: %s is entering combat!"), *ThisName)
 	}
 }
 

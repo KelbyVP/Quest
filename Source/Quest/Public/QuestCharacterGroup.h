@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "QuestCharacterBase.h"
 #include "QuestCharacterGroup.generated.h"
-
-class AQuestCharacterBase;
 
 UCLASS()
 class QUEST_API AQuestCharacterGroup : public AActor
@@ -38,8 +37,16 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestCharacterGroup")
 		AQuestCharacterBase* Leader;
 
+	/** The affiliation of this group with the player's party */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestCharacterGroup")
+		ECharacterAffiliation Affiliation = ECharacterAffiliation::IT_Neutral;
+
+
 	/** Tells us whether this group is currently in combat */
 	bool bIsInCombat;
+
+	/** Array of character groups with whom this group is currently fighting */
+	TArray<AQuestCharacterGroup*> AdverseGroupsInCombat;
 
 	/** Adds a character to the group */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
@@ -48,6 +55,9 @@ public:
 	/** Sets a leader for the group */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
 		void SetLeader(AQuestCharacterBase* NewLeader);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
+		void CheckShouldStartFighting(AQuestCharacterBase* CharacterToFight);
 
 
 private:

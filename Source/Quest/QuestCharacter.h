@@ -33,6 +33,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		UQuestSelectableComponent* SelectableComponent;
 
+	/** Override the parent function to do nothing because the QuestCharacter class uses a party instead */
+	void InitializeCharacterGroup() override;
+
 
 public:
 

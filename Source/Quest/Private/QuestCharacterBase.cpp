@@ -38,7 +38,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 	GroupRange = 2000.0f;
 
 	// Variables for the AI Perception Component
-	AISightRadius = 500.0f;
+	AISightRadius = 1500.0f;
 	AISightAge = 5.0f;
 	AILoseSightRadius = 550.0f;
 	AIFieldOfView = 180.0f;
@@ -189,26 +189,26 @@ void AQuestCharacterBase::AddMembersToCharacterGroup()
 		QueryParams
 	);
 
-	/** Add found characters with same affiliation  to the character group */
+	/** Add found characters with same affiliation to the character group if they are not already leaders */
 	if (CharactersInRange.Num() > 0)
 	{
 		for (auto& Hit : CharactersInRange)
 		{
 			AQuestCharacterBase* PossibleMember = Cast<AQuestCharacterBase>(Hit.GetActor());
-			if (PossibleMember && PossibleMember->CharacterGroup == nullptr && Affiliation == PossibleMember->Affiliation)
+			if (PossibleMember && 
+				PossibleMember->CharacterGroup == nullptr && 
+				Affiliation == PossibleMember->Affiliation &&
+				!PossibleMember->bIsLeader
+				)
 			{
 				CharacterGroup->AddCharacter(PossibleMember);
-				FString NewCharacterName = PossibleMember->GetName();
-				UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::AddMembersToCharacterGroup: %s added to group!"), *NewCharacterName)
 			}
 		}
-
 	}
 }
 
 bool AQuestCharacterBase::DoesCharacterHaveTag(FGameplayTag const& Tag)
 {
-	
 	FGameplayTagContainer TagContainer;
 	GetOwnedGameplayTags(TagContainer);
 	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);

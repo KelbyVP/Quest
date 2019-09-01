@@ -210,7 +210,8 @@ public:
 
 private:
 
-	void InitializeCharacterGroup();
+	/** Sets up the character group, but is overriden for QuestCharacter class, which uses the Party instead */
+	virtual void InitializeCharacterGroup();
 	void AddMembersToCharacterGroup();
 
 

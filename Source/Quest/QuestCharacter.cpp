@@ -57,6 +57,12 @@ void AQuestCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 }
+
+void AQuestCharacter::InitializeCharacterGroup()
+{
+
+}
+
 //
 //void AQuestCharacter::SelectTargetCharacterToAttack()
 //{

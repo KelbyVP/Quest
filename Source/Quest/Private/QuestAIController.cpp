@@ -9,6 +9,7 @@
 #include "QuestAutoOrderComponent.h"
 #include "QuestBlackboardHelperLibrary.h"
 #include "QuestCharacterBase.h"
+#include "QuestCharacterGroup.h"
 #include "QuestOrder.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestDefaultOrder.h"
@@ -27,7 +28,7 @@ AQuestAIController::AQuestAIController()
 	SightConfig->PeripheralVisionAngleDegrees = AIFieldOfView;
 	SightConfig->SetMaxAge(AISightAge);
 
-	/** Detect all types of characters */
+	/** Detect all characters  */
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
@@ -173,6 +174,14 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 
 void AQuestAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
 {
-	
+	AQuestCharacterBase* ControlledCharacter = Cast<AQuestCharacterBase>(GetPawn());
+	for (auto& PawnToCheck : DetectedPawns)
+	{
+		AQuestCharacterBase* CharacterDetected = Cast<AQuestCharacterBase>(PawnToCheck);
+		if (CharacterDetected)
+		{
+				ControlledCharacter->CharacterGroup->CheckShouldStartFighting(CharacterDetected);
+		}
+	}
 }
 

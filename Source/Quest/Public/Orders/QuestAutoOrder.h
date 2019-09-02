@@ -31,4 +31,6 @@ struct QUEST_API FQuestAutoOrder
 	/** Operator overloads */
 	bool operator==(const FQuestAutoOrder& Other) const;
 	bool operator!=(const FQuestAutoOrder& Other) const;
+
+	bool FindAutoOrderInArray(const TArray<FQuestAutoOrder> InArray, int32& Index);
 };

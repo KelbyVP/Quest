@@ -32,6 +32,10 @@ public:
 
 	UFUNCTION()
 		void EnterCombat();
+	UFUNCTION()
+		void GenerateAutoOrder();
+
+
 
 protected:
 	// Called when the game starts
@@ -42,7 +46,8 @@ private:
 	/** Sets a ranged or melee attack order based on the character's equipped weapon */
 	bool GetWeaponAttackOrder(TSoftClassPtr<UQuestOrder>& InOrder);
 
-	bool SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrder);
+	UFUNCTION()
+		bool SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrder);
 
 		
 };

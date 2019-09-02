@@ -34,22 +34,20 @@ protected:
 	UFUNCTION()
 		void InitializePerceptionComponent(AQuestCharacterBase* ControlledPawn);
 
-
-
-
-
-
 private:
-	/** Blackboard that holds data used by the AI */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestAIController", meta = (AllowPrivateAccess = true))
-		UBlackboardData * CharacterBlackboard;
-
 	/** Variables for the AI Perception System */
 	UPROPERTY()
 		UAISenseConfig_Sight* SightConfig;
 
+	/** Blackboard that holds data used by the AI */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestAIController", meta = (AllowPrivateAccess = true))
+		UBlackboardData * CharacterBlackboard;
 
+	/** Delegate that broadcasts results of the current Behavior Tree */
+	FQuestOrderCallback CurrentOrderResultCallback;
 
+	/** Used to cache the Behavior Tree result */
+	EBTNodeResult::Type BehaviorTreeResult;
 
 	bool VerifyBlackboard() const;
 	void SetBlackboardValues(const FQuestOrderData& Order);
@@ -60,6 +58,10 @@ private:
 	void OnPawnDetected(const TArray<AActor*>& DetectedPawns);
 
 public:
+
+	/** 
+	*	Default variables for the Perception Component 
+	*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestAIController")
 		float AISightRadius = 500.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestAIController")
@@ -70,7 +72,11 @@ public:
 		float AIFieldOfView = 90.0f;
 
 	/** Issues the order specified */
-	void IssueOrder(const FQuestOrderData& Order);
+	void IssueOrder(const FQuestOrderData& Order, FQuestOrderCallback Callback);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestAIController")
+		void BehaviorTreeEnded(EBTNodeResult::Type Result);
+
 
 
 };

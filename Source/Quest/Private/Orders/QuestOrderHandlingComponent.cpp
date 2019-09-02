@@ -3,6 +3,9 @@
 
 #include "QuestOrderHandlingComponent.h"
 #include "QuestAIController.h"
+#include "QuestAutoOrderComponent.h"
+#include "QuestCharacterBase.h"
+#include "QuestDefaultOrder.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
@@ -55,10 +58,67 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	AQuestAIController* Controller = Cast<AQuestAIController>(Cast<APawn>(GetOwner())->GetController());
 	if (Controller)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: Calling order %s for %s!"), *Order.OrderType->GetName(), *GetOwner()->GetName());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: controller NOT found for %s!"), *GetOwner()->GetName());
+	}
+}
+
+bool UQuestOrderHandlingComponent::TryCallNextOrder()
+{
+	if (NextOrder.OrderType != nullptr)
+	{
+		CurrentOrder = NextOrder;
+		NextOrder.OrderType = nullptr;
+		IssueOrder(CurrentOrder);
+		return true;
+	}
+	else {return false;}
+}
+
+void UQuestOrderHandlingComponent::OnOrderEndedCallback(EQuestOrderResult OrderResult)
+{
+	OrderEnded(OrderResult);
+}
+
+void UQuestOrderHandlingComponent::OrderEnded(EQuestOrderResult OrderResult)
+{
+	AActor* Owner = GetOwner();
+	AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(Owner);
+	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder = Character->DefaultOrder;
+	TSoftClassPtr<UQuestOrder> Order = nullptr;
+	if (Character)
+	{
+		switch (OrderResult)
+		{
+		case EQuestOrderResult::FAILED:
+			/**
+			*	TODO: Upon failure of one order in the array, need to try next order and so on until one succeeds, and if none succeed, then attack,
+			*	and then restart trying the array again
+			*/
+				if (DefaultOrder)
+				{
+					if (!TryCallNextOrder())
+					{
+						NextOrder.OrderType = nullptr;
+						SetCurrentOrder(FQuestOrderData(DefaultOrder));
+					};
+				}
+			return;
+		case EQuestOrderResult::CANCELLED:
+			// TODO: Even if order was cancelled, we may wish to treat it as successful (eg., cancelled after spell committed)
+			// TODO: If not successful, do we want to do the same thing as suggested in the TODO for Failed, by cycling through orders?
+				Character->AutoOrderComponent->GenerateAutoOrder();
+				return;
+		case EQuestOrderResult::SUCCEEDED:
+			Character->SetAutoOrderAsUsed(CurrentOrder.OrderType);
+			if (!TryCallNextOrder())
+			{
+				Character->AutoOrderComponent->GenerateAutoOrder();
+			}
+		}
 	}
 }
 

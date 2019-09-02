@@ -46,6 +46,26 @@ AQuestAIController::AQuestAIController()
 
 void AQuestAIController::Tick(float DeltaTime)
 {
+	if (Blackboard == nullptr)
+	{
+		return;
+	}
+
+	// TODO:  Do I want to do something when the BT is aborted?
+	switch (BehaviorTreeResult)
+	{
+	case EBTNodeResult::InProgress:
+		break;
+	case EBTNodeResult::Failed:
+		CurrentOrderResultCallback.Broadcast(EQuestOrderResult::FAILED);
+		break;
+	case EBTNodeResult::Aborted:
+		break;
+	case EBTNodeResult::Succeeded:
+		CurrentOrderResultCallback.Broadcast(EQuestOrderResult::SUCCEEDED);
+		break;
+	}
+	BehaviorTreeResult = EBTNodeResult::InProgress;
 }
 
 void AQuestAIController::OnPossess(APawn* InPawn)
@@ -96,18 +116,45 @@ void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* Cont
 	}
 }
 
-void AQuestAIController::IssueOrder(const FQuestOrderData& Order)
+void AQuestAIController::IssueOrder(const FQuestOrderData& Order, FQuestOrderCallback Callback)
 {
 	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(Order.OrderType.Get());
 	if (BehaviorTree == nullptr)
 	{
+		Callback.Broadcast(EQuestOrderResult::FAILED);
 		return;
 	}
 
+	CurrentOrderResultCallback = Callback;
+	BehaviorTreeResult = EBTNodeResult::InProgress;
 	SetBlackboardValues(Order);
 	ApplyOrder(Order, BehaviorTree);
 }
 
+
+void AQuestAIController::BehaviorTreeEnded(EBTNodeResult::Type Result)
+{
+	//  TODO:  Instead of setting this variable and checking it in tick, why not just broadcast the delegates here?
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
+	switch (Result)
+	{
+	case EBTNodeResult::InProgress:
+		return;
+	case EBTNodeResult::Failed:
+		BehaviorTreeResult = EBTNodeResult::Failed;
+		return;
+	case EBTNodeResult::Aborted:
+		// TODO:  Do I want something to happen if the order is aborted?
+		return;
+	case EBTNodeResult::Succeeded:
+		BehaviorTreeResult = EBTNodeResult::Succeeded;
+		return;
+	}
+}
 
 bool AQuestAIController::VerifyBlackboard() const
 {

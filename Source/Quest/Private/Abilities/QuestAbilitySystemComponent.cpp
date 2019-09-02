@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Kelby Van Patten, All Rights Reserved
 
 
 #include "QuestAbilitySystemComponent.h"
@@ -6,4 +6,5 @@
 UQuestAbilitySystemComponent::UQuestAbilitySystemComponent()
 {
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
+
 }

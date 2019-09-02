@@ -92,13 +92,23 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 void UQuestAutoOrderComponent::EnterCombat()
 {
 	bIsInCombat = true;
+	GenerateAutoOrder();
+}
+
+void UQuestAutoOrderComponent::GenerateAutoOrder()
+{
 	TSoftClassPtr<UQuestOrder> Order = nullptr;
 	if (SelectAutoOrder(Order))
 	{
+		Order.LoadSynchronous();
 		FString CharacterName = GetOwner()->GetName();
 		FString OrderName = Order->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::EnterCombat:  %s selected order %s!"), *CharacterName, *OrderName);
 		IssueAutoOrder(Order);
+	}
+	else {
+		FString CharacterName = GetOwner()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::EnterCombat:  %s failed to generate an auto order!"), *CharacterName);
 	}
 }
 
@@ -107,6 +117,7 @@ bool UQuestAutoOrderComponent::SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrd
 	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
 	if (OwningCharacter)
 	{
+		FString CharacterName = GetOwner()->GetName();
 		/** If this is a QuestCharacter, use weapon attack */
 		// TODO:  If a Quest Character is battling but not yet in the party, do we want them to use other auto orders?
 		AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
@@ -121,16 +132,22 @@ bool UQuestAutoOrderComponent::SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrd
 			{
 				for (auto& Order : OwningCharacter->AutoOrderArray)
 				{
-					if (Order.bHasBeenUsed == false &&
-						UQuestOrderHelperLibrary::CanObeyOrder(Order.OrderType, OwningCharacter))
+					Order.OrderType.LoadSynchronous();
+					if (Order.bHasBeenUsed == false 
+						 &&	UQuestOrderHelperLibrary::CanObeyOrder(Order.OrderType, OwningCharacter)
+						)
 					{
 						InOrder = Order.OrderType;
-						break;
+						return true;
 					}
 				}
 			}
 			/** If unable to get order from array, issue melee order */
-			else return (GetWeaponAttackOrder(InOrder));
+
+			else
+			{
+				return (GetWeaponAttackOrder(InOrder));
+			}
 		}
 		else return false;
 	}

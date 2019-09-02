@@ -24,6 +24,7 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 
 	if (OrderType == nullptr || !IsValid(OrderedActor))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: null pointers!"))
 		return false;
 	}
 
@@ -47,16 +48,29 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 			OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked,
 			ErrorTags.MissingTags, ErrorTags.BlockingTags))
 		{
+			FString Error;
+			if (ErrorTags.MissingTags.Num() > 0)
+			{
+				for (auto& tag : ErrorTags.MissingTags)
+				{
+					Error += tag.ToString();
+				}
+			}
+			if (ErrorTags.BlockingTags.Num() > 0)
+			{
+				Error += TEXT(" Blocking!");
+			}
+			UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: Error tags %s!"), *Error);
 			return false;
 		}
-		else
-		{
-			if (!UQuestAbilitySystemHelper::DoesSatisfyTagRequirements(
-				OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked))
-			{
-				return false;
-			}
-		}
+		//else
+		//{
+		//	if (!UQuestAbilitySystemHelper::DoesSatisfyTagRequirements(
+		//		OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked))
+		//	{
+		//		return false;
+		//	}
+		//}
 	}
 	return true;
 }

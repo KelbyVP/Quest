@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "QuestOrderResult.h"
 #include "QuestOrderHandlingComponent.generated.h"
 
 struct FQuestOrderData;
@@ -29,9 +30,17 @@ public:
 	void SetNextOrder(const FQuestOrderData &NewOrder);
 	void SetCurrentOrder(const FQuestOrderData &NewOrder);
 	void IssueOrder(const FQuestOrderData& Order);
+	bool TryCallNextOrder();
 
 private:
 
 	FQuestOrderData NextOrder;
 	FQuestOrderData CurrentOrder;
+
+	/** Function called when FQuestOrderCallback delegate received */
+	UFUNCTION()
+	void OnOrderEndedCallback(EQuestOrderResult OrderResult);
+
+	/** Begins next auto order when prior order is finished */
+	void OrderEnded(EQuestOrderResult OrderResult);
 };

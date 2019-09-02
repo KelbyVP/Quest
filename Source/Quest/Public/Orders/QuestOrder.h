@@ -5,11 +5,15 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestOrderCancellationPolicy.h"
+#include "QuestOrderResult.h"
 #include "QuestOrderTagRequirements.h"
 #include "QuestOrderTargetType.h"
 #include "QuestOrder.generated.h"
 
 class UBehaviorTree;
+
+/** Delegate used to broadcast how the order finished */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestOrderCallback, EQuestOrderResult, Result);
 
 /**
  * An order type that can be given to a character to execute

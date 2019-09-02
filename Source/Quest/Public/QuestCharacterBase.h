@@ -65,6 +65,60 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
+	UFUNCTION()
+		TSoftClassPtr<UQuestDefaultOrder> GetDefaultOrder() const;
+
+	/** Basic functions to implement the ability system */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void AddGameplayTag(FGameplayTag TagToAdd);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void RemoveGameplayTag(FGameplayTag TagToRemove);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		bool DoesCharacterHaveTag(FGameplayTag const& Tag);
+
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
+
+
+	/** Function called by delegate when the character's health changes */
+	UFUNCTION()
+		void OnHealthChanged(float Health, float MaxHealth);
+
+	/** Blueprint function that will be called by OnHealthChanged when character's health changes */
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
+		void BP_OnHealthChanged(float Health, float MaxHealth);
+
+	/** Function called when character wants to make a melee attack */
+	UFUNCTION()
+		void MeleeAttack();
+
+	/** Blueprint function called by MeleeAttack; the blueprint implementation should trigger the Melee gameplay ability */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
+		void BP_MeleeAttack();
+
+	/** Blueprint event that gets called when the character dies */
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
+		void BP_Die();
+
+	/** Basic functions to implement the spellcasting system */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetSpellbookType();
+
+	/** Moves character to start point on rotation actor such as whirlwind */
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
+		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void EnterCombat();
+
+	/** Sets an auto order struct to used; called by order handling component once order is successfully completed */
+	void SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order);
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
 		FGameplayTagContainer GameplayTags;
 
@@ -166,57 +220,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
 		float AIFieldOfView;
 
-	UFUNCTION()
-		TSoftClassPtr<UQuestDefaultOrder> GetDefaultOrder() const;
-
-
-
-	/** Basic functions to implement the ability system */
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void AddGameplayTag(FGameplayTag TagToAdd);
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void RemoveGameplayTag(FGameplayTag TagToRemove);
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-	bool DoesCharacterHaveTag(FGameplayTag const& Tag);
-
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
-
-
-	/** Function called by delegate when the character's health changes */
-	UFUNCTION()
-		void OnHealthChanged(float Health, float MaxHealth);
-
-	/** Blueprint function that will be called by OnHealthChanged when character's health changes */
-	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
-		void BP_OnHealthChanged(float Health, float MaxHealth);
-
-	/** Function called when character wants to make a melee attack */
-	UFUNCTION()
-		void MeleeAttack();
-
-	/** Blueprint function called by MeleeAttack; the blueprint implementation should trigger the Melee gameplay ability */
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
-		void BP_MeleeAttack();
-
-	/** Blueprint event that gets called when the character dies */
-	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
-		void BP_Die();
-
-	/** Basic functions to implement the spellcasting system */
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void SetSpellbookType();
-
-	/** Moves character to start point on rotation actor such as whirlwind */
-	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
-		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
-
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup);
-
-	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void EnterCombat();
 
 private:
 

@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "QuestAttributeSet.h"
@@ -44,6 +45,9 @@ AQuestCharacterBase::AQuestCharacterBase()
 	AIFieldOfView = 180.0f;
 
 	Affiliation = ECharacterAffiliation::IT_Neutral;
+
+	AddGameplayTag(FGameplayTag::RequestGameplayTag(FName(TEXT("status.alive"))));
+	// TODO:  Add function that sets default gameplay tags
 }
 
 // Called when the game starts or when spawned
@@ -174,10 +178,16 @@ void AQuestCharacterBase::EnterCombat()
 
 		/** If we are not already in combat, begin */
 		AutoOrderComponent->EnterCombat();
+	}
+}
 
-
-		FString ThisName = GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::EnterCombat: %s is entering combat!"), *ThisName)
+void AQuestCharacterBase::SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order)
+{
+	int32 Index;
+	FQuestAutoOrder AutoOrder = FQuestAutoOrder(Order);
+	if (AutoOrder.FindAutoOrderInArray(AutoOrderArray, Index))
+	{
+		AutoOrderArray[Index].bHasBeenUsed = true;
 	}
 }
 

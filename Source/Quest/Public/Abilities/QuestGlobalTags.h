@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "GameplayTagContainer.h"
 #include "QuestGlobalTags.generated.h"
-
 /**
  *  Global tags
  */
@@ -15,5 +15,7 @@ class QUEST_API UQuestGlobalTags : public UAIBlueprintHelperLibrary
 	GENERATED_BODY()
 	
 public:
+
+	static bool CanTagBeStacked(const FGameplayTag& Tag);
 
 };

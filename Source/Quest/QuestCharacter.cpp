@@ -38,8 +38,6 @@ AQuestCharacter::AQuestCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-
-
 	// Create a selectable component...
 	SelectableComponent = CreateDefaultSubobject<UQuestSelectableComponent>("SelectableComponent");
 

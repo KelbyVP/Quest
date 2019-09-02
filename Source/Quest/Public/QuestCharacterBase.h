@@ -74,12 +74,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void AddGameplayTags(TArray<FGameplayTag> DefaultTags);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		bool DoesCharacterHaveTag(FGameplayTag const& Tag);
 
-	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; return; }
-
+	/** This function must be overriden to avoid an abstract class error */
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { AbilitySystemComponent->GetOwnedGameplayTags(TagContainer); return; }
+	// old implmentation of GetOwnedGameplayTags { TagContainer = GameplayTags; return; }
 
 	/** Function called by delegate when the character's health changes */
 	UFUNCTION()
@@ -121,15 +124,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
 		FGameplayTagContainer GameplayTags;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		FGameplayTag FullHealthTag;
+	// The tags that should initially be added to the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		TArray<FGameplayTag> DefaultTags;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		TArray<TSubclassOf<UQuestGameplayAbility>> AbilitiesToAcquire;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAttributeSet* AttributeSetComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
-		FGameplayTag FullHealthTag;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		ECharacterClass CharacterClass;
 	/** Used to track whether this character has a spellbook */

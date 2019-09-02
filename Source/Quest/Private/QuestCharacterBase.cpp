@@ -14,6 +14,7 @@
 #include "QuestAttributeSet.h"
 #include "QuestAutoOrderComponent.h"
 #include "QuestCharacterGroup.h"
+#include "QuestGlobalTags.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
@@ -46,8 +47,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 
 	Affiliation = ECharacterAffiliation::IT_Neutral;
 
-	AddGameplayTag(FGameplayTag::RequestGameplayTag(FName(TEXT("status.alive"))));
-	// TODO:  Add function that sets default gameplay tags
+	// Add the default gameplay tags to this character
 }
 
 // Called when the game starts or when spawned
@@ -58,6 +58,14 @@ void AQuestCharacterBase::BeginPlay()
 	/** Subscribe to the OnHealthChange broadcast from our Attribute Set, and when we receive it, run OnHealthChanged */
 	AttributeSetComponent->OnHealthChange.AddDynamic(this, &AQuestCharacterBase::OnHealthChanged);
 
+	/** Add default tags */
+	if (DefaultTags.Num() > 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Adding tags!"))
+		AddGameplayTags(DefaultTags);
+	}
+
+	/** Initialize character group */
 	if (bIsLeader)
 	{
 		if (CharacterGroup == nullptr)		
@@ -108,6 +116,18 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 void AQuestCharacterBase::AddGameplayTag(FGameplayTag TagToAdd)
 {
 	GetAbilitySystemComponent()->AddLooseGameplayTag(TagToAdd);
+	if (UQuestGlobalTags::CanTagBeStacked(TagToAdd))
+	{
+		GetAbilitySystemComponent()->SetTagMapCount(TagToAdd, 1);
+	}
+}
+
+void AQuestCharacterBase::AddGameplayTags(TArray<FGameplayTag> TagsToAdd)
+{
+	for (auto Tag : TagsToAdd)
+	{
+		AddGameplayTag(Tag);
+	}
 }
 
 void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
@@ -246,7 +266,8 @@ void AQuestCharacterBase::AddMembersToCharacterGroup()
 bool AQuestCharacterBase::DoesCharacterHaveTag(FGameplayTag const& Tag)
 {
 	FGameplayTagContainer TagContainer;
-	GetOwnedGameplayTags(TagContainer);
+	// TODO:  Can delete?
+	//GetOwnedGameplayTags(TagContainer);
 	AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
 	if (TagContainer.HasTag(Tag))
 	{

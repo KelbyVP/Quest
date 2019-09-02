@@ -33,15 +33,16 @@ public:
 	UFUNCTION()
 		void EnterCombat();
 
-	void SelectOrder();
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
 
+	/** Sets a ranged or melee attack order based on the character's equipped weapon */
+	bool GetWeaponAttackOrder(TSoftClassPtr<UQuestOrder>& InOrder);
 
+	bool SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrder);
 
 		
 };

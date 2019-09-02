@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameFramework/Character.h"
+#include "GameplayAbility.h"
 #include "GameplayTagAssetInterface.h"
 #include "QuestAbilitySystemComponent.h"
-#include "GameplayAbility.h"
+#include "QuestAutoOrder.h"
 #include "QuestWeaponItem.h"
 #include "QuestShieldItem.h"
 #include "QuestGameMode.h"
@@ -146,7 +147,10 @@ public:
 	/** Variables for Order System */
 	UQuestOrderHandlingComponent* OrderHandlingComponent;
 	UQuestAutoOrderComponent* AutoOrderComponent;
-	TArray<FQuestOrderData> AutoOrderArray;
+
+	/** Orders for the character to follow automatically when the character enters combat */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
+	TArray<FQuestAutoOrder> AutoOrderArray;
 
 	/** Default order, puts character at idle */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestCharacterBase)

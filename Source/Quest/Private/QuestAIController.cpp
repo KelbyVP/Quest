@@ -157,7 +157,6 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 	}
 	if (BehaviorTreeComponent != nullptr && BehaviorTree != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestAIController::applyOrder: not null pointers!"))
 		/** If the tree is the same, restart it if it should restart*/
 		UBehaviorTree* CurrentTree = BehaviorTreeComponent->GetRootTree();
 		if (CurrentTree == BehaviorTree)

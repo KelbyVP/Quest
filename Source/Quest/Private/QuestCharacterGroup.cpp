@@ -26,9 +26,6 @@ void AQuestCharacterGroup::SetLeader(AQuestCharacterBase* NewLeader)
 {
 	Leader = NewLeader;
 	Affiliation = Leader->Affiliation;
-	FString LeaderName = Leader->GetName();
-	FString GroupName = GetName();
-	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterGroup::SetLeader: %s has been set as leader of group %s!"), *LeaderName, *GroupName)
 }
 
 void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* CharacterToFight)
@@ -52,13 +49,19 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 
 		/** Start fighting this group */
 		AdverseGroupsInCombat.Add(CharacterToFight->CharacterGroup);
-		bIsInCombat = true;
-		OnEnterCombat.Broadcast();
+
+		/** if we aren't already in combat, start */
+		if (!bIsInCombat)
+		{
+			bIsInCombat = true;
+			OnEnterCombat.Broadcast();
+		}
+
+		/** Tell the other group to check whether it should start fighting */
 		if (Leader)
 		{
 			CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
 		}
 	}
-
 }
 

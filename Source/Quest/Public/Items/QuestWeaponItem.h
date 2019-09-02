@@ -8,6 +8,15 @@
 #include "QuestWeaponItem.generated.h"
 
 class USkeletalMesh;
+class UQuestAttackOrder;
+
+/** Describes whether the weapon is melee or ranged */
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	IT_Melee UMETA(DisplayName = "Melee"),
+	IT_Ranged UMETA(DisplayName = "Ranged")
+};
 
 /**
  * 
@@ -32,6 +41,13 @@ public:
 	/** The location where the weapon will spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 		FTransform RelativeSpawnLocation;
+
+	/** Whether the weapon is melee or ranged */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		EWeaponType WeaponType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+		TSoftClassPtr<UQuestAttackOrder> AttackOrder;
 
 
 

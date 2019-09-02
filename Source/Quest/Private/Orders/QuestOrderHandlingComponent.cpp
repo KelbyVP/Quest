@@ -55,8 +55,6 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	AQuestAIController* Controller = Cast<AQuestAIController>(Cast<APawn>(GetOwner())->GetController());
 	if (Controller)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: controller found for %s!"), *GetOwner()->GetName());
-		Controller->IssueOrder(Order);
 	}
 	else
 	{

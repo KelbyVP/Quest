@@ -2,6 +2,7 @@
 
 
 #include "QuestWeaponItem.h"
+#include "QuestMeleeAttackOrder.h"
 
 UQuestWeaponItem::UQuestWeaponItem()
 {
@@ -13,4 +14,5 @@ UQuestWeaponItem::UQuestWeaponItem()
 	bCanBeEquipped = true;
 	SocketName = "swordSocket";
 	UseText = "Equip";
+	WeaponType = EWeaponType::IT_Melee;
 }

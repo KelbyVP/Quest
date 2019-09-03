@@ -20,12 +20,12 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType)
 	TargetActor = nullptr;
 }
 
-FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* Actor)
+FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor)
 {
 	OrderType = InOrderType;
 	bUseLocation = false;
 	TargetLocation = FVector::ZeroVector;
-	TargetActor = Actor;
+	TargetActor = InTargetActor;
 }
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector InTargetLocation)
@@ -36,12 +36,12 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector
 	TargetActor = nullptr;
 }
 
-FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* Actor, FVector InTargetLocation)
+FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor, FVector InTargetLocation)
 {
 	OrderType = OrderType;
 	bUseLocation = true;
 	TargetLocation = InTargetLocation;
-	TargetActor = Actor;
+	TargetActor = InTargetActor;
 }
 
 FString FQuestOrderData::ToString() const

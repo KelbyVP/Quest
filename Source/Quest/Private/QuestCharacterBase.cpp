@@ -61,7 +61,6 @@ void AQuestCharacterBase::BeginPlay()
 	/** Add default tags */
 	if (DefaultTags.Num() > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Adding tags!"))
 		AddGameplayTags(DefaultTags);
 	}
 

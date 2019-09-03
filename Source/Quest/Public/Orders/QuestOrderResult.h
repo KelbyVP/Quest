@@ -1,3 +1,5 @@
+// Copyright 2019 Kelby Van Patten, All Rights Reserved
+
 #pragma once
 
 UENUM(BlueprintType)

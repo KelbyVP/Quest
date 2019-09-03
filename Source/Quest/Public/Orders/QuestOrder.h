@@ -7,6 +7,7 @@
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrderResult.h"
 #include "QuestOrderTagRequirements.h"
+#include "QuestOrderTargetScoringMethod.h"
 #include "QuestOrderTargetType.h"
 #include "QuestOrder.generated.h"
 
@@ -34,11 +35,17 @@ public:
 	/** Gets the order's target type */
 	EQuestOrderTargetType GetTargetType();
 
+	/** Gets the order's target scoring method */
+	EQuestOrderTargetScoringMethod GetTargetScoringMethod();
+
 	/** Gets the order's cancellation policy */
 	EQuestOrderCancellationPolicy GetCancellationPolicy();
 
 	/** Gets the order's range */
 	float GetRange();
+
+	/** Gets the order's target acquisition range */
+	float GetTargetAcquisitionRange();
 
 	/** Gets the order's behavior tree */
 	UBehaviorTree* GetBehaviorTree();
@@ -54,13 +61,21 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		EQuestOrderTargetType TargetType;
 
+	/** The method used to choose a target */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
+		EQuestOrderTargetScoringMethod TargetScoringMethod;
+
 	/** How the order interacts with other orders */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		EQuestOrderCancellationPolicy CancellationPolicy;
 
-	/** Maximum range for targets */
+	/** Maximum range that can be reached by the order */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
 		float Range;
+
+	/** Maximum range to look for targets; may be larger than Range if order allows character to move toward targets */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))
+		float TargetAcquisitionRange;
 
 	/** The behavior tree associated with the order */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "QuestOrder", meta = (AllowPrivateAccess = true))

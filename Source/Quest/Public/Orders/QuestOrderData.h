@@ -17,9 +17,9 @@ struct QUEST_API FQuestOrderData
 
 	FQuestOrderData();
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType);
-	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* Actor);
+	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor);
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector InTargetLocation);
-	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* Actor, FVector InTargetLocation);
+	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor, FVector InTargetLocation);
 
 	/** The order type */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestOrderData")

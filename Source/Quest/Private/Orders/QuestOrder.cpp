@@ -20,6 +20,11 @@ EQuestOrderTargetType UQuestOrder::GetTargetType()
 	return TargetType;
 }
 
+EQuestOrderTargetScoringMethod UQuestOrder::GetTargetScoringMethod()
+{
+	return TargetScoringMethod;
+}
+
 EQuestOrderCancellationPolicy UQuestOrder::GetCancellationPolicy()
 {
 	return CancellationPolicy;
@@ -28,6 +33,11 @@ EQuestOrderCancellationPolicy UQuestOrder::GetCancellationPolicy()
 float UQuestOrder::GetRange()
 {
 	return Range;
+}
+
+float UQuestOrder::GetTargetAcquisitionRange()
+{
+	return TargetAcquisitionRange;
 }
 
 UBehaviorTree* UQuestOrder::GetBehaviorTree()

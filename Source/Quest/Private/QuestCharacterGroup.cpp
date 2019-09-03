@@ -63,5 +63,8 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 			CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
 		}
 	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterGroup::CheckShouldStartFighting: %s Got stuck on null pointers!"), *GetName());
+	}
 }
 

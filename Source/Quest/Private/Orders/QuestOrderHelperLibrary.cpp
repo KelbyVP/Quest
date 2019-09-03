@@ -3,8 +3,16 @@
 
 #include "QuestOrderHelperLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "CollisionQueryParams.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
+#include "Math/UnrealMathUtility.h"
+#include "Math/Vector.h"
 #include "QuestAbilitySystemHelper.h"
+#include "QuestAttributeSet.h"
+#include "QuestCharacterBase.h"
+#include "QuestCharacterGroup.h"
 #include "QuestOrder.h"
 #include "QuestOrderErrorTags.h"
 
@@ -24,7 +32,6 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 
 	if (OrderType == nullptr || !IsValid(OrderedActor))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: null pointers!"))
 		return false;
 	}
 
@@ -48,29 +55,8 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 			OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked,
 			ErrorTags.MissingTags, ErrorTags.BlockingTags))
 		{
-			FString Error;
-			if (ErrorTags.MissingTags.Num() > 0)
-			{
-				for (auto& tag : ErrorTags.MissingTags)
-				{
-					Error += tag.ToString();
-				}
-			}
-			if (ErrorTags.BlockingTags.Num() > 0)
-			{
-				Error += TEXT(" Blocking!");
-			}
-			UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: Error tags %s!"), *Error);
 			return false;
 		}
-		//else
-		//{
-		//	if (!UQuestAbilitySystemHelper::DoesSatisfyTagRequirements(
-		//		OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked))
-		//	{
-		//		return false;
-		//	}
-		//}
 	}
 	return true;
 }
@@ -88,6 +74,256 @@ EQuestOrderTargetType UQuestOrderHelperLibrary::GetTargetType(TSoftClassPtr<UQue
 	}
 
 	return OrderType->GetDefaultObject<UQuestOrder>()->GetTargetType();
+}
+
+EQuestOrderTargetScoringMethod UQuestOrderHelperLibrary::GetTargetScoringMethod(TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (OrderType == nullptr)
+	{
+		return EQuestOrderTargetScoringMethod::CHOOSE_CLOSEST_ADVERSARY_TARGET;
+	}
+
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+
+	return OrderType->GetDefaultObject<UQuestOrder>()->GetTargetScoringMethod();
+}
+
+float UQuestOrderHelperLibrary::GetTargetAcquisitionRange(TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (OrderType == nullptr)
+	{
+		return 0.0f;
+	}
+
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+
+	return OrderType->GetDefaultObject<UQuestOrder>()->GetTargetAcquisitionRange();
+}
+
+TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetHostileTargetsInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
+{
+	TArray<AQuestCharacterBase*> PossibleTargetsInRange;
+	TArray<AQuestCharacterBase*> HostileTargetsInRange;
+	PossibleTargetsInRange = GetCharacterssInRange(OrderedCharacter, Radius);
+
+	/** Filter targets with whom we are in combat */
+	if (PossibleTargetsInRange.Num() > 0)
+	{
+		for (auto& PossibleTarget : PossibleTargetsInRange)
+		{
+			if (PossibleTarget->Affiliation != ECharacterAffiliation::IT_Neutral &&
+				PossibleTarget->Affiliation != OrderedCharacter->Affiliation)
+			{
+				HostileTargetsInRange.Add(PossibleTarget);
+				OrderedCharacter->CharacterGroup->CheckShouldStartFighting(PossibleTarget);
+			}
+		}
+	}
+	return HostileTargetsInRange;
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectClosestTarget(const AActor* OrderedCharacter, TArray<AQuestCharacterBase*> TargetCharacters)
+{
+	AQuestCharacterBase* ClosestTarget = nullptr;
+	float DistanceToTarget = 999999.f;
+
+	if (TargetCharacters.Num() > 0)
+	{
+		ClosestTarget = TargetCharacters[0];
+		DistanceToTarget = FVector::Dist(OrderedCharacter->GetActorLocation(), ClosestTarget->GetActorLocation());
+		for (auto& Character : TargetCharacters)
+		{
+			float DistanceToCharacter = FVector::Dist(OrderedCharacter->GetActorLocation(), Character->GetActorLocation());
+			if (DistanceToCharacter < DistanceToTarget)
+			{
+				ClosestTarget = Character;
+				DistanceToTarget = DistanceToCharacter;
+			}
+		}
+	}
+	return ClosestTarget;
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectClosestHostileTarget(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	float TargetAcquisitionRange = GetTargetAcquisitionRange(OrderType);
+	TArray<AQuestCharacterBase*> TargetsInRange = GetHostileTargetsInRange(OrderedCharacter, TargetAcquisitionRange);
+	return SelectClosestTarget(OrderedCharacter, TargetsInRange);
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectClosestHostileLeaderInAcquisitionRange(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	float Range = GetTargetAcquisitionRange(OrderType);
+	float Distance = Range +1;
+	AQuestCharacterBase* ClosestLeader = nullptr;
+	FVector OrderedCharacterLocation = OrderedCharacter->GetActorLocation();
+	for (auto& AdverseGroup : OrderedCharacter->CharacterGroup->AdverseGroupsInCombat)
+	{
+		float LeaderDistance = FVector::Dist(AdverseGroup->Leader->GetActorLocation(), OrderedCharacterLocation);
+		if (LeaderDistance < Distance &&
+			LeaderDistance < Range)
+		{
+			Distance = LeaderDistance;
+			ClosestLeader = AdverseGroup->Leader;
+		}
+	}
+
+	return ClosestLeader;
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAdversaryInAcquisitionRange(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	float AcquisitionRange = GetTargetAcquisitionRange(OrderType);
+	TArray<AQuestCharacterBase*> HostileTargetsInRange = GetHostileTargetsInRange(OrderedCharacter, AcquisitionRange);
+	return GetMostPowerfulCharacterInArray(HostileTargetsInRange);
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAdverseSpellcasterInAcquisitionRange(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	AQuestCharacterBase* MostPowerfulSpellcaster = nullptr;
+	float AcquisitionRange = GetTargetAcquisitionRange(OrderType);
+	TArray<AQuestCharacterBase*> HostileTargetsInRange = GetHostileTargetsInRange(OrderedCharacter, AcquisitionRange);
+	TArray<AQuestCharacterBase*> SpellcastersInRange;
+	if (HostileTargetsInRange.Num() > 0)
+	{
+		for (auto& Target : HostileTargetsInRange)
+		{
+			if (Target->bIsSpellcaster)
+			{
+				SpellcastersInRange.AddUnique(Target);
+			}
+		}
+	}
+	if (SpellcastersInRange.Num() > 0)
+	{
+		MostPowerfulSpellcaster = GetMostPowerfulCharacterInArray(SpellcastersInRange);
+		if (!MostPowerfulSpellcaster)
+		{
+			MostPowerfulSpellcaster = SelectMostPowerfulAdversaryInAcquisitionRange(OrderedCharacter, OrderType);
+		}
+		if (!MostPowerfulSpellcaster)
+		{
+			MostPowerfulSpellcaster = SelectClosestHostileTarget(OrderedCharacter, OrderType);
+		}
+	}
+	return MostPowerfulSpellcaster;
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAlliedLeaderInAcquisitionRange(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	TArray<AQuestCharacterBase*> Characters;
+	float Radius = GetTargetAcquisitionRange(OrderType);
+	Characters = GetCharacterssInRange(OrderedCharacter, Radius);
+	TArray<AQuestCharacterBase*> AlliedLeaders;
+
+	/** Remove characters that are not leaders or allies */
+	for (auto& Character : Characters)
+	{
+		if (Character->bIsLeader &&
+			Character->Affiliation == OrderedCharacter->Affiliation
+			)
+		{
+			AlliedLeaders.AddUnique(Character);
+		}
+	}
+
+	/** If we have ally leaders in range, return the most powerful one */
+	if (AlliedLeaders.Num() > 0)
+	{
+		return GetMostPowerfulCharacterInArray(AlliedLeaders);
+	}
+
+	/** If we have no ally leaders in range, return most powerful ally in range */
+	else
+	{
+		TArray<AQuestCharacterBase*> Allies;
+		for (auto& Character: Characters)
+		{
+			if (Character->Affiliation == OrderedCharacter->Affiliation)
+			{
+				Allies.AddUnique(Character);
+			}
+		}
+		return GetMostPowerfulCharacterInArray(Allies);
+	}
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(TArray<AQuestCharacterBase*>& CharacterArray)
+{
+	AQuestCharacterBase* MostPowerfulAdversary = nullptr;
+	float MostPowerfulLevel = 0.f;
+	float MostPowerfulHealth = 0.f;
+
+	if (CharacterArray.Num() > 0)
+	{
+		for (auto& Target : CharacterArray)
+		{
+			float TargetLevel = Target->AttributeSetComponent->Level.GetCurrentValue();
+			if (FMath::IsNearlyEqual(TargetLevel, MostPowerfulLevel))
+			{
+				float TargetHealth = Target->AttributeSetComponent->Health.GetCurrentValue();
+				if (TargetHealth > MostPowerfulHealth)
+				{
+					MostPowerfulAdversary = Target;
+					MostPowerfulHealth = TargetHealth;
+					MostPowerfulLevel = TargetLevel;
+				}
+			}
+			else if (TargetLevel > MostPowerfulLevel)
+			{
+				MostPowerfulAdversary = Target;
+				MostPowerfulHealth = Target->AttributeSetComponent->Health.GetCurrentValue();
+				MostPowerfulLevel = TargetLevel;
+			}
+		}
+	}
+	return MostPowerfulAdversary;
+}
+
+TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharacterssInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
+{
+	/** Set variables for sweep */
+	TArray<FHitResult> Hits;
+	FVector OrderedCharacterLocation = OrderedCharacter->GetActorLocation();
+	FVector End = OrderedCharacterLocation + FVector(0, 0, 1);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(OrderedCharacter);
+	QueryParams.AddIgnoredComponent(OrderedCharacter->GetCapsuleComponent());
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+
+	/** Run sweep */
+	OrderedCharacter->GetWorld()->SweepMultiByObjectType(
+		Hits,
+		OrderedCharacterLocation,
+		End,
+		FQuat::Identity,
+		ObjParams,
+		FCollisionShape::MakeSphere(Radius),
+		QueryParams
+	);
+
+	/** Filter unique QuestCharacterBase actors */
+	TArray<AQuestCharacterBase*> CharactersInRange;
+
+	for (auto& Hit : Hits)
+	{
+		AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(Hit.GetActor());
+		if (Character)
+		{
+			CharactersInRange.AddUnique(Character);
+		}
+	}
+
+	return CharactersInRange;
 }
 
 EQuestOrderCancellationPolicy UQuestOrderHelperLibrary::GetCancellationPolicy(TSoftClassPtr<UQuestOrder> OrderType)
@@ -126,6 +362,48 @@ UBehaviorTree* UQuestOrderHelperLibrary::GetBehaviorTree(TSoftClassPtr<UQuestOrd
 		OrderType.LoadSynchronous();
 	}
 	return OrderType->GetDefaultObject<UQuestOrder>()->GetBehaviorTree();
+}
+
+AQuestCharacterBase* UQuestOrderHelperLibrary::SelectTarget(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	AQuestCharacterBase* TargetCharacter = nullptr;
+	EQuestOrderTargetScoringMethod TargetScoringMethod = GetTargetScoringMethod(OrderType);
+
+	// TODO:  Delete FStrings; these are only used for the UE Logs
+	FString TargetName;
+	FString Name = OrderType->GetName();
+	
+	switch (TargetScoringMethod)
+	{
+	case EQuestOrderTargetScoringMethod::CHOOSE_CLOSEST_ADVERSARY_TARGET:
+		TargetCharacter = SelectClosestHostileTarget(OrderedCharacter, OrderType);
+		break;
+
+	case EQuestOrderTargetScoringMethod::CHOOSE_ADVERSARY_LEADER:
+		TargetCharacter = SelectClosestHostileLeaderInAcquisitionRange(OrderedCharacter, OrderType);
+
+		if (TargetCharacter == nullptr)
+		{
+			TargetCharacter = SelectClosestHostileTarget(OrderedCharacter, OrderType);
+			break;
+		}
+		break;
+
+	case EQuestOrderTargetScoringMethod::CHOOSE_MOST_POWERFUL_ADVERSARY_TARGET:
+		TargetCharacter = SelectMostPowerfulAdversaryInAcquisitionRange(OrderedCharacter, OrderType);
+		break;
+
+	case EQuestOrderTargetScoringMethod::CHOOSE_ADVERSARY_SPELLCASTER:
+		TargetCharacter = SelectMostPowerfulAdverseSpellcasterInAcquisitionRange(OrderedCharacter, OrderType);
+		break;
+
+	case EQuestOrderTargetScoringMethod::CHOOSE_ALLIED_LEADER:
+		TargetCharacter = SelectMostPowerfulAlliedLeaderInAcquisitionRange(OrderedCharacter, OrderType);
+		break;
+	default:
+		break;
+	}
+	return TargetCharacter;
 }
 
 bool UQuestOrderHelperLibrary::ShouldRestartBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType)

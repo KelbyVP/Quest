@@ -63,29 +63,34 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 		return false;
 	}
 
+	FString Name;
+	if (Order) { Name = Order->GetName(); }
+	else { Name = FString(TEXT("None")); }
 	EQuestOrderTargetType TargetType = UQuestOrderHelperLibrary::GetTargetType(Order);
-	//switch (TargetType)
-	//{
-	//	case EQuestOrderTargetType::NONE:
-	//	{
-	//		OrderComponent->SetNextOrder(FQuestOrderData(Order));
-	//	}
+	switch (TargetType)
+	{
+		case EQuestOrderTargetType::NONE:
+		{
+			/** Orders with no target type are targeting self; may need to revise if we have a different situation */
+			OrderComponent->SetNextOrder(FQuestOrderData(Order));
+			break;
+		}
+		case EQuestOrderTargetType::ACTOR:
+		{
+			AQuestCharacterBase* TargetCharacter;
+			TargetCharacter = UQuestOrderHelperLibrary::SelectTarget(Cast<AQuestCharacterBase>(Owner), Order);
+			// TODO:  If there isn't a path to the selected actor, just pick the closest actor that there is a path to
+			if (TargetCharacter)
+			{
+				OrderComponent->SetNextOrder(FQuestOrderData(Order, TargetCharacter));
+			}
+			else { UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent: %s chose nullptr as a target!"), *Owner->GetName()); }
+			break;
+		}
+		// TODO:  what do we want to do with other TargetTypes?
+			return true;
+	}
 
-
-	//	// TODO:: plenty more code goes here to sort out what the order looks like and set it as the next order in the order handling component
-	//   // Order-Abilities gets the target type here and tells the OrderComponent to issue the order through the Order Component's InsertOrderBeforeCurrentOrder function
-
-
-
-
-	//	FString Name;
-	//	if (Order) { Name = Order->GetName(); }
-	//	else { Name = FString(TEXT("None")); }
-
-	//	UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::IssueAutoOrder: calling order %s"), *Name)
-	//		return true;
-	//}
-	OrderComponent->SetNextOrder(FQuestOrderData(Order));
 	return true;
 }
 
@@ -101,14 +106,7 @@ void UQuestAutoOrderComponent::GenerateAutoOrder()
 	if (SelectAutoOrder(Order))
 	{
 		Order.LoadSynchronous();
-		FString CharacterName = GetOwner()->GetName();
-		FString OrderName = Order->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::EnterCombat:  %s selected order %s!"), *CharacterName, *OrderName);
 		IssueAutoOrder(Order);
-	}
-	else {
-		FString CharacterName = GetOwner()->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent::EnterCombat:  %s failed to generate an auto order!"), *CharacterName);
 	}
 }
 

@@ -13,5 +13,8 @@ UCLASS()
 class QUEST_API UQuestAttackOrder : public UQuestOrder
 {
 	GENERATED_BODY()
-	
+
+public:
+
+		UQuestAttackOrder();
 };

@@ -60,10 +60,6 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: Calling order %s for %s!"), *Order.OrderType->GetName(), *GetOwner()->GetName());
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: controller NOT found for %s!"), *GetOwner()->GetName());
-	}
 }
 
 bool UQuestOrderHandlingComponent::TryCallNextOrder()

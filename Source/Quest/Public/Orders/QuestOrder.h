@@ -54,6 +54,9 @@ public:
 	/** Gets the order's behavior tree */
 	UBehaviorTree* GetBehaviorTree();
 
+	/** Starts the order.  Callback must be called when the character finishes executing the order. */
+	virtual void IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback) const;
+
 	/** Tells whether to restart the behavior tree when new order of same type issued */
 	bool ShouldRestartBehaviorTree();
 

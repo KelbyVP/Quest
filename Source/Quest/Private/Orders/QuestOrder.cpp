@@ -51,6 +51,11 @@ UBehaviorTree* UQuestOrder::GetBehaviorTree()
 	return BehaviorTree;
 }
 
+void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback) const
+{
+	UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: is calling Issue Order for order!"));
+}
+
 bool UQuestOrder::ShouldRestartBehaviorTree()
 {
 	return bShouldRestartBehaviorTree;

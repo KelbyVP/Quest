@@ -30,6 +30,7 @@ public:
 	void SetNextOrder(const FQuestOrderData &NewOrder);
 	void SetCurrentOrder(const FQuestOrderData &NewOrder);
 	void IssueOrder(const FQuestOrderData& Order);
+	void ObeyOrder(const FQuestOrderData& Order);
 	bool TryCallNextOrder();
 	bool VerifyOrder(const FQuestOrderData& Order) const;
 

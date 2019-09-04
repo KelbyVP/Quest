@@ -71,18 +71,12 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 		Order.OrderType.LoadSynchronous();
 	}
 
-	/** Get our default order */
-	TSoftClassPtr<UQuestOrder> DefaultOrder = Character->DefaultOrder;
-	if (!DefaultOrder.IsValid())
-	{
-		DefaultOrder.LoadSynchronous();
-	}
-
 	if (VerifyOrder(Order))
 	{
 		/** TODO:  Tell it to execute the order */
 		FString OrderName = Order.OrderType->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: %s is going to execute the chosen order!"), *Character->GetName());
+		ObeyOrder(Order);
 	}
 	else
 	{
@@ -90,6 +84,35 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	}
 
 	
+}
+
+void UQuestOrderHandlingComponent::ObeyOrder(const FQuestOrderData& Order)
+{
+	AActor* Owner = GetOwner();
+	FQuestOrderTargetData TargetData = UQuestOrderHelperLibrary::CreateTargetDataForOrder(Owner, Order.TargetActor, Order.TargetLocation);
+
+	/** Execute order, and register callback if order is not instant */
+	switch (UQuestOrderHelperLibrary::GetCancellationPolicy(Order.OrderType))
+	{
+	case EQuestOrderCancellationPolicy::INSTANT:
+		/** Do not register a callback if order is instant; current order continues executing and will still callback when finished */
+		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, FQuestOrderCallback());
+		break;
+	case EQuestOrderCancellationPolicy::CAN_BE_CANCELLED:
+	case EQuestOrderCancellationPolicy::CANNOT_BE_CANCELLED:
+		{FQuestOrderCallback Callback;
+		Callback.AddDynamic(this, &UQuestOrderHandlingComponent::OnOrderEndedCallback);
+		if (!Order.OrderType.IsValid())
+		{
+			Order.OrderType.LoadSynchronous();
+		}
+		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, Callback);
+		}
+		break;
+	default:
+		check(0);
+		break;
+	}
 }
 
 bool UQuestOrderHandlingComponent::TryCallNextOrder()

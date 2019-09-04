@@ -31,10 +31,9 @@ void AQuestCharacterGroup::SetLeader(AQuestCharacterBase* NewLeader)
 void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* CharacterToFight)
 {
 	/** Don't start fighting if other character is neutral, on our side, or dead */
-	if (CharacterToFight != nullptr && Leader != nullptr)
+	if (IsValid(CharacterToFight) && IsValid(Leader)) // NOTE:  This will give a read access violation if there isn't a leader for a group and therefore no group
 	{
-		if (CharacterToFight->Affiliation == ECharacterAffiliation::IT_Neutral || 
-			CharacterToFight->Affiliation == Leader->Affiliation ||
+		if (!CharacterToFight->IsAdverse(Leader) ||
 			CharacterToFight->bIsDead
 			)
 		{
@@ -58,7 +57,7 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 		}
 
 		/** Tell the other group to check whether it should start fighting */
-		if (Leader)
+		if (IsValid(Leader) && IsValid(CharacterToFight) && IsValid(CharacterToFight->CharacterGroup))
 		{
 			CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
 		}

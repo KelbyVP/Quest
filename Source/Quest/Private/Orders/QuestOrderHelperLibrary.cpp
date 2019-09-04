@@ -15,12 +15,17 @@
 #include "QuestCharacterGroup.h"
 #include "QuestOrder.h"
 #include "QuestOrderErrorTags.h"
+#include "QuestOrderTargetData.h"
+#include "QuestOrderTargetType.h"
 
+
+/** 
+*	CanObeyOrder tells whether the ordered character has the right tags 
+*/
 
 /** TODO:  The Orders/Ability code sets this up as multiple functions by having the function create the tags and then calling another version
 *	that takes a reference to the tags as a parameter.  May need to do that if I need to call a version of the function that returns the tags.\
 */
-
 bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType, const AActor* OrderedActor)
 {
 	FQuestOrderErrorTags ErrorTags;
@@ -76,6 +81,28 @@ EQuestOrderTargetType UQuestOrderHelperLibrary::GetTargetType(TSoftClassPtr<UQue
 	return OrderType->GetDefaultObject<UQuestOrder>()->GetTargetType();
 }
 
+FQuestOrderTargetData UQuestOrderHelperLibrary::CreateTargetDataForOrder(const AActor* OrderedActor, AActor* TargetActor, const FVector& TargetLocation)
+{
+	FQuestOrderTargetData TargetData;
+	TargetData.Actor = TargetActor;
+	TargetData.Location = TargetLocation;
+
+	/** If there is no target actor, just return the target data with location only */
+	if (TargetActor == nullptr)
+	{
+		return TargetData;
+	}
+
+	/** If we have a target actor, also create the target tags */
+
+	FGameplayTagContainer SourceTags;
+	FGameplayTagContainer TargetTags;
+	UQuestAbilitySystemHelper::GetSourceAndTargetTags(OrderedActor, TargetActor, SourceTags, TargetTags);
+
+	TargetData.TargetTags = TargetTags;
+	return TargetData;
+}
+
 EQuestOrderTargetScoringMethod UQuestOrderHelperLibrary::GetTargetScoringMethod(TSoftClassPtr<UQuestOrder> OrderType)
 {
 	if (OrderType == nullptr)
@@ -110,18 +137,24 @@ TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetHostileTargetsInRange(
 {
 	TArray<AQuestCharacterBase*> PossibleTargetsInRange;
 	TArray<AQuestCharacterBase*> HostileTargetsInRange;
-	PossibleTargetsInRange = GetCharacterssInRange(OrderedCharacter, Radius);
+	PossibleTargetsInRange = GetCharactersInRange(OrderedCharacter, Radius);
 
 	/** Filter targets with whom we are in combat */
 	if (PossibleTargetsInRange.Num() > 0)
 	{
 		for (auto& PossibleTarget : PossibleTargetsInRange)
 		{
-			if (PossibleTarget->Affiliation != ECharacterAffiliation::IT_Neutral &&
-				PossibleTarget->Affiliation != OrderedCharacter->Affiliation)
+			if (IsValid(PossibleTarget))
 			{
-				HostileTargetsInRange.Add(PossibleTarget);
-				OrderedCharacter->CharacterGroup->CheckShouldStartFighting(PossibleTarget);
+
+				if (PossibleTarget->IsAdverse(OrderedCharacter))
+				{
+					HostileTargetsInRange.Add(PossibleTarget);
+					if (IsValid(OrderedCharacter) && IsValid(OrderedCharacter->CharacterGroup))
+					{
+						OrderedCharacter->CharacterGroup->CheckShouldStartFighting(PossibleTarget);
+					}
+				}
 			}
 		}
 	}
@@ -219,7 +252,7 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAlliedLeaderInA
 {
 	TArray<AQuestCharacterBase*> Characters;
 	float Radius = GetTargetAcquisitionRange(OrderType);
-	Characters = GetCharacterssInRange(OrderedCharacter, Radius);
+	Characters = GetCharactersInRange(OrderedCharacter, Radius);
 	TArray<AQuestCharacterBase*> AlliedLeaders;
 
 	/** Remove characters that are not leaders or allies */
@@ -286,7 +319,7 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(T
 	return MostPowerfulAdversary;
 }
 
-TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharacterssInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
+TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
 {
 	/** Set variables for sweep */
 	TArray<FHitResult> Hits;
@@ -404,6 +437,44 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectTarget(const AQuestCharacte
 		break;
 	}
 	return TargetCharacter;
+}
+
+bool UQuestOrderHelperLibrary::IsValidTarget(TSoftClassPtr<UQuestOrder> OrderType, const AActor* OrderedActor, const FQuestOrderTargetData& TargetData)
+{
+	if (OrderType == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::IsValidTarget: %s had a null pointer for an order!"), *OrderedActor->GetName());
+		return false;
+	}
+
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+
+	/** Create an instance of the order so we can have it check the target's validity */
+	const UQuestOrder* Order = OrderType->GetDefaultObject<UQuestOrder>();
+
+	/** Check to see whether the target actor is valid and meets the tag requirements */
+	EQuestOrderTargetType TargetType = Order->GetTargetType();
+	if (TargetType == EQuestOrderTargetType::ACTOR)
+	{
+		if (!IsValid(TargetData.Actor))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::IsValidTarget: %s had a null pointer for a target!"), *OrderedActor->GetName());
+			return false;
+		}
+		FQuestOrderTagRequirements TagRequirements;
+		Order->GetTagRequirements(OrderedActor, TagRequirements);
+		if (!UQuestAbilitySystemHelper::DoesSatisfyTagRequirements(TargetData.TargetTags, TagRequirements.TargetTagsRequired, TagRequirements.TargetTagsBlocked))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::IsValidTarget: %s did not satisfy tag requirements!"), *OrderedActor->GetName());
+			return false;
+		}
+	}
+
+	/** Check to see whether the target meets any additional requirements the order may have */
+	return Order->IsValidTarget(OrderedActor, TargetData);
 }
 
 bool UQuestOrderHelperLibrary::ShouldRestartBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType)

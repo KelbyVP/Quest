@@ -2,8 +2,33 @@
 
 
 #include "QuestAbilitySystemHelper.h"
-
+#include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "QuestGlobalTags.h"
+
+void UQuestAbilitySystemHelper::GetTags(const AActor* Actor, FGameplayTagContainer& OutGameplayTags)
+{
+	OutGameplayTags = OutGameplayTags.EmptyContainer;
+
+	if (!IsValid(Actor))
+	{
+		return;
+	}
+
+	const UAbilitySystemComponent* AbilitySystem = Actor->FindComponentByClass<UAbilitySystemComponent>();
+	if (AbilitySystem == nullptr)
+	{
+		return;
+	}
+
+	AbilitySystem->GetOwnedGameplayTags(OutGameplayTags);
+}
+
+void UQuestAbilitySystemHelper::GetSourceAndTargetTags(const AActor* SourceActor, const AActor* TargetActor, FGameplayTagContainer& OutSourceTags, FGameplayTagContainer& OutTargetTags)
+{
+	GetTags(SourceActor, OutSourceTags);
+	GetTags(TargetActor, OutTargetTags);
+}
 
 bool UQuestAbilitySystemHelper::DoesSatisfyTagRequirements(const FGameplayTagContainer& Tags, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& BlockedTags)
 {

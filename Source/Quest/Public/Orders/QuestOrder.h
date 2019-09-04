@@ -11,6 +11,7 @@
 #include "QuestOrderTargetType.h"
 #include "QuestOrder.generated.h"
 
+struct FQuestOrderTargetData;
 class UBehaviorTree;
 
 /** Delegate used to broadcast how the order finished */
@@ -33,7 +34,10 @@ public:
 	virtual void GetTagRequirements(const AActor* OrderedActor, FQuestOrderTagRequirements& OutTagRequirements) const;
 
 	/** Gets the order's target type */
-	EQuestOrderTargetType GetTargetType();
+	EQuestOrderTargetType GetTargetType() const;
+
+	/** Checks any unique targeting requirements for this order; should be overriden by child classes if there are unique requirements */
+	virtual bool IsValidTarget(const AActor* OrderedActor, const FQuestOrderTargetData& TargetData) const;
 
 	/** Gets the order's target scoring method */
 	EQuestOrderTargetScoringMethod GetTargetScoringMethod();

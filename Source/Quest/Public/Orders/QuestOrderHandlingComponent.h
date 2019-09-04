@@ -31,6 +31,8 @@ public:
 	void SetCurrentOrder(const FQuestOrderData &NewOrder);
 	void IssueOrder(const FQuestOrderData& Order);
 	bool TryCallNextOrder();
+	bool VerifyOrder(const FQuestOrderData& Order) const;
+
 
 private:
 

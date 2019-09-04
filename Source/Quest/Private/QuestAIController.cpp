@@ -72,7 +72,7 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	TSoftClassPtr<UQuestOrder> DefaultOrder;
+
 	AQuestCharacterBase* ControlledPawn = Cast<AQuestCharacterBase>(GetPawn());
 
 	/** Updates the PerceptionComponent's variables based on the character settings */
@@ -223,13 +223,23 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 
 void AQuestAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)
 {
+	/** This part exists just in case the character is not a leader and doesn't have a character group; then it should become a leader and form one*/
 	AQuestCharacterBase* ControlledCharacter = Cast<AQuestCharacterBase>(GetPawn());
-	for (auto& PawnToCheck : DetectedPawns)
+	if (!ControlledCharacter->CharacterGroup)
 	{
-		AQuestCharacterBase* CharacterDetected = Cast<AQuestCharacterBase>(PawnToCheck);
-		if (CharacterDetected)
+		ControlledCharacter->CreateCharacterGroup();
+	}
+
+	/** See whether our group should fight this character */
+	if (IsValid(ControlledCharacter->CharacterGroup))
+	{
+		for (auto& PawnToCheck : DetectedPawns)
 		{
+			AQuestCharacterBase* CharacterDetected = Cast<AQuestCharacterBase>(PawnToCheck);
+			if (CharacterDetected)
+			{
 				ControlledCharacter->CharacterGroup->CheckShouldStartFighting(CharacterDetected);
+			}
 		}
 	}
 }

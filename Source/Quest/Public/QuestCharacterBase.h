@@ -116,7 +116,13 @@ public:
 		void SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void CreateCharacterGroup();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void EnterCombat();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure,  Category = "QuestCharacterBase")
+		bool IsAdverse(const AQuestCharacterBase* OtherActor);
 
 	/** Sets an auto order struct to used; called by order handling component once order is successfully completed */
 	void SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order);

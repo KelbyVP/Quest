@@ -10,6 +10,7 @@
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
 #include "QuestOrderData.h"
+#include "QuestOrderTargetData.h"
 
 // Sets default values for this component's properties
 UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
@@ -55,23 +56,86 @@ void UQuestOrderHandlingComponent::SetCurrentOrder(const FQuestOrderData &NewOrd
 
 void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 {
-	AQuestAIController* Controller = Cast<AQuestAIController>(Cast<APawn>(GetOwner())->GetController());
-	if (Controller)
+	AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(GetOwner());
+	if (Character == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: Calling order %s for %s!"), *Order.OrderType->GetName(), *GetOwner()->GetName());
+		return;
 	}
+
+	/** Clear next order */
+	NextOrder.OrderType = nullptr;
+	
+	/** Load order if necessary */
+	if (!Order.OrderType.IsValid())
+	{
+		Order.OrderType.LoadSynchronous();
+	}
+
+	/** Get our default order */
+	TSoftClassPtr<UQuestOrder> DefaultOrder = Character->DefaultOrder;
+	if (!DefaultOrder.IsValid())
+	{
+		DefaultOrder.LoadSynchronous();
+	}
+
+	if (VerifyOrder(Order))
+	{
+		/** TODO:  Tell it to execute the order */
+		FString OrderName = Order.OrderType->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: %s is going to execute the chosen order!"), *Character->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: %s is going to execute default order!"), *Character->GetName());
+	}
+
+	
 }
 
 bool UQuestOrderHandlingComponent::TryCallNextOrder()
 {
 	if (NextOrder.OrderType != nullptr)
 	{
-		CurrentOrder = NextOrder;
+		FQuestOrderData NewCurrentorder = NextOrder;
 		NextOrder.OrderType = nullptr;
-		IssueOrder(CurrentOrder);
+		SetCurrentOrder(NewCurrentorder);
 		return true;
 	}
 	else {return false;}
+}
+
+bool UQuestOrderHandlingComponent::VerifyOrder(const FQuestOrderData& Order) const
+{
+	AActor* OrderedActor = GetOwner();
+	if (!Order.OrderType.IsValid())
+	{
+		Order.OrderType.LoadSynchronous();
+	}
+
+	/** verify the order is not a null pointer */
+	TSubclassOf<UQuestOrder> OrderType = Order.OrderType.Get();
+	if (OrderType == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: null pointer as an order!"));
+		return false;
+	}
+
+	/** verify the actor can issue this order */
+	if (!UQuestOrderHelperLibrary::CanObeyOrder(OrderType.Get(), OrderedActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: %s could not obey order!"), *OrderedActor->GetName());
+		return false;
+	}
+
+	/** verify the target is valid */
+	FQuestOrderTargetData TargetData = UQuestOrderHelperLibrary::CreateTargetDataForOrder(OrderedActor, Order.TargetActor, Order.TargetLocation);
+	if (!UQuestOrderHelperLibrary::IsValidTarget(OrderType.Get(), OrderedActor, TargetData))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: %s could not get a valid target for the order!"), *OrderedActor->GetName());
+		return false;
+	}
+
+	return true;
 }
 
 void UQuestOrderHandlingComponent::OnOrderEndedCallback(EQuestOrderResult OrderResult)

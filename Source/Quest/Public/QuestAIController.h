@@ -71,6 +71,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestAIController")
 		float AIFieldOfView = 90.0f;
 
+	/** The default order for the controlled character */
+	TSoftClassPtr<UQuestOrder> DefaultOrder;
+
 	/** Issues the order specified */
 	void IssueOrder(const FQuestOrderData& Order, FQuestOrderCallback Callback);
 

@@ -53,8 +53,11 @@ void AQuestGATargetActorGroundSelect::StartTargeting(UGameplayAbility* Ability)
 
 	// Keep the mouse from moving the character while targeting is active
 	PlayerController = Cast<AQuestPlayerController>(MasterPC);
-	PlayerController->bControllerShouldMoveCharacter = false;
-	PlayerController->bIsTargeting = true;
+	if (PlayerController)
+	{
+		PlayerController->bControllerShouldMoveCharacter = false;
+		PlayerController->bIsTargeting = true;
+	}
 	
 	// Reset the decal size
 	Decal->DecalSize = FVector(Radius);

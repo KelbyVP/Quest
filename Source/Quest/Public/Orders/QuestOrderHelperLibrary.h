@@ -9,6 +9,7 @@
 
 class UQuestOrder;
 class AQuestCharacterBase;
+struct FQuestOrderTargetData;
 
 /**
  * 
@@ -30,6 +31,9 @@ public:
 	/** Gets an order's target type */
 	static EQuestOrderTargetType GetTargetType(TSoftClassPtr<UQuestOrder> OrderType);
 
+	/** Gets target data for an order */
+	static FQuestOrderTargetData CreateTargetDataForOrder(const AActor* OrderedActor, AActor* TargetActor, const FVector& TargetLocation);
+
 	/** Gets an order's target scoring method */
 	static EQuestOrderTargetScoringMethod GetTargetScoringMethod(TSoftClassPtr<UQuestOrder> OrderType);
 
@@ -47,6 +51,10 @@ public:
 
 	/** Chooses the best target suitable for the order */
 	static AQuestCharacterBase* SelectTarget(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType);
+
+	/** Tells us whether the target is valid for the order */
+	static bool IsValidTarget(TSoftClassPtr<UQuestOrder> OrderType, const AActor* OrderedActor,
+		const FQuestOrderTargetData& TargetData);
 
 	static TArray<AQuestCharacterBase*> GetHostileTargetsInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
 
@@ -75,7 +83,7 @@ public:
 	*/
 	static AQuestCharacterBase* GetMostPowerfulCharacterInArray(TArray<AQuestCharacterBase*>& CharacterArray);
 
-	static TArray<AQuestCharacterBase*> GetCharacterssInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
+	static TArray<AQuestCharacterBase*> GetCharactersInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
 
 
 

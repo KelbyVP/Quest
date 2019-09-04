@@ -67,6 +67,7 @@ void AQuestSpectatorPawn::Tick(float DeltaSeconds)
 		}
 	}
 
+	// TODO:  Do we really need to do this in the Tick?  maybe just have CenterOnCharacter call MovetoSelectedCharacterLocation
 	if (bShouldMovePawnTowardSelectedCharacter)
 	{
 		MoveToSelectedCharacterLocation(DeltaSeconds);

@@ -16,6 +16,7 @@
 #include "QuestCharacterGroup.h"
 #include "QuestGlobalTags.h"
 #include "QuestOrderHandlingComponent.h"
+#include "QuestOrderHelperLibrary.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
 
@@ -185,6 +186,32 @@ void AQuestCharacterBase::SetCharacterGroup(AQuestCharacterGroup* InCharacterGro
 	CharacterGroup->OnEnterCombat.AddDynamic(this, &AQuestCharacterBase::EnterCombat);
 }
 
+void AQuestCharacterBase::CreateCharacterGroup()
+{
+	/** Try to find a leader without a CharacterGroup and ask that leader to form a CharacterGroup */
+	if (!CharacterGroup && !bIsLeader)
+	{
+		TArray<AQuestCharacterBase*> CharactersInRange;
+		CharactersInRange = UQuestOrderHelperLibrary::GetCharactersInRange(this, GroupRange);
+		for (auto& Character : CharactersInRange)
+		{
+			if (!Character->CharacterGroup && Character->bIsLeader)
+			{
+				Character->InitializeCharacterGroup();
+				Character->AddMembersToCharacterGroup();
+				break;
+			}
+		}
+	}
+	/** If we still don't have a CharacterGroup, become a leader and create one */
+	if (!CharacterGroup)
+	{
+		bIsLeader = true;
+		InitializeCharacterGroup();
+		AddMembersToCharacterGroup();
+	}
+}
+
 void AQuestCharacterBase::EnterCombat()
 {
 	if (AutoOrderComponent)
@@ -198,6 +225,16 @@ void AQuestCharacterBase::EnterCombat()
 		/** If we are not already in combat, begin */
 		AutoOrderComponent->EnterCombat();
 	}
+}
+
+bool AQuestCharacterBase::IsAdverse(const AQuestCharacterBase* OtherActor)
+{
+	if (OtherActor->Affiliation != ECharacterAffiliation::IT_Neutral
+		&& OtherActor->Affiliation != Affiliation)
+	{
+		return true ;
+	}
+	else { return false; }
 }
 
 void AQuestCharacterBase::SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order)

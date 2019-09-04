@@ -2,6 +2,7 @@
 
 
 #include "QuestOrder.h"
+#include "QuestOrderTargetData.h"
 
 UQuestOrder::UQuestOrder()
 {
@@ -15,9 +16,14 @@ void UQuestOrder::GetTagRequirements(const AActor* OrderedActor, FQuestOrderTagR
 	OutTagRequirements = TagRequirements;
 }
 
-EQuestOrderTargetType UQuestOrder::GetTargetType()
+EQuestOrderTargetType UQuestOrder::GetTargetType() const
 {
 	return TargetType;
+}
+
+bool UQuestOrder::IsValidTarget(const AActor* OrderedActor, const FQuestOrderTargetData& TargetData) const
+{
+	return true;
 }
 
 EQuestOrderTargetScoringMethod UQuestOrder::GetTargetScoringMethod()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "QuestOrderTargetData.h"
 #include "QuestAbilitySystemHelper.generated.h"
 
 /**
@@ -15,6 +16,14 @@ class QUEST_API UQuestAbilitySystemHelper : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
+
+	/** Gets the actor's gameplay tags */
+	UFUNCTION(BlueprintPure, Category = "QuestAbilitySystemHelper")
+	static void GetTags(const AActor* Actor, FGameplayTagContainer& OutGameplayTags);
+
+	UFUNCTION(BlueprintPure, Category = "QuestAbilitySystemHelper")
+		static void GetSourceAndTargetTags(const AActor* SourceActor, const AActor* TargetActor,
+			FGameplayTagContainer& OutSourceTags, FGameplayTagContainer& OutTargetTags);
 
 	/** Checks whether any required tags are missing or blocking tags are present */
 

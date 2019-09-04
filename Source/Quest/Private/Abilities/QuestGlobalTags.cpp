@@ -15,3 +15,39 @@ bool UQuestGlobalTags::CanTagBeStacked(const FGameplayTag& Tag)
 		Tag != FGameplayTag::RequestGameplayTag(FName(TEXT("status.alive")))
 		;
 }
+
+const FGameplayTag& UQuestGlobalTags::Relationship_Hostile()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("relationship.Hostile")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Relationship_Neutral()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("relationship.Neutral")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Relationship_Self()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("relationship.Neutral")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Relationship_Friendly()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("relationship.Friendly")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Relationship_Visible()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("relationship.Visible")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Status_Alive()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("status.alive")));
+	return Tag;
+}

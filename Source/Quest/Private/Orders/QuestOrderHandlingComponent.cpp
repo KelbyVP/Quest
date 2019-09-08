@@ -75,12 +75,10 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	{
 		/** TODO:  Tell it to execute the order */
 		FString OrderName = Order.OrderType->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: %s is going to execute the chosen order!"), *Character->GetName());
 		ObeyOrder(Order);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::IssueOrder: %s is going to execute default order!"), *Character->GetName());
 	}
 
 	
@@ -139,14 +137,12 @@ bool UQuestOrderHandlingComponent::VerifyOrder(const FQuestOrderData& Order) con
 	TSubclassOf<UQuestOrder> OrderType = Order.OrderType.Get();
 	if (OrderType == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: null pointer as an order!"));
 		return false;
 	}
 
 	/** verify the actor can issue this order */
 	if (!UQuestOrderHelperLibrary::CanObeyOrder(OrderType.Get(), OrderedActor))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: %s could not obey order!"), *OrderedActor->GetName());
 		return false;
 	}
 
@@ -154,7 +150,6 @@ bool UQuestOrderHandlingComponent::VerifyOrder(const FQuestOrderData& Order) con
 	FQuestOrderTargetData TargetData = UQuestOrderHelperLibrary::CreateTargetDataForOrder(OrderedActor, Order.TargetActor, Order.TargetLocation);
 	if (!UQuestOrderHelperLibrary::IsValidTarget(OrderType.Get(), OrderedActor, TargetData))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: %s could not get a valid target for the order!"), *OrderedActor->GetName());
 		return false;
 	}
 

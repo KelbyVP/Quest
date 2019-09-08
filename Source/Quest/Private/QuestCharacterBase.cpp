@@ -230,6 +230,7 @@ void AQuestCharacterBase::EnterCombat()
 bool AQuestCharacterBase::IsAdverse(const AQuestCharacterBase* OtherActor)
 {
 	if (OtherActor->Affiliation != ECharacterAffiliation::IT_Neutral
+		&& Affiliation != ECharacterAffiliation::IT_Neutral
 		&& OtherActor->Affiliation != Affiliation)
 	{
 		return true ;

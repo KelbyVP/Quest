@@ -118,9 +118,11 @@ void AQuestAIController::InitializePerceptionComponent(AQuestCharacterBase* Cont
 
 void AQuestAIController::IssueOrder(const FQuestOrderData& Order, FQuestOrderCallback Callback)
 {
+
 	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(Order.OrderType.Get());
 	if (BehaviorTree == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestAIController::IssueOrder: Behavior tree is null pointer!"))
 		Callback.Broadcast(EQuestOrderResult::FAILED);
 		return;
 	}
@@ -192,7 +194,12 @@ void AQuestAIController::SetBlackboardValues(const FQuestOrderData& Order)
 
 void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree* BehaviorTree)
 {
-	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: Apply order called!"))
+	FString TargetName = FString(TEXT("NoName"));
+	if (Order.TargetActor != nullptr)
+	{
+		TargetName = Order.TargetActor->GetName();
+	}
+	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: Apply order called by %s for order %s with target %s!"), *GetPawn()->GetName(), *Order.OrderType->GetName(), *TargetName)
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent == nullptr)
 	{

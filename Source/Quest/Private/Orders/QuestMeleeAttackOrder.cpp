@@ -3,3 +3,7 @@
 
 #include "QuestMeleeAttackOrder.h"
 
+UQuestMeleeAttackOrder::UQuestMeleeAttackOrder()
+{
+	Range = 100;
+}

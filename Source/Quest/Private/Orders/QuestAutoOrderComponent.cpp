@@ -123,6 +123,7 @@ bool UQuestAutoOrderComponent::SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrd
 		{
 			return (GetWeaponAttackOrder(InOrder));
 		}
+
 		/** If not a QuestCharacter, choose an order from AutoOrderArray */
 		else if (!OwningQuestCharacter)
 		{
@@ -141,13 +142,8 @@ bool UQuestAutoOrderComponent::SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrd
 				}
 			}
 			/** If unable to get order from array, issue melee order */
-
-			else
-			{
 				return (GetWeaponAttackOrder(InOrder));
-			}
 		}
-		else return false;
 	}
 	return false;
 }

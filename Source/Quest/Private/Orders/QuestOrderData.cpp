@@ -38,7 +38,7 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor, FVector InTargetLocation)
 {
-	OrderType = OrderType;
+	OrderType = InOrderType;
 	bUseLocation = true;
 	TargetLocation = InTargetLocation;
 	TargetActor = InTargetActor;

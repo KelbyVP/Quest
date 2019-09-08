@@ -2,7 +2,11 @@
 
 
 #include "QuestOrder.h"
+#include "GameFramework/Actor.h"
+#include "QuestAIController.h"
+#include "QuestOrderData.h"
 #include "QuestOrderTargetData.h"
+#include "QuestOrderTargetType.h"
 
 UQuestOrder::UQuestOrder()
 {
@@ -53,7 +57,44 @@ UBehaviorTree* UQuestOrder::GetBehaviorTree()
 
 void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: is calling Issue Order for order!"));
+	if (!IsValid(OrderedActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: Ordered Actor is invalid!"));
+		Callback.Broadcast(EQuestOrderResult::FAILED);
+		return;
+	}
+
+	APawn* Pawn = Cast<APawn>(OrderedActor);
+	if (Pawn == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: Ordered Actor % is not a pawn!"), *OrderedActor->GetName());
+		Callback.Broadcast(EQuestOrderResult::FAILED);
+		return;
+	}
+
+	AQuestAIController* Controller = Cast<AQuestAIController>(Pawn->GetController());
+	if (Controller == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: Ordered Actor % does not have the required controller!"), *OrderedActor->GetName());
+		Callback.Broadcast(EQuestOrderResult::FAILED);
+		return;
+	}
+
+	AActor* TargetActor = TargetData.Actor;
+	const FVector TargetLocation = TargetData.Location;
+
+	UClass* OrderType = GetClass();
+	if (OrderType == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: OrderType is a null pointer!"));
+		Callback.Broadcast(EQuestOrderResult::FAILED);
+		return;
+	}
+	FQuestOrderData Order(OrderType, TargetActor, TargetLocation);
+	EQuestOrderTargetType TargetType = GetTargetType();
+
+	Order.bUseLocation = TargetType == EQuestOrderTargetType::LOCATION || TargetType == EQuestOrderTargetType::DIRECTION;
+	Controller->IssueOrder(Order, Callback);
 }
 
 bool UQuestOrder::ShouldRestartBehaviorTree()

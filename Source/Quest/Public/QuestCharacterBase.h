@@ -79,6 +79,10 @@ public:
 		void RemoveGameplayTag(FGameplayTag TagToRemove);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		bool DoesCharacterHaveTag(FGameplayTag const& Tag);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void SetWeaponMesh(UQuestWeaponItem* Weapon);
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "SetWeaponMesh"))
+		void BP_SetWeaponMesh(UQuestWeaponItem* Weapon);
 
 	/** This function must be overriden to avoid an abstract class error */
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { AbilitySystemComponent->GetOwnedGameplayTags(TagContainer); return; }
@@ -91,6 +95,12 @@ public:
 	/** Blueprint function that will be called by OnHealthChanged when character's health changes */
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "OnHealthChanged"))
 		void BP_OnHealthChanged(float Health, float MaxHealth);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void TurnTowardTarget(AQuestCharacterBase* TargetCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "TurnTowardTarget"))
+	void BP_TurnTowardTarget(AQuestCharacterBase* Target);
 
 	/** Function called when character wants to make a melee attack */
 	UFUNCTION()

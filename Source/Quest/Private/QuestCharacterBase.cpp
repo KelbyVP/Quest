@@ -64,6 +64,10 @@ void AQuestCharacterBase::BeginPlay()
 	{
 		AddGameplayTags(DefaultTags);
 	}
+	if (EquippedWeapon)
+	{
+		SetWeaponMesh(EquippedWeapon);
+	}
 
 	/** Initialize character group */
 	if (bIsLeader)
@@ -150,6 +154,11 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	// call the Blueprint function that determines what happens when health changed
 	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
+}
+
+void AQuestCharacterBase::TurnTowardTarget(AQuestCharacterBase* TargetCharacter)
+{
+	BP_TurnTowardTarget(TargetCharacter);
 }
 
 void AQuestCharacterBase::MeleeAttack()
@@ -311,5 +320,10 @@ bool AQuestCharacterBase::DoesCharacterHaveTag(FGameplayTag const& Tag)
 		return true;
 	}
 	return false;
+}
+
+void AQuestCharacterBase::SetWeaponMesh(UQuestWeaponItem* Weapon)
+{
+	BP_SetWeaponMesh(Weapon);
 }
 

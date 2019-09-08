@@ -26,11 +26,11 @@ FVector UQuestBlackboardHelperLibrary::GetBlackboardLocation(UBTNode* NodeOwner)
 AActor* UQuestBlackboardHelperLibrary::GetBlackboardTarget(UBTNode* NodeOwner)
 {
 	UBlackboardComponent* BlackboardComp = UBTFunctionLibrary::GetOwnersBlackboard(NodeOwner);
-	return BlackboardComp ? Cast<AActor>(BlackboardComp->GetValueAsObject(BLACKBOARD_KEY_LOCATION)) : nullptr;
+	return BlackboardComp ? Cast<AActor>(BlackboardComp->GetValueAsObject(BLACKBOARD_KEY_TARGET)) : nullptr;
 }
 
 float UQuestBlackboardHelperLibrary::GetBlackboardRange(UBTNode* NodeOwner)
 {
 	UBlackboardComponent* BlackboardComp = UBTFunctionLibrary::GetOwnersBlackboard(NodeOwner);
-	return BlackboardComp ? BlackboardComp->GetValueAsFloat(BLACKBOARD_KEY_LOCATION) : 0.0f;
+	return BlackboardComp ? BlackboardComp->GetValueAsFloat(BLACKBOARD_KEY_RANGE) : 0.0f;
 }

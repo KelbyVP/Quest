@@ -17,13 +17,13 @@ class QUEST_API UQuestBlackboardHelperLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultTosefl = "NodeOwner"))
+	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
 		static TSubclassOf<UQuestOrder> GetBlackboardOrderType(UBTNode* NodeOwner);
-	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultTosefl = "NodeOwner"))
+	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
 		static FVector GetBlackboardLocation(UBTNode* NodeOwner);
-	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultTosefl = "NodeOwner"))
+	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
 		static AActor* GetBlackboardTarget(UBTNode* NodeOwner);
-	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultTosefl = "NodeOwner"))
+	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
 		static float GetBlackboardRange(UBTNode* NodeOwner);
 
 	static const FName BLACKBOARD_KEY_ORDER_TYPE;

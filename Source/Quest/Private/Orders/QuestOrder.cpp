@@ -91,9 +91,9 @@ void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& 
 		return;
 	}
 	FQuestOrderData Order(OrderType, TargetActor, TargetLocation);
-	EQuestOrderTargetType TargetType = GetTargetType();
+	EQuestOrderTargetType OrderTargetType = GetTargetType();
 
-	Order.bUseLocation = TargetType == EQuestOrderTargetType::LOCATION || TargetType == EQuestOrderTargetType::DIRECTION;
+	Order.bUseLocation = OrderTargetType == EQuestOrderTargetType::LOCATION || OrderTargetType == EQuestOrderTargetType::DIRECTION;
 	Controller->IssueOrder(Order, Callback);
 }
 

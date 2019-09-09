@@ -2,6 +2,7 @@
 
 
 #include "QuestAIController.h"
+#include "AIModule/Classes/Navigation/CrowdFollowingComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameplayTags/Classes/GameplayTagContainer.h"
@@ -18,7 +19,8 @@
 #include "QuestCharacterBase.h"
 #include "UObjectGlobals.h"
 
-AQuestAIController::AQuestAIController()
+AQuestAIController::AQuestAIController(const FObjectInitializer& ObjectInitializer) 
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	/** Create AI Perception Component and configuration */
 

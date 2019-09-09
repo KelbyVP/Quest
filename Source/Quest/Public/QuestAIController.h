@@ -23,7 +23,7 @@ public:
 
 
 	/** Default constructor */
-	AQuestAIController();
+	AQuestAIController(const FObjectInitializer& ObjectInitializer);
 
 	/** Called every tick */
 	virtual void Tick(float DeltaTime) override;

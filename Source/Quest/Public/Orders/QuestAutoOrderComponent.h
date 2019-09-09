@@ -30,6 +30,9 @@ public:
 	/** Tells us whether the character is in combat */
 	bool bIsInCombat = false;
 
+	/** Sets a ranged or melee attack order based on the character's equipped weapon */
+	bool GetWeaponAttackOrder(TSoftClassPtr<UQuestOrder>& InOrder);
+
 	UFUNCTION()
 		void EnterCombat();
 	UFUNCTION()
@@ -43,8 +46,7 @@ protected:
 
 private:
 
-	/** Sets a ranged or melee attack order based on the character's equipped weapon */
-	bool GetWeaponAttackOrder(TSoftClassPtr<UQuestOrder>& InOrder);
+
 
 	UFUNCTION()
 		bool SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrder);

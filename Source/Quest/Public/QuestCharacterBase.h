@@ -102,6 +102,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "TurnTowardTarget"))
 	void BP_TurnTowardTarget(AQuestCharacterBase* Target);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void TurnTowardLocation(FVector Location);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "TurnTowardLocation"))
+	void BP_TurnTowardLocation(FVector Location);
+
 	/** Function called when character wants to make a melee attack */
 	UFUNCTION()
 		void MeleeAttack();

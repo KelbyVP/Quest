@@ -25,4 +25,5 @@ public:
 	static const FGameplayTag& Relationship_Self();
 	static const FGameplayTag& Relationship_Visible();
 	static const FGameplayTag& Status_Alive();
+	static const FGameplayTag& Cooldown();
 };

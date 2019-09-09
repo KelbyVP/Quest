@@ -29,13 +29,50 @@ void UQuestOrderHandlingComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter)
+{
+	AQuestCharacterBase* OrderedCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	if (!IsValid(OrderedCharacter))
+	{
+		return;
+	}
+	/** If the target is adverse, fight him */
+	if (OrderedCharacter->IsAdverse(TargetCharacter))
+	{
+		// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
+		TSoftClassPtr<UQuestOrder> OrderType;
+		OrderedCharacter->AutoOrderComponent->GetWeaponAttackOrder(OrderType);
+		FQuestOrderData Order(OrderType, TargetCharacter);
+		OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+	}
+}
+
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder)
+{
+	AQuestCharacterBase* OrderedCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	if (!IsValid(OrderedCharacter))
+	{
+		return;
+	}
+	// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
+
+	FQuestOrderData Order(MoveOrder, TargetLocation);
+	OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+}
+
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage)
+{
+
+}
+
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 {
 	//  Check whether this character has a cooldown tag
 	FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag(FName(TEXT("cooldown")));
-	if (Cast<AQuestCharacterBase>(GetOwner())->DoesCharacterHaveTag(CooldownTag))
+	if (Cast<AQuestCharacterBase>(GetOwner())->DoesCharacterHaveTag(CooldownTag)
+		&& !UQuestOrderHelperLibrary::CanObeyWhileCooldownInEffect(GetOwner(), NewOrder.OrderType)
+		)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::SetNextOrder: character has cooldown tag!"));
 		NextOrder = NewOrder;
 		return;
 	}
@@ -88,9 +125,8 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	}
 	else
 	{
+		// TODO:: Do we want it to do something if it can't be verified?
 	}
-
-	
 }
 
 void UQuestOrderHandlingComponent::ObeyOrder(const FQuestOrderData& Order)

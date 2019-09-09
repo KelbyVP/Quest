@@ -80,16 +80,17 @@ void AQuestCharacterGroup::OnMemberDeath(AQuestCharacterBase* DeadCharacter)
 
 	/** Check whether there are any living members */
 	bool bDoesGroupHaveAnyLivingMembers = false;
-
 	if (Members.Num() <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterGroup::OnMemberDeath: No members in %s' group! "), *DeadCharacter->GetName());
+		return;
 	}
 	for (auto& Member : Members)
 	{
 		if (Member && !Member->bIsDead)
 		{
 			bDoesGroupHaveAnyLivingMembers = true;
+			break;
 		}
 	}
 
@@ -99,7 +100,10 @@ void AQuestCharacterGroup::OnMemberDeath(AQuestCharacterBase* DeadCharacter)
 		bIsInCombat = false;
 		for (auto& Group : AdverseGroupsInCombat)
 		{
-			Group->OnCharacterGroupDefeated(this);
+			if (IsValid(Group))
+			{
+				Group->OnCharacterGroupDefeated(this);
+			}
 		}
 		if (bShouldDefeatTriggerEvent)
 		{
@@ -109,30 +113,27 @@ void AQuestCharacterGroup::OnMemberDeath(AQuestCharacterBase* DeadCharacter)
 	}
 
 	/** If there are still living members, but the leader died, pick a new leader from those still living */
-	else
-	{
 
-		if (DeadCharacter == Leader)
+	if (DeadCharacter == Leader)
+	{
+		TArray<AQuestCharacterBase*> LivingMembers;
+		for (auto& Member : Members)
 		{
-			TArray<AQuestCharacterBase*> LivingMembers;
-			for (auto& Member : Members)
+			if (Member && !Member->bIsDead)
 			{
-				if (Member && !Member->bIsDead)
-				{
-					LivingMembers.AddUnique(Member);
-				}
+				LivingMembers.AddUnique(Member);
 			}
-			if (LivingMembers.Num() > 0)
-			{
-				SetLeader(UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(LivingMembers));
-			}
+		}
+		if (LivingMembers.Num() > 0)
+		{
+			SetLeader(UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(LivingMembers));
 		}
 	}
 }
 
 void AQuestCharacterGroup::OnCharacterGroupDefeated(AQuestCharacterGroup* DefeatedGroup)
 {
-	if (!DefeatedGroup)
+	if (!IsValid(DefeatedGroup))
 	{
 		return;
 	}

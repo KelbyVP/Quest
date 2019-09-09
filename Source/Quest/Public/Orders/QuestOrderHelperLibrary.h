@@ -49,6 +49,9 @@ public:
 	/** Gets behavior tree associated with the order */
 	static UBehaviorTree* GetBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType);
 
+	/** Tells whether the order can be executed while the character has a cooldown tag */
+	static bool CanObeyWhileCooldownInEffect(const AActor* OrderedActor, TSoftClassPtr<UQuestOrder> OrderType);
+
 	/** Chooses the best target suitable for the order */
 	static AQuestCharacterBase* SelectTarget(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType);
 

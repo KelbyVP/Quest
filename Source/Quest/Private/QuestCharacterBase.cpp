@@ -165,6 +165,11 @@ void AQuestCharacterBase::TurnTowardTarget(AQuestCharacterBase* TargetCharacter)
 	BP_TurnTowardTarget(TargetCharacter);
 }
 
+void AQuestCharacterBase::TurnTowardLocation(FVector Location)
+{
+	BP_TurnTowardLocation(Location);
+}
+
 void AQuestCharacterBase::MeleeAttack()
 {
 	BP_MeleeAttack();

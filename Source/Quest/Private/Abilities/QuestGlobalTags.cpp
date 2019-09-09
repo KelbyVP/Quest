@@ -51,3 +51,9 @@ const FGameplayTag& UQuestGlobalTags::Status_Alive()
 	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("status.alive")));
 	return Tag;
 }
+
+const FGameplayTag& UQuestGlobalTags::Cooldown()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("cooldown")));
+	return Tag;
+}

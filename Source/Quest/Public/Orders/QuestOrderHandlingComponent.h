@@ -8,6 +8,7 @@
 #include "QuestOrderHandlingComponent.generated.h"
 
 struct FQuestOrderData;
+class AQuestStorage;
 
 /**
  * This component handles the orders for a character to execute.
@@ -27,6 +28,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	void IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter);
+	void IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder);
+	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage);
 	void SetNextOrder(const FQuestOrderData &NewOrder);
 	void SetCurrentOrder(const FQuestOrderData &NewOrder);
 	void IssueOrder(const FQuestOrderData& Order);

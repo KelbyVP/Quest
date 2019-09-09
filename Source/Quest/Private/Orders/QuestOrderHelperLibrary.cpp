@@ -13,6 +13,7 @@
 #include "QuestAttributeSet.h"
 #include "QuestCharacterBase.h"
 #include "QuestCharacterGroup.h"
+#include "QuestGlobalTags.h"
 #include "QuestOrder.h"
 #include "QuestOrderErrorTags.h"
 #include "QuestOrderTargetData.h"
@@ -395,6 +396,31 @@ UBehaviorTree* UQuestOrderHelperLibrary::GetBehaviorTree(TSoftClassPtr<UQuestOrd
 		OrderType.LoadSynchronous();
 	}
 	return OrderType->GetDefaultObject<UQuestOrder>()->GetBehaviorTree();
+}
+
+bool UQuestOrderHelperLibrary::CanObeyWhileCooldownInEffect(const AActor* OrderedActor, TSoftClassPtr<UQuestOrder> OrderType)
+{
+	if (OrderType == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyWhileCooldownInEffect: no valid order type!"))
+			return false;
+	}
+	if (!OrderType.IsValid())
+	{
+		OrderType.LoadSynchronous();
+	}
+	FQuestOrderTagRequirements TagRequirements;
+	OrderType->GetDefaultObject<UQuestOrder>()->GetTagRequirements(OrderedActor, TagRequirements);
+	if (TagRequirements.SourceTagsBlocked.HasTag(UQuestGlobalTags::Cooldown()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyWhileCooldownInEffect: Cannot obey order %s during cooldown!"), *OrderType->GetName());
+		return false;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyWhileCooldownInEffect: Can obey order %s during cooldown!"), *OrderType->GetName());
+		return true;
+	}
 }
 
 AQuestCharacterBase* UQuestOrderHelperLibrary::SelectTarget(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)

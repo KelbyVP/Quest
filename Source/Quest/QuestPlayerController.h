@@ -12,6 +12,7 @@
 class AQuestCharacter;
 class AQuestCharacterBase;
 class AQuestMerchantCharacter;
+class UQuestOrder;
 class AQuestSpectatorPawn;
 class AQuestStorage;
 
@@ -26,29 +27,27 @@ public:
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
+	//uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Navigate player to the current mouse cursor location. */
-	void MoveToMouseCursor();
+	///** Navigate player to the current mouse cursor location. */
+	//void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
-	void SetNewMoveDestination(FHitResult &Hit);
+	void SetPlayerDirectedOrder(FHitResult &Hit);
 
 	/** Input handlers for SetDestination action. */
 	void OnSetTargetPressed();
-	void OnSetTargetReleased();
+	//void OnSetTargetReleased();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Quest Player Controller")
 		FVector DestinationLocation;
 
 public:
-	AQuestCharacterBase* PawnClicked;
-	AQuestStorage* StorageClicked;
 
 	/** The invisible Spectator Pawn that controls the camera */
 	UPROPERTY(BlueprintReadOnly, Category = "QuestPlayerController")
@@ -86,6 +85,9 @@ private:
 	/** Component used for moving along a path. */
 	UPROPERTY(VisibleAnywhere, Category = "QuestPlayerController")
 	UPathFollowingComponent* PathFollowingComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
+		TSoftClassPtr<UQuestOrder> MoveOrder;
 
 
 };

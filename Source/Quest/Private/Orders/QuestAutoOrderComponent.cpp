@@ -38,6 +38,7 @@ bool UQuestAutoOrderComponent::GetWeaponAttackOrder(TSoftClassPtr<UQuestOrder>& 
 		}
 		
 		// If no weapon, set to default order
+		// TODO: Do we want to have some default hand-to-hand combat order?
 		else
 		{
 			InOrder = OwningCharacter->DefaultOrder;

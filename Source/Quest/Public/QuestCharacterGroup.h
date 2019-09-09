@@ -8,6 +8,7 @@
 #include "QuestCharacterGroup.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterCombat);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeaveCombat);
 
 UCLASS()
 class QUEST_API AQuestCharacterGroup : public AActor
@@ -57,6 +58,7 @@ public:
 	TArray<AQuestCharacterGroup*> AdverseGroupsInCombat;
 	
 	FOnEnterCombat OnEnterCombat;
+	FOnLeaveCombat OnLeaveCombat;
 
 	/** Adds a character to the group */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")

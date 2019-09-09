@@ -52,6 +52,7 @@ private:
 	bool VerifyBlackboard() const;
 	void SetBlackboardValues(const FQuestOrderData& Order);
 	void ApplyOrder(const FQuestOrderData& Order, UBehaviorTree* BehaviorTree);
+	void OnCooldownTagChanged(const FGameplayTag CooldownTag, int32 NewCount);
 
 	/** Function called when perception component sees something */
 	UFUNCTION()

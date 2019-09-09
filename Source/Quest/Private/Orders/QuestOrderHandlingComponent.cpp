@@ -31,6 +31,15 @@ void UQuestOrderHandlingComponent::BeginPlay()
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 {
+	//  Check whether this character has a cooldown tag
+	FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag(FName(TEXT("cooldown")));
+	if (Cast<AQuestCharacterBase>(GetOwner())->DoesCharacterHaveTag(CooldownTag))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::SetNextOrder: character has cooldown tag!"));
+		NextOrder = NewOrder;
+		return;
+	}
+
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
 	switch (CancellationPolicy)
 	{

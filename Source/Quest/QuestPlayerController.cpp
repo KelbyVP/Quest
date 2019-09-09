@@ -24,7 +24,6 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	bControllerShouldMoveCharacter = true;
 	bIsTargeting = false;
-	ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
 	Gold = 0;
 }
 
@@ -74,12 +73,8 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 	if (Hit.bBlockingHit)
 	{
 		AActor* ActorClicked;
-		if (!ControlledCharacter)
-		{
-			ControlledCharacter = Cast<AQuestCharacter>(GetPawn());
-		}
 
-		if (ControlledCharacter)
+		if (SelectedCharacter)
 		{
 			ActorClicked = Hit.GetActor();
 			PawnClicked = Cast<AQuestCharacterBase>(ActorClicked);
@@ -98,7 +93,7 @@ void AQuestPlayerController::SetNewMoveDestination(FHitResult &Hit)
 			// If we did not click on a character or storage actor, move unless we're too close for the animation to play correctly
 			else
 			{
-				ControlledCharacter->AbilitySystemComponent->CurrentMontageStop(1.0f);
+				SelectedCharacter->AbilitySystemComponent->CurrentMontageStop(1.0f);
 				DestinationLocation = DestLocation;
 				//MoveToTargetLocation();
 			}
@@ -126,7 +121,7 @@ void AQuestPlayerController::SetPathFollowingComponent()
 		*	The SimpleMoveToLocation function creates a PathFollowingComponent with the right settings,
 		*	so moving to current location is a simple way to create the component 
 		*/
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, ControlledCharacter->GetActorLocation());
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, SelectedCharacter->GetActorLocation());
 		PathFollowingComponent = FindComponentByClass<UPathFollowingComponent>();
 		
 		/** Bind the delegate that tells us when a move is finished */

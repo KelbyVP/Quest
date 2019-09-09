@@ -149,18 +149,11 @@ void AQuestCharacterGroup::OnCharacterGroupDefeated(AQuestCharacterGroup* Defeat
 	{
 		EndCombat();
 	}
-
 }
 
 void AQuestCharacterGroup::EndCombat()
 {
 	bIsInCombat = false;
-	for (auto& Member : Members)
-	{
-		if (Member && !Member->bIsDead)
-		{
-			Member->OnCombatEnd();
-		}
-	}
+	OnLeaveCombat.Broadcast();
 }
 

@@ -197,6 +197,7 @@ void AQuestCharacterBase::SetCharacterGroup(AQuestCharacterGroup* InCharacterGro
 {
 	CharacterGroup = InCharacterGroup;
 	CharacterGroup->OnEnterCombat.AddDynamic(this, &AQuestCharacterBase::EnterCombat);
+	CharacterGroup->OnLeaveCombat.AddDynamic(this, &AQuestCharacterBase::LeaveCombat);
 }
 
 void AQuestCharacterBase::CreateCharacterGroup()
@@ -240,7 +241,7 @@ void AQuestCharacterBase::EnterCombat()
 	}
 }
 
-void AQuestCharacterBase::OnCombatEnd()
+void AQuestCharacterBase::LeaveCombat()
 {
 	/** 
 	*	TODO:  If it's a QuestCharacter, We don't want an auto-order if the character 

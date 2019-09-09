@@ -132,7 +132,7 @@ public:
 		void EnterCombat();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
-		void OnCombatEnd();
+		void LeaveCombat();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure,  Category = "QuestCharacterBase")
 		bool IsAdverse(const AQuestCharacterBase* OtherActor);

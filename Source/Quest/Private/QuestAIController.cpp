@@ -4,10 +4,12 @@
 #include "QuestAIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameplayTags/Classes/GameplayTagContainer.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "QuestAutoOrderComponent.h"
 #include "QuestBlackboardHelperLibrary.h"
+#include "QuestCharacter.h"
 #include "QuestCharacterBase.h"
 #include "QuestCharacterGroup.h"
 #include "QuestOrder.h"
@@ -93,6 +95,13 @@ void AQuestAIController::OnPossess(APawn* InPawn)
 	}
 	UBehaviorTree* BehaviorTree = UQuestOrderHelperLibrary::GetBehaviorTree(DefaultOrder.Get());
 	RunBehaviorTree(BehaviorTree);
+
+	/**	
+	*	Subscribe to the AbilitySystemComponent's delegate that tells us when a cooldown tag has been added or removed
+	*	so that when removed, we can call a new order
+	*/
+	FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag(FName(TEXT("cooldown")));
+	ControlledPawn->AbilitySystemComponent->RegisterGameplayTagEvent(CooldownTag, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AQuestAIController::OnCooldownTagChanged);
 }
 
 
@@ -224,6 +233,11 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 			BehaviorTreeComponent->StartTree(*BehaviorTree, EBTExecutionMode::SingleRun);
 		}
 	}
+}
+
+void AQuestAIController::OnCooldownTagChanged(const FGameplayTag CooldownTag, int32 NewCount)
+{
+	CurrentOrderResultCallback.Broadcast(EQuestOrderResult::SUCCEEDED);
 }
 
 void AQuestAIController::OnPawnDetected(const TArray<AActor*>& DetectedPawns)

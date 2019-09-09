@@ -54,6 +54,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestPlayerController")
 	AQuestSpectatorPawn* ControlledPawn;
 
+	/** The Party Member that is currently selected */
+	UPROPERTY(BlueprintReadWrite, Category = "QuestPlayerController")
+		AQuestCharacter* SelectedCharacter;
+
 
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
@@ -75,9 +79,6 @@ public:
 		void BP_OnTargetSelected();
 
 private:
-	// TODO:  Delete this because the player controller no longer controls a Quest Character
-	AQuestCharacter* ControlledCharacter;
-
 
 	void SetPathFollowingComponent();
 	void MovetoTargetLocation();

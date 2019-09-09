@@ -209,14 +209,7 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 		TargetName = Order.TargetActor->GetName();
 	}
 		UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
-	if (BehaviorTreeComponent == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: no behavior tree component found!"))
-	}
-	if (BehaviorTree == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: no behavior tree found!"))
-	}
+
 	if (BehaviorTreeComponent != nullptr && BehaviorTree != nullptr)
 	{
 		/** If the tree is the same, restart it if it should restart*/

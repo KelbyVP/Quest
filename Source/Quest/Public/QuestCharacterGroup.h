@@ -43,6 +43,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestCharacterGroup")
 		ECharacterAffiliation Affiliation = ECharacterAffiliation::IT_Neutral;
 
+	/** Tells us whether to start some kind of event when the group is defeated 
+	*	TODO:  When the group is initialized, if this bool is true, get the functionality from the leader
+	*	so that the group knows what it is even if it has to change leaders during combat
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestCharacterGroup")
+		bool bShouldDefeatTriggerEvent;
 
 	/** Tells us whether this group is currently in combat */
 	bool bIsInCombat;
@@ -63,6 +69,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
 		void CheckShouldStartFighting(AQuestCharacterBase* CharacterToFight);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
+		void OnMemberDeath(AQuestCharacterBase* DeadCharacter);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
+		void OnCharacterGroupDefeated(AQuestCharacterGroup* DefeatedGroup);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterGroup")
+		void EndCombat();
 
 private:
 

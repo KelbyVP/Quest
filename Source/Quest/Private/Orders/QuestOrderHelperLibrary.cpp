@@ -289,7 +289,7 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAlliedLeaderInA
 
 AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(TArray<AQuestCharacterBase*>& CharacterArray)
 {
-	AQuestCharacterBase* MostPowerfulAdversary = nullptr;
+	AQuestCharacterBase* MostPowerfulCharacter = nullptr;
 	float MostPowerfulLevel = 0.f;
 	float MostPowerfulHealth = 0.f;
 
@@ -303,20 +303,20 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(T
 				float TargetHealth = Target->AttributeSetComponent->Health.GetCurrentValue();
 				if (TargetHealth > MostPowerfulHealth)
 				{
-					MostPowerfulAdversary = Target;
+					MostPowerfulCharacter = Target;
 					MostPowerfulHealth = TargetHealth;
 					MostPowerfulLevel = TargetLevel;
 				}
 			}
 			else if (TargetLevel > MostPowerfulLevel)
 			{
-				MostPowerfulAdversary = Target;
+				MostPowerfulCharacter = Target;
 				MostPowerfulHealth = Target->AttributeSetComponent->Health.GetCurrentValue();
 				MostPowerfulLevel = TargetLevel;
 			}
 		}
 	}
-	return MostPowerfulAdversary;
+	return MostPowerfulCharacter;
 }
 
 TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
@@ -344,13 +344,13 @@ TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(cons
 		QueryParams
 	);
 
-	/** Filter unique QuestCharacterBase actors */
+	/** Filter unique QuestCharacterBase living actors */
 	TArray<AQuestCharacterBase*> CharactersInRange;
 
 	for (auto& Hit : Hits)
 	{
 		AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(Hit.GetActor());
-		if (Character)
+		if (Character && !Character->bIsDead)
 		{
 			CharactersInRange.AddUnique(Character);
 		}

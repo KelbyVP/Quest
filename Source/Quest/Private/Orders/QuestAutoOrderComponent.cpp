@@ -5,6 +5,7 @@
 #include "QuestAttackOrder.h"
 #include "QuestCharacter.h"
 #include "QuestCharacterBase.h"
+#include "QuestCharacterGroup.h"
 #include "QuestDefaultOrder.h"
 #include "QuestOrderData.h"
 #include "QuestOrderHandlingComponent.h"
@@ -84,7 +85,6 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 			{
 				OrderComponent->SetNextOrder(FQuestOrderData(Order, TargetCharacter));
 			}
-			else { UE_LOG(LogTemp, Warning, TEXT("QuestAutoOrderComponent: %s chose nullptr as a target!"), *Owner->GetName()); }
 			break;
 		}
 		// TODO:  what do we want to do with other TargetTypes?
@@ -115,7 +115,11 @@ bool UQuestAutoOrderComponent::SelectAutoOrder(TSoftClassPtr<UQuestOrder>& InOrd
 	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
 	if (OwningCharacter)
 	{
-		FString CharacterName = GetOwner()->GetName();
+		if (!OwningCharacter->CharacterGroup->bIsInCombat)
+		{
+			InOrder = OwningCharacter->DefaultOrder;
+			return (InOrder != nullptr);
+		}
 		/** If this is a QuestCharacter, use weapon attack */
 		// TODO:  If a Quest Character is battling but not yet in the party, do we want them to use other auto orders?
 		AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);

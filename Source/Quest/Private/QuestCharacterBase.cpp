@@ -38,6 +38,7 @@ AQuestCharacterBase::AQuestCharacterBase()
 	CharacterClass = ECharacterClass::IT_Wizard;
 	bIsLeader = false;
 	CharacterGroup = nullptr;
+	bShouldDefeatTriggerEvent = false;
 	GroupRange = 2000.0f;
 
 	// Variables for the AI Perception Component
@@ -140,19 +141,22 @@ void AQuestCharacterBase::RemoveGameplayTag(FGameplayTag TagToRemove)
 }
 
 /** Called when the AttributeSet broadcasts an OnHealthChanged delegate; */
-
 void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 { 
 	// Check to see whether the character is dead
 	if (Health <= 0)
 	{
-		// TODO:  If the character is a leader and dies, we need to see whether there are any other characters in the character group, and if so, make one of them the leader
 		bIsDead = true;
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnHealthChanged: %s is dead!"), *GetName());
+		CharacterGroup->OnMemberDeath(this);
+		// TODO:  Ensure that anyone auto-attacking this character doesn't trigger errors because the character is now dead
+		// TODO:  Set up functionality for when player character dies (should be done in blueprint)
 		BP_Die();
+		return;
 	}
 
 	// call the Blueprint function that determines what happens when health changed
-	UE_LOG(LogTemp, Warning, TEXT("Health down to %f"), AttributeSetComponent->Health.GetCurrentValue());
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnHealthChanged: %s health down to %f"), *GetName(), AttributeSetComponent->Health.GetCurrentValue());
 	BP_OnHealthChanged(Health, MaxHealth);
 }
 
@@ -236,6 +240,16 @@ void AQuestCharacterBase::EnterCombat()
 	}
 }
 
+void AQuestCharacterBase::OnCombatEnd()
+{
+	/** 
+	*	TODO:  If it's a QuestCharacter, We don't want an auto-order if the character 
+	*	Is implementing an order that the player chose that isn't a combat order
+	*/
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnCombatEnd: %s is leaving combat and setting a new auto order!"), *GetName());
+	AutoOrderComponent->GenerateAutoOrder();
+}
+
 bool AQuestCharacterBase::IsAdverse(const AQuestCharacterBase* OtherActor)
 {
 	if (OtherActor->Affiliation != ECharacterAffiliation::IT_Neutral
@@ -262,6 +276,7 @@ void AQuestCharacterBase::InitializeCharacterGroup()
 	CharacterGroup = GetWorld()->SpawnActor<AQuestCharacterGroup>(AQuestCharacterGroup::StaticClass(), FVector(0, 0, 0), FRotator(), FActorSpawnParameters());
 	CharacterGroup->AddCharacter(this);
 	CharacterGroup->SetLeader(this);
+	CharacterGroup->bShouldDefeatTriggerEvent = bShouldDefeatTriggerEvent;
 }
 
 void AQuestCharacterBase::AddMembersToCharacterGroup()

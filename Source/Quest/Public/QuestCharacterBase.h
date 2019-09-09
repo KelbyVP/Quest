@@ -131,6 +131,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void EnterCombat();
 
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void OnCombatEnd();
+
 	UFUNCTION(BlueprintCallable, BlueprintPure,  Category = "QuestCharacterBase")
 		bool IsAdverse(const AQuestCharacterBase* OtherActor);
 
@@ -177,6 +180,10 @@ public:
 	// Tells us whether this character is the leader of its CharacterGroup
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		bool bIsLeader;
+
+	// Tells us whether some event should be triggered when this character's group is defeated
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		bool bShouldDefeatTriggerEvent;
 
 	// If this character is the leader of its CharacterGroup, how far to look for other group members
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")

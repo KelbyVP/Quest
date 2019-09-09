@@ -199,8 +199,7 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 	{
 		TargetName = Order.TargetActor->GetName();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: Apply order called by %s for order %s with target %s!"), *GetPawn()->GetName(), *Order.OrderType->GetName(), *TargetName)
-	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+		UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: no behavior tree component found!"))
@@ -222,7 +221,6 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: starting tree!"))
 			BehaviorTreeComponent->StartTree(*BehaviorTree, EBTExecutionMode::SingleRun);
 		}
 	}

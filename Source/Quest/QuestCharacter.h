@@ -10,6 +10,7 @@
 class AQuestStorage;
 class AQuestMerchantCharacter;
 class UQuestCharacterAttributeSet;
+class UQuestHoldOrder;
 class UQuestSelectableComponent;
 
 UCLASS(Blueprintable)
@@ -47,6 +48,8 @@ public:
 		int32 Experience;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		int32 NextLevelExperience;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		TSoftClassPtr<UQuestHoldOrder> HoldOrder;
 
 
 	void InteractWithTarget(AActor* InteractionTarget);

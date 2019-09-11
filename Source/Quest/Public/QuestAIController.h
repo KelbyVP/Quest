@@ -46,8 +46,7 @@ private:
 	/** Delegate that broadcasts results of the current Behavior Tree */
 	FQuestOrderCallback CurrentOrderResultCallback;
 
-	/** Used to cache the Behavior Tree result */
-	EBTNodeResult::Type BehaviorTreeResult;
+
 
 	bool VerifyBlackboard() const;
 	void SetBlackboardValues(const FQuestOrderData& Order);
@@ -71,6 +70,9 @@ public:
 		float AILoseSightRadius = AISightRadius + 50.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestAIController")
 		float AIFieldOfView = 90.0f;
+
+	/** Used to cache the Behavior Tree result */
+	EBTNodeResult::Type BehaviorTreeResult;
 
 	/** The default order for the controlled character */
 	TSoftClassPtr<UQuestOrder> DefaultOrder;

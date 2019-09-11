@@ -15,6 +15,7 @@ class AQuestMerchantCharacter;
 class UQuestOrder;
 class AQuestSpectatorPawn;
 class AQuestStorage;
+class UQuestMoveOrder;
 
 UCLASS()
 class AQuestPlayerController : public APlayerController
@@ -57,6 +58,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "QuestPlayerController")
 		AQuestCharacter* SelectedCharacter;
 
+	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
+		TSoftClassPtr<UQuestMoveOrder> MoveOrder;
+
 
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
@@ -77,6 +81,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
 		void BP_OnTargetSelected();
 
+
+
 private:
 
 	void SetPathFollowingComponent();
@@ -86,8 +92,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "QuestPlayerController")
 	UPathFollowingComponent* PathFollowingComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
-		TSoftClassPtr<UQuestOrder> MoveOrder;
+
 
 
 };

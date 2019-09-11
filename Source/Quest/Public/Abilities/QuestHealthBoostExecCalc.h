@@ -6,6 +6,7 @@
 #include "Abilities/QuestDamageExecutionCalculation.h"
 #include "QuestHealthBoostExecCalc.generated.h"
 
+class UQuestGameplayAbility;
 /**
  * 
  */

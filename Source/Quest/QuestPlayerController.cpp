@@ -12,6 +12,7 @@
 #include "QuestGameMode.h"
 #include "QuestGameplayAbility.h"
 #include "QuestMerchantCharacter.h"
+#include "QuestMoveOrder.h"
 #include "QuestOrder.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestSpectatorPawn.h"
@@ -95,6 +96,7 @@ void AQuestPlayerController::SetPlayerDirectedOrder(FHitResult &Hit)
 			if (StorageClicked)
 			{
 				// TODO:  call appropriate order when clicking on a storage
+				return;
 			}
 
 			// If we did not click on a character or storage actor, move unless we're too close for the animation to play correctly			

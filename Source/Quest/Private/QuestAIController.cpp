@@ -210,6 +210,8 @@ void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree*
 	{
 		TargetName = Order.TargetActor->GetName();
 	}
+	UE_LOG(LogTemp, Warning, TEXT("QuestAIController::ApplyOrder: calling apply order for %s!"), *GetName())
+
 		UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 
 	if (BehaviorTreeComponent != nullptr && BehaviorTree != nullptr)

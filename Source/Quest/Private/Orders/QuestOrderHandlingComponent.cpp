@@ -2,15 +2,21 @@
 
 
 #include "QuestOrderHandlingComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "QuestAIController.h"
+#include "QuestAttackOrder.h"
 #include "QuestAutoOrderComponent.h"
+#include "QuestCharacter.h"
 #include "QuestCharacterBase.h"
+#include "QuestCharacterGroup.h"
 #include "QuestDefaultOrder.h"
+#include "QuestHoldOrder.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
 #include "QuestOrderData.h"
 #include "QuestOrderTargetData.h"
+#include "QuestPlayerController.h"
 
 // Sets default values for this component's properties
 UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
@@ -18,6 +24,7 @@ UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	bIsBeingDirectedByPlayer = false;
 
 	// ...
 }
@@ -40,6 +47,7 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestChar
 	if (OrderedCharacter->IsAdverse(TargetCharacter))
 	{
 		// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
+		bIsBeingDirectedByPlayer = true;
 		TSoftClassPtr<UQuestOrder> OrderType;
 		OrderedCharacter->AutoOrderComponent->GetWeaponAttackOrder(OrderType);
 		FQuestOrderData Order(OrderType, TargetCharacter);
@@ -55,7 +63,7 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(FVector Ta
 		return;
 	}
 	// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
-
+	bIsBeingDirectedByPlayer = true;
 	FQuestOrderData Order(MoveOrder, TargetLocation);
 	OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
 }
@@ -63,6 +71,90 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(FVector Ta
 void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage)
 {
 
+}
+
+void UQuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection()
+{
+	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
+
+	if (!IsValid(OwningCharacter))
+	{
+		return;
+	}
+
+	auto AutoOrderComponent = OwningCharacter->AutoOrderComponent;
+	if (!IsValid(AutoOrderComponent))
+	{
+		return;
+	}
+	/** If this character is not in combat, set to auto-order mode and use GenerateAutoOrder to get Default Order */
+	if (!OwningCharacter->CharacterGroup->bIsInCombat)
+	{
+		bIsBeingDirectedByPlayer = false;
+		AutoOrderComponent->GenerateAutoOrder();
+		return;
+	}
+	
+	TSoftClassPtr<UQuestOrder> CurrentOrderType = CurrentOrder.OrderType;
+	if (!CurrentOrder.OrderType.IsValid())
+	{
+		CurrentOrder.OrderType.LoadSynchronous();
+	}
+
+	AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TSoftClassPtr<UQuestOrder> AttackOrder = nullptr;
+	/** If this character was  attacking . . . */
+	if (AutoOrderComponent->GetWeaponAttackOrder(AttackOrder) && AttackOrder == CurrentOrderType)
+	{
+		/** If this character was attacking a target that's still alive, melee attack again */
+		if (OwningCharacter->TargetActor && !OwningCharacter->TargetActor->bIsDead)
+		{
+			UE_LOG(LogTemp, Warning,
+				TEXT("QuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection: %s is doing a player-directed follow-on attack!"),
+				*GetOwner()->GetName());
+				SetNextOrder(FQuestOrderData(AttackOrder, OwningCharacter->TargetActor));
+				return;
+		}
+		/** If target is lost or dead, resume auto order mode */
+		else
+		{
+			bIsBeingDirectedByPlayer = false;
+			AutoOrderComponent->GenerateAutoOrder();
+			return;
+		}
+	}
+
+	AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
+
+	/** If this character was moving . . . */
+	if (PlayerController && CurrentOrder.OrderType == PlayerController->MoveOrder)
+	{
+		// If the move succeeded, hold position
+		AQuestAIController* Controller = Cast<AQuestAIController>(OwningCharacter->GetController());
+		if (Controller && Controller->BehaviorTreeResult == EBTNodeResult::Succeeded)
+		{
+			SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
+			return;
+		}
+		// If move did not succeed, move to auto order mode
+		else
+		{
+			bIsBeingDirectedByPlayer = false;
+			AutoOrderComponent->GenerateAutoOrder();
+			return;
+		}
+	}
+
+	/** If this character had a hold order, hold position */
+	if (CurrentOrder.OrderType == OwningQuestCharacter->HoldOrder)
+	{
+		SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
+		return;
+	}
+
+	/** Coming out of any other order, switch back to auto-order mode */
+	bIsBeingDirectedByPlayer = false;
+	AutoOrderComponent->GenerateAutoOrder();
 }
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
@@ -73,10 +165,14 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 		&& !UQuestOrderHelperLibrary::CanObeyWhileCooldownInEffect(GetOwner(), NewOrder.OrderType)
 		)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::SetNextOrder:  cooldown blocking trying to set next order %s"),
+			*NewOrder.OrderType->GetName());
 		NextOrder = NewOrder;
 		return;
 	}
-
+	// TODO:  I'm suspicious that the CannotBeCancelled option will result in an order never getting called, because we already
+	// got the callback from the current order, but we're preventing the new order from being called.  Need to debug and see. 
+	//  Maybe it's as simple as checking the status of the BehaviorTreeResult in the AIController?
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
 	switch (CancellationPolicy)
 	{
@@ -239,7 +335,16 @@ void UQuestOrderHandlingComponent::OrderEnded(EQuestOrderResult OrderResult)
 			Character->SetAutoOrderAsUsed(CurrentOrder.OrderType);
 			if (!TryCallNextOrder())
 			{
-				Character->AutoOrderComponent->GenerateAutoOrder();
+				// If this order should be determined based on a recent player order, issue appropriate order
+				if (bIsBeingDirectedByPlayer)
+				{
+					SetNextOrderBasedOnPlayerDirection();
+				}
+				// If this order should not be determined based on a recent player order, generate auto order
+				else
+				{
+					Character->AutoOrderComponent->GenerateAutoOrder();
+				}
 			}
 		}
 	}

@@ -65,9 +65,7 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 		return false;
 	}
 
-	FString Name;
-	if (Order) { Name = Order->GetName(); }
-	else { Name = FString(TEXT("None")); }
+
 	EQuestOrderTargetType TargetType = UQuestOrderHelperLibrary::GetTargetType(Order);
 	switch (TargetType)
 	{
@@ -98,7 +96,12 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 void UQuestAutoOrderComponent::EnterCombat()
 {
 	bIsInCombat = true;
-	GenerateAutoOrder();
+
+	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	if (OwningCharacter && !OwningCharacter->OrderHandlingComponent->bIsBeingDirectedByPlayer)
+	{
+		GenerateAutoOrder();
+	}
 }
 
 void UQuestAutoOrderComponent::GenerateAutoOrder()

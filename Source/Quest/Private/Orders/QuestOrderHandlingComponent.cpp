@@ -11,12 +11,15 @@
 #include "QuestCharacterGroup.h"
 #include "QuestDefaultOrder.h"
 #include "QuestHoldOrder.h"
+#include "QuestMeleeAttackOrder.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
 #include "QuestOrder.h"
 #include "QuestOrderData.h"
 #include "QuestOrderTargetData.h"
 #include "QuestPlayerController.h"
+#include "QuestRangedAttackOrder.h"
+#include "QuestWeaponItem.h"
 
 // Sets default values for this component's properties
 UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
@@ -73,7 +76,7 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStor
 
 }
 
-void UQuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection()
+void UQuestOrderHandlingComponent::SetNextOrderAfterPlayerDirectedOrder()
 {
 	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
 
@@ -87,6 +90,7 @@ void UQuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection()
 	{
 		return;
 	}
+
 	/** If this character is not in combat, set to auto-order mode and use GenerateAutoOrder to get Default Order */
 	if (!OwningCharacter->CharacterGroup->bIsInCombat)
 	{
@@ -100,61 +104,101 @@ void UQuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection()
 	{
 		CurrentOrder.OrderType.LoadSynchronous();
 	}
-
+	/** If we are in combat . . . */
 	AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	TSoftClassPtr<UQuestOrder> AttackOrder = nullptr;
-	/** If this character was  attacking . . . */
-	if (AutoOrderComponent->GetWeaponAttackOrder(AttackOrder) && AttackOrder == CurrentOrderType)
+
+	/** If this character has an attack order available . . . */
+	if (AutoOrderComponent->GetWeaponAttackOrder(AttackOrder))
 	{
-		/** If this character was attacking a target that's still alive, melee attack again */
-		if (OwningCharacter->TargetActor && !OwningCharacter->TargetActor->bIsDead)
+		/** if the character was attacking, try to attack the same character again, or else resume auto order mode */
+		if (AttackOrder == CurrentOrderType)
 		{
-			UE_LOG(LogTemp, Warning,
-				TEXT("QuestOrderHandlingComponent::SetNextOrderBasedOnPlayerDirection: %s is doing a player-directed follow-on attack!"),
-				*GetOwner()->GetName());
+			if (OwningCharacter->TargetActor && !OwningCharacter->TargetActor->bIsDead)
+			{
 				SetNextOrder(FQuestOrderData(AttackOrder, OwningCharacter->TargetActor));
 				return;
+			}
+			else
+			{
+				bIsBeingDirectedByPlayer = false;
+				AutoOrderComponent->GenerateAutoOrder();
+				return;
+			}
 		}
-		/** If target is lost or dead, resume auto order mode */
-		else
-		{
-			bIsBeingDirectedByPlayer = false;
-			AutoOrderComponent->GenerateAutoOrder();
-			return;
-		}
-	}
 
-	AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
+		AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
 
-	/** If this character was moving . . . */
-	if (PlayerController && CurrentOrder.OrderType == PlayerController->MoveOrder)
-	{
-		// If the move succeeded, hold position
-		AQuestAIController* Controller = Cast<AQuestAIController>(OwningCharacter->GetController());
-		if (Controller && Controller->BehaviorTreeResult == EBTNodeResult::Succeeded)
+		/** If this character just finished moving successfully, attack if we can do so without moving */
+		if (PlayerController && CurrentOrder.OrderType == PlayerController->MoveOrder)
 		{
-			SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
-			return;
-		}
-		// If move did not succeed, move to auto order mode
-		else
-		{
-			bIsBeingDirectedByPlayer = false;
-			AutoOrderComponent->GenerateAutoOrder();
-			return;
-		}
-	}
+			AQuestAIController* Controller = Cast<AQuestAIController>(OwningCharacter->GetController());
 
-	/** If this character had a hold order, hold position */
-	if (CurrentOrder.OrderType == OwningQuestCharacter->HoldOrder)
-	{
-		SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
-		return;
+			if (Controller && Controller->BehaviorTreeResult == EBTNodeResult::Succeeded)
+			{
+				TryToAttackWhileHolding();
+				return;
+			}
+			// If move did not succeed, move to auto order mode
+			else
+			{
+				bIsBeingDirectedByPlayer = false;
+				AutoOrderComponent->GenerateAutoOrder();
+				return;
+			}
+		}
+
+		/** Otherwise, attack if we can do so without moving or else hold */
+			TryToAttackWhileHolding();
+			return;
+
+
 	}
 
 	/** Coming out of any other order, switch back to auto-order mode */
 	bIsBeingDirectedByPlayer = false;
 	AutoOrderComponent->GenerateAutoOrder();
+}
+
+void UQuestOrderHandlingComponent::TryToAttackWhileHolding()
+{
+	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	TSoftClassPtr<UQuestOrder> AttackOrder = nullptr;
+	if (OwningCharacter->AutoOrderComponent->GetWeaponAttackOrder(AttackOrder))
+	// Find enemies in range
+	if (AttackOrder == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT
+		("QuestOrderHandlingComponent::SetNextOrderAfterPlayerDirectedOrder: Attack Order is null pointer for %s!"),
+			*GetOwner()->GetName())
+	}
+	float Range = UQuestOrderHelperLibrary::GetRange(AttackOrder);
+	TArray<AQuestCharacterBase*> HostileCharactersInAttackRange = UQuestOrderHelperLibrary::GetHostileTargetsInRange(OwningCharacter, Range);
+
+	// If there are enemies in range, attack them
+	if (HostileCharactersInAttackRange.Num() > 0)
+	{
+		OwningCharacter->AutoOrderComponent->GenerateAutoOrder();
+		return;
+	}
+	// If there are no enemies in range, hold
+	else
+	{
+		AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
+		if (IsValid(OwningQuestCharacter))
+		{
+			if (OwningQuestCharacter->HoldOrder != nullptr)
+			{
+				SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
+				return;
+			}
+		}
+		else
+		{
+			SetNextOrder(FQuestOrderData(OwningCharacter->DefaultOrder));
+			return;
+		}
+	}
 }
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
@@ -338,7 +382,7 @@ void UQuestOrderHandlingComponent::OrderEnded(EQuestOrderResult OrderResult)
 				// If this order should be determined based on a recent player order, issue appropriate order
 				if (bIsBeingDirectedByPlayer)
 				{
-					SetNextOrderBasedOnPlayerDirection();
+					SetNextOrderAfterPlayerDirectedOrder();
 				}
 				// If this order should not be determined based on a recent player order, generate auto order
 				else

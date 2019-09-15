@@ -148,7 +148,7 @@ TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetHostileTargetsInRange(
 			if (IsValid(PossibleTarget))
 			{
 
-				if (PossibleTarget->IsAdverse(OrderedCharacter))
+				if (PossibleTarget->IsAdverse(OrderedCharacter) && !PossibleTarget->bIsDead)
 				{
 					HostileTargetsInRange.Add(PossibleTarget);
 					if (IsValid(OrderedCharacter) && IsValid(OrderedCharacter->CharacterGroup))

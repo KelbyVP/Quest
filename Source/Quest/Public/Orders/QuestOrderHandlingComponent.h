@@ -38,8 +38,11 @@ public:
 	void IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter);
 	void IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder);
 	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage);
-	void SetNextOrderBasedOnPlayerDirection();
-	void SetNextOrder(const FQuestOrderData &NewOrder);
+	void SetNextOrderAfterPlayerDirectedOrder();
+
+	void TryToAttackWhileHolding();
+
+	void SetNextOrder(const FQuestOrderData& NewOrder);
 	void SetCurrentOrder(const FQuestOrderData &NewOrder);
 	void IssueOrder(const FQuestOrderData& Order);
 	void ObeyOrder(const FQuestOrderData& Order);

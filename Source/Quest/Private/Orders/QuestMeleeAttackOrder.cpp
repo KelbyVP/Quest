@@ -5,5 +5,5 @@
 
 UQuestMeleeAttackOrder::UQuestMeleeAttackOrder()
 {
-	Range = 100;
+	Range = 200;
 }

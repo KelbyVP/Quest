@@ -26,7 +26,7 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
-	bControllerShouldMoveCharacter = true;
+	bControllerShouldDirectCharacter = true;
 	bIsTargeting = false;
 	Gold = 0;
 }
@@ -95,14 +95,19 @@ void AQuestPlayerController::SetPlayerDirectedOrder(FHitResult &Hit)
 
 void AQuestPlayerController::OnSetTargetPressed()
 {
-		// set flag to keep updating destination until released
-		//bMoveToMouseCursor = true;
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 	if (Hit.bBlockingHit)
 	{
 		// If we hit something, issue appropriate order
-		SetPlayerDirectedOrder(Hit);
+		if (bControllerShouldDirectCharacter)
+		{
+			SetPlayerDirectedOrder(Hit);
+		}
+		if (bIsTargeting)
+		{
+			BP_OnTargetSelected();
+		}
 	}
 
 }

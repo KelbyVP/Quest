@@ -238,9 +238,7 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 		NextOrder = NewOrder;
 		return;
 	}
-	// TODO:  I'm suspicious that the CannotBeCancelled option will result in an order never getting called, because we already
-	// got the callback from the current order, but we're preventing the new order from being called.  Need to debug and see. 
-	//  Maybe it's as simple as checking the status of the BehaviorTreeResult in the AIController?
+
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
 
 	switch (CancellationPolicy)
@@ -295,9 +293,6 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 
 	if (VerifyOrder(Order))
 	{
-		/** TODO:  Tell it to execute the order */
-		FString OrderName = Order.OrderType->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::Issue: trying to obey order!"))
 		ObeyOrder(Order);
 	}
 	else

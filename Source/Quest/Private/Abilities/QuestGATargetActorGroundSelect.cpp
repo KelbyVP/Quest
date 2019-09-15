@@ -34,7 +34,7 @@ void AQuestGATargetActorGroundSelect::BeginPlay()
 void AQuestGATargetActorGroundSelect::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	PlayerController->bControllerShouldMoveCharacter = true;
+	PlayerController->bControllerShouldDirectCharacter = true;
 }
 
 void AQuestGATargetActorGroundSelect::Tick(float DeltaSeconds)
@@ -55,7 +55,7 @@ void AQuestGATargetActorGroundSelect::StartTargeting(UGameplayAbility* Ability)
 	PlayerController = Cast<AQuestPlayerController>(MasterPC);
 	if (PlayerController)
 	{
-		PlayerController->bControllerShouldMoveCharacter = false;
+		PlayerController->bControllerShouldDirectCharacter = false;
 		PlayerController->bIsTargeting = true;
 	}
 	
@@ -134,6 +134,6 @@ void AQuestGATargetActorGroundSelect::ConfirmTargetingAndContinue()
 	}
 
 	// Enable character movement on mouse click
-	PlayerController->bControllerShouldMoveCharacter = true;
+	PlayerController->bControllerShouldDirectCharacter = true;
 	PlayerController->bIsTargeting = false;
 }

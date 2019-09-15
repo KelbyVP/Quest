@@ -27,23 +27,18 @@ public:
 	virtual void BeginPlay() override;
 
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	//uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	///** Navigate player to the current mouse cursor location. */
-	//void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
 	void SetPlayerDirectedOrder(FHitResult &Hit);
 
 	/** Input handlers for SetDestination action. */
 	void OnSetTargetPressed();
-	//void OnSetTargetReleased();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Quest Player Controller")
 		FVector DestinationLocation;
@@ -69,7 +64,7 @@ public:
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
-	bool bControllerShouldMoveCharacter;
+	bool bControllerShouldDirectCharacter;
 
 	/** Set whether the controller is targeting */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")

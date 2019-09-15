@@ -3,6 +3,8 @@
 
 #include "QuestGATargetActorClicked.h"
 #include "GameplayAbility.h"
+#include "Kismet/GameplayStatics.h"
+#include "QuestAIController.h"
 #include "QuestPlayerController.h"
 #include "QuestCharacterBase.h"
 
@@ -13,26 +15,46 @@ AQuestGATargetActorClicked::AQuestGATargetActorClicked()
 
 void AQuestGATargetActorClicked::StartTargeting(UGameplayAbility* Ability)
 {
+
 	// Override ability and controller variables from parent class
 	OwningAbility = Ability;
-	MasterPC = Cast<APlayerController>(Ability->GetOwningActorFromActorInfo()->GetInstigatorController());
 
-	// Keep the mouse from moving the character while targeting is active
-	PlayerController = Cast<AQuestPlayerController>(MasterPC);
-	PlayerController->bControllerShouldMoveCharacter = false;
-	PlayerController->bIsTargeting = true;
-	PlayerController->CurrentMouseCursor = EMouseCursor::Hand;
+	MasterPC = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(MasterPC))
+
+	{
+		// Keep the mouse from moving the character while targeting is active
+		UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked:StartTargeting:  MasterPC is valid!"))
+		PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (IsValid(PlayerController))
+		{
+
+			PlayerController->bControllerShouldDirectCharacter = false;
+			PlayerController->bIsTargeting = true;
+			PlayerController->CurrentMouseCursor = EMouseCursor::Hand;
+		}
+		else 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked:StartTargeting:  Player controller is not valid!"))
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked:StartTargeting:  MasterPC is not valid!"))
+	}
 }
 
 void AQuestGATargetActorClicked::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	PlayerController->bControllerShouldMoveCharacter = true;
+	PlayerController->bControllerShouldDirectCharacter = true;
+	PlayerController->bIsTargeting = false;
 	PlayerController->CurrentMouseCursor = EMouseCursor::Default;
 }
 
 void AQuestGATargetActorClicked::ConfirmTargetingAndContinue()
 {
+	UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked::ConfirmTargetingingAndContinue:  Confirming!"));
 	FHitResult Hit;
 	if (MasterPC != nullptr)
 	{

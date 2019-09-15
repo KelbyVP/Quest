@@ -31,6 +31,7 @@ public:
 		UBoxComponent* InteractionBox;
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestStorage")
 		FVector InteractionBoxExtents;
+
 	// How close the character must be to interact with the storage
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestStorage")
 		float InteractionRange;

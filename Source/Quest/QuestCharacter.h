@@ -41,10 +41,14 @@ private:
 
 public:
 
+	/** Variable for temporarily storing storage chest reference when storage chest is open */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		AQuestStorage* StorageChest;
+
+	/** Variable for temporarily storing merchant reference when shop is open */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		AQuestMerchantCharacter* Merchant;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		int32 Experience;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")

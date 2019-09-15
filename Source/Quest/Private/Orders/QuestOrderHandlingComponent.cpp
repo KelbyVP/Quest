@@ -11,6 +11,7 @@
 #include "QuestCharacterGroup.h"
 #include "QuestDefaultOrder.h"
 #include "QuestHoldOrder.h"
+#include "QuestMerchantCharacter.h"
 #include "QuestMeleeAttackOrder.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestOrderCancellationPolicy.h"
@@ -56,6 +57,27 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestChar
 		OrderedCharacter->AutoOrderComponent->GetWeaponAttackOrder(OrderType);
 		FQuestOrderData Order(OrderType, TargetCharacter);
 		OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+		return;
+	}
+
+	/** If the target is a merchant, open his shop */
+	AQuestMerchantCharacter* Merchant = Cast<AQuestMerchantCharacter>(TargetCharacter);
+	if (IsValid(Merchant))
+	{
+		AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (IsValid(PlayerController))
+		{
+			AQuestCharacter* OwningCharacter = Cast<AQuestCharacter>(GetOwner());
+			if (IsValid(OwningCharacter))
+			{
+				OwningCharacter->Merchant = Merchant;
+				TSoftClassPtr<UQuestOrder> OrderType;
+				OrderType = Merchant->OpenShopOrder;
+				FQuestOrderData Order(OrderType, TargetCharacter);
+				OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+				return;
+			}
+		}
 	}
 }
 
@@ -80,9 +102,12 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStor
 	}
 	bIsBeingDirectedByPlayer = true;
 	AQuestCharacter* OwningCharacter = Cast<AQuestCharacter>(GetOwner());
-	OwningCharacter->StorageChest = Storage;
-	FQuestOrderData Order(OpenStorageOrder, Storage);
-	OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+	if (IsValid(OwningCharacter))
+	{
+		OwningCharacter->StorageChest = Storage;
+		FQuestOrderData Order(OpenStorageOrder, Storage);
+		OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
+	}
 }
 
 void UQuestOrderHandlingComponent::SetNextOrderAfterPlayerDirectedOrder()

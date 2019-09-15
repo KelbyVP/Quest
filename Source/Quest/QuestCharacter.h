@@ -25,7 +25,8 @@ public:
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
-
+	// Override parent function to ensure it does not interrupt a player directed order
+	virtual void LeaveCombat() override;
 
 private:
 
@@ -50,9 +51,6 @@ public:
 		int32 NextLevelExperience;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		TSoftClassPtr<UQuestHoldOrder> HoldOrder;
-
-
-	void InteractWithTarget(AActor* InteractionTarget);
 
 	void OnLeaveStorage();
 

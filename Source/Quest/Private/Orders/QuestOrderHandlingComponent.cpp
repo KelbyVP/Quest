@@ -19,6 +19,7 @@
 #include "QuestOrderTargetData.h"
 #include "QuestPlayerController.h"
 #include "QuestRangedAttackOrder.h"
+#include "QuestStorage.h"
 #include "QuestWeaponItem.h"
 
 // Sets default values for this component's properties
@@ -28,6 +29,7 @@ UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	bIsBeingDirectedByPlayer = false;
+	bIsCurrentOrderComplete = false;
 
 	// ...
 }
@@ -49,7 +51,6 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestChar
 	/** If the target is adverse, fight him */
 	if (OrderedCharacter->IsAdverse(TargetCharacter))
 	{
-		// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
 		bIsBeingDirectedByPlayer = true;
 		TSoftClassPtr<UQuestOrder> OrderType;
 		OrderedCharacter->AutoOrderComponent->GetWeaponAttackOrder(OrderType);
@@ -65,15 +66,23 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(FVector Ta
 	{
 		return;
 	}
-	// TODO: make sure the ordered character keeps following this order and doesn't get overriden by an auto-order if OnEnterCombat gets broadcast
 	bIsBeingDirectedByPlayer = true;
 	FQuestOrderData Order(MoveOrder, TargetLocation);
 	OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
 }
 
-void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage)
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage, TSoftClassPtr<UQuestOrder> OpenStorageOrder)
 {
-
+	AQuestCharacterBase* OrderedCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	if (!IsValid(OrderedCharacter))
+	{
+		return;
+	}
+	bIsBeingDirectedByPlayer = true;
+	AQuestCharacter* OwningCharacter = Cast<AQuestCharacter>(GetOwner());
+	OwningCharacter->StorageChest = Storage;
+	FQuestOrderData Order(OpenStorageOrder, Storage);
+	OrderedCharacter->OrderHandlingComponent->SetNextOrder(Order);
 }
 
 void UQuestOrderHandlingComponent::SetNextOrderAfterPlayerDirectedOrder()
@@ -164,41 +173,33 @@ void UQuestOrderHandlingComponent::TryToAttackWhileHolding()
 {
 	AQuestCharacterBase* OwningCharacter = Cast<AQuestCharacterBase>(GetOwner());
 	TSoftClassPtr<UQuestOrder> AttackOrder = nullptr;
-	if (OwningCharacter->AutoOrderComponent->GetWeaponAttackOrder(AttackOrder))
-	// Find enemies in range
-	if (AttackOrder == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT
-		("QuestOrderHandlingComponent::SetNextOrderAfterPlayerDirectedOrder: Attack Order is null pointer for %s!"),
-			*GetOwner()->GetName())
-	}
-	float Range = UQuestOrderHelperLibrary::GetRange(AttackOrder);
-	TArray<AQuestCharacterBase*> HostileCharactersInAttackRange = UQuestOrderHelperLibrary::GetHostileTargetsInRange(OwningCharacter, Range);
-
-	// If there are enemies in range, attack them
-	if (HostileCharactersInAttackRange.Num() > 0)
-	{
-		OwningCharacter->AutoOrderComponent->GenerateAutoOrder();
-		return;
-	}
-	// If there are no enemies in range, hold
-	else
-	{
-		AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
-		if (IsValid(OwningQuestCharacter))
+	if (OwningCharacter && OwningCharacter->AutoOrderComponent->GetWeaponAttackOrder(AttackOrder))
+		// Find enemies in range
 		{
-			if (OwningQuestCharacter->HoldOrder != nullptr)
+			float Range = UQuestOrderHelperLibrary::GetRange(AttackOrder);
+			TArray<AQuestCharacterBase*> HostileCharactersInAttackRange = UQuestOrderHelperLibrary::GetHostileTargetsInRange(OwningCharacter, Range);
+
+			// If there are enemies in range, attack them
+			if (HostileCharactersInAttackRange.Num() > 0)
 			{
-				SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
+				OwningCharacter->AutoOrderComponent->GenerateAutoOrder();
 				return;
 			}
 		}
-		else
+	// If no enemies in range, issue hold order
+	AQuestCharacter* OwningQuestCharacter = Cast<AQuestCharacter>(OwningCharacter);
+	if (IsValid(OwningQuestCharacter))
+	{
+		if (OwningQuestCharacter->HoldOrder != nullptr)
 		{
-			SetNextOrder(FQuestOrderData(OwningCharacter->DefaultOrder));
+			SetNextOrder(FQuestOrderData(OwningQuestCharacter->HoldOrder));
 			return;
 		}
 	}
+
+	// If we don't have a hold order, issue default order
+	SetNextOrder(FQuestOrderData(OwningCharacter->DefaultOrder));
+	return;
 }
 
 void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
@@ -209,8 +210,6 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 		&& !UQuestOrderHelperLibrary::CanObeyWhileCooldownInEffect(GetOwner(), NewOrder.OrderType)
 		)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::SetNextOrder:  cooldown blocking trying to set next order %s"),
-			*NewOrder.OrderType->GetName());
 		NextOrder = NewOrder;
 		return;
 	}
@@ -218,6 +217,7 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 	// got the callback from the current order, but we're preventing the new order from being called.  Need to debug and see. 
 	//  Maybe it's as simple as checking the status of the BehaviorTreeResult in the AIController?
 	EQuestOrderCancellationPolicy CancellationPolicy = UQuestOrderHelperLibrary::GetCancellationPolicy(CurrentOrder.OrderType);
+
 	switch (CancellationPolicy)
 	{
 	case EQuestOrderCancellationPolicy::CAN_BE_CANCELLED:
@@ -225,8 +225,18 @@ void UQuestOrderHandlingComponent::SetNextOrder(const FQuestOrderData &NewOrder)
 		NextOrder.OrderType = nullptr;
 		break;
 	case EQuestOrderCancellationPolicy::CANNOT_BE_CANCELLED:
-		NextOrder = NewOrder;
-		break;
+		if (bIsCurrentOrderComplete)
+		{
+
+			SetCurrentOrder(NewOrder);
+			NextOrder.OrderType = nullptr;
+			break;
+		}
+		else
+		{
+			NextOrder = NewOrder;
+			break;
+		}
 	case EQuestOrderCancellationPolicy::INSTANT:
 		IssueOrder(NewOrder);
 	}
@@ -236,6 +246,7 @@ void UQuestOrderHandlingComponent::SetCurrentOrder(const FQuestOrderData &NewOrd
 {
 	// TODO:  Cancel any existing current order
 	CurrentOrder = NewOrder;
+	bIsCurrentOrderComplete = false;
 	// TODO:: create an order preview system so we see the range, etc. of the order, and update that system based on the target type, etc. of this order
 	IssueOrder(CurrentOrder);
 }
@@ -261,10 +272,12 @@ void UQuestOrderHandlingComponent::IssueOrder(const FQuestOrderData &Order)
 	{
 		/** TODO:  Tell it to execute the order */
 		FString OrderName = Order.OrderType->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::Issue: trying to obey order!"))
 		ObeyOrder(Order);
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::Issue: could not obey order!"))
 		// TODO:: Do we want it to do something if it can't be verified?
 	}
 }
@@ -322,12 +335,14 @@ bool UQuestOrderHandlingComponent::VerifyOrder(const FQuestOrderData& Order) con
 	TSubclassOf<UQuestOrder> OrderType = Order.OrderType.Get();
 	if (OrderType == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: null pointer!"))
 		return false;
 	}
 
 	/** verify the actor can issue this order */
 	if (!UQuestOrderHelperLibrary::CanObeyOrder(OrderType.Get(), OrderedActor))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: cannot obey!"))
 		return false;
 	}
 
@@ -335,6 +350,7 @@ bool UQuestOrderHandlingComponent::VerifyOrder(const FQuestOrderData& Order) con
 	FQuestOrderTargetData TargetData = UQuestOrderHelperLibrary::CreateTargetDataForOrder(OrderedActor, Order.TargetActor, Order.TargetLocation);
 	if (!UQuestOrderHelperLibrary::IsValidTarget(OrderType.Get(), OrderedActor, TargetData))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHandlingComponent::VerifyOrder: no valid target!"))
 		return false;
 	}
 
@@ -348,6 +364,7 @@ void UQuestOrderHandlingComponent::OnOrderEndedCallback(EQuestOrderResult OrderR
 
 void UQuestOrderHandlingComponent::OrderEnded(EQuestOrderResult OrderResult)
 {
+	bIsCurrentOrderComplete = true;
 	AActor* Owner = GetOwner();
 	AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(Owner);
 	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder = Character->DefaultOrder;

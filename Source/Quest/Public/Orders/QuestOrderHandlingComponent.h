@@ -37,7 +37,7 @@ public:
 
 	void IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter);
 	void IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder);
-	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage);
+	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage, TSoftClassPtr<UQuestOrder> OpenStorageOrder);
 	void SetNextOrderAfterPlayerDirectedOrder();
 
 	void TryToAttackWhileHolding();
@@ -54,6 +54,11 @@ private:
 
 	FQuestOrderData NextOrder;
 	FQuestOrderData CurrentOrder;
+
+	/** Tells us whether the current order is complete; used for determining whether new order can be called 
+	*	if current order cancellation policy is cannot be cancelled.
+	*/
+	bool bIsCurrentOrderComplete;
 
 
 

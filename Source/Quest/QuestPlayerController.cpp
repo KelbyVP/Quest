@@ -57,20 +57,6 @@ void AQuestPlayerController::SetupInputComponent()
 	/*InputComponent->BindAction("SetTarget", IE_Released, this, &AQuestPlayerController::OnSetTargetReleased);*/
 }
 
-
-//void AQuestPlayerController::MoveToMouseCursor()
-//{
-//		// Trace to see what is under the mouse cursor
-//		 FHitResult Hit;
-//		 GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-//
-//		if (Hit.bBlockingHit)
-//		{
-//			// We hit something, move there
-//			SetNewMoveDestination(Hit);
-//		}
-//}
-
 void AQuestPlayerController::SetPlayerDirectedOrder(FHitResult &Hit)
 {
 	if (Hit.bBlockingHit)
@@ -95,7 +81,7 @@ void AQuestPlayerController::SetPlayerDirectedOrder(FHitResult &Hit)
 			StorageClicked = Cast<AQuestStorage>(ActorClicked);
 			if (StorageClicked)
 			{
-				// TODO:  call appropriate order when clicking on a storage
+				SelectedCharacter->OrderHandlingComponent->IssuePlayerDirectedOrderWithTarget(StorageClicked, OpenStorageOrder);
 				return;
 			}
 
@@ -103,7 +89,6 @@ void AQuestPlayerController::SetPlayerDirectedOrder(FHitResult &Hit)
 			SelectedCharacter->AbilitySystemComponent->CurrentMontageStop(1.0f);
 			FVector DestLocation = Hit.ImpactPoint;
 			SelectedCharacter->OrderHandlingComponent->IssuePlayerDirectedOrderWithTarget(DestLocation, MoveOrder);
-
 		}
 	}
 }
@@ -121,12 +106,6 @@ void AQuestPlayerController::OnSetTargetPressed()
 	}
 
 }
-
-//void AQuestPlayerController::OnSetTargetReleased()
-//{
-//	// clear flag to indicate we should stop updating the destination
-//	bMoveToMouseCursor = false;
-//}
 
 void AQuestPlayerController::SetPathFollowingComponent()
 {

@@ -15,6 +15,7 @@ AQuestStorage::AQuestStorage()
 	InteractionBoxExtents = FVector(130, 80, 80);
 	InteractionBox->SetupAttachment(RootComponent);
 	InteractionBox->SetBoxExtent(InteractionBoxExtents);
+	InteractionRange = 150.f;
 }
 
 // Called when the game starts or when spawned

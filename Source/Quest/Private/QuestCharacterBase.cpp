@@ -248,10 +248,6 @@ void AQuestCharacterBase::EnterCombat()
 
 void AQuestCharacterBase::LeaveCombat()
 {
-	/** 
-	*	TODO:  If it's a QuestCharacter, We don't want an auto-order if the character 
-	*	Is implementing an order that the player chose that isn't a combat order
-	*/
 	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnCombatEnd: %s is leaving combat and setting a new auto order!"), *GetName());
 	AutoOrderComponent->GenerateAutoOrder();
 }

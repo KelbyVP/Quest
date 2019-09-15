@@ -61,6 +61,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
 		TSoftClassPtr<UQuestMoveOrder> MoveOrder;
 
+	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
+		TSoftClassPtr<UQuestOrder> OpenStorageOrder;
+	
+
 
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */

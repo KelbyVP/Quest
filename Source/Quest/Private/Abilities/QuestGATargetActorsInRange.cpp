@@ -3,9 +3,10 @@
 
 #include "QuestGATargetActorsInRange.h"
 #include "GameFramework/PlayerController.h"
-#include "QuestCharacterBase.h"
 #include "GameplayAbility.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "QuestCharacterBase.h"
+#include "QuestPlayerController.h"
 
 AQuestGATargetActorsInRange::AQuestGATargetActorsInRange()
 {
@@ -14,13 +15,13 @@ AQuestGATargetActorsInRange::AQuestGATargetActorsInRange()
 void AQuestGATargetActorsInRange::StartTargeting(UGameplayAbility* Ability)
 {
 	OwningAbility = Ability;
-	MasterPC = Cast<APlayerController>(Ability->GetOwningActorFromActorInfo()->GetInstigatorController());
+	MasterPC = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }
 
 void AQuestGATargetActorsInRange::ConfirmTargetingAndContinue()
 {
-
-	// Create an array of actors within the target radius of the cursor location
+	AQuestPlayerController* PlayerController = Cast<AQuestPlayerController>(MasterPC);
+	// Create an array of actors within the target radius of the location set by the ability (usually the character's location)
 	TArray<TWeakObjectPtr<AActor>> CharactersInRange;
 	TArray<FOverlapResult> Overlaps;
 	bool TraceComplex = false;
@@ -41,6 +42,8 @@ void AQuestGATargetActorsInRange::ConfirmTargetingAndContinue()
 			if (auto Character = Cast<APawn>(o.GetActor()))
 			{
 				CharactersInRange.AddUnique(Character);
+				UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorsInRange::ConfirmTargetingAndContinue: adding %s to target list!"),
+					*Character->GetName());
 			}
 		}
 	}
@@ -55,5 +58,12 @@ void AQuestGATargetActorsInRange::ConfirmTargetingAndContinue()
 	else
 	{
 		TargetDataReadyDelegate.Broadcast(FGameplayAbilityTargetDataHandle());
+	}
+
+		// Enable character movement on mouse click
+	if (IsValid(PlayerController))
+	{
+		PlayerController->bControllerShouldDirectCharacter = true;
+		PlayerController->bIsTargeting = false;
 	}
 }

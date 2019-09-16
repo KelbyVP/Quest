@@ -2,11 +2,14 @@
 
 
 #include "QuestGATargetActorGroundSelect.h"
-#include <GameFramework/PlayerController.h>
-#include "QuestPlayerController.h"
 #include "Components/SceneComponent.h"
 #include "Components/DecalComponent.h"
+#include <GameFramework/PlayerController.h>
 #include "GameplayAbility.h"
+#include "Kismet/GameplayStatics.h"
+#include "QuestPlayerController.h"
+
+
 
 AQuestGATargetActorGroundSelect::AQuestGATargetActorGroundSelect()
 {
@@ -49,18 +52,20 @@ void AQuestGATargetActorGroundSelect::StartTargeting(UGameplayAbility* Ability)
 {
 	// Override ability and controller variables from parent class
 	OwningAbility = Ability;
-	MasterPC = Cast<APlayerController>(Ability->GetOwningActorFromActorInfo()->GetInstigatorController());
-
-	// Keep the mouse from moving the character while targeting is active
-	PlayerController = Cast<AQuestPlayerController>(MasterPC);
-	if (PlayerController)
+	MasterPC = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(MasterPC))
 	{
-		PlayerController->bControllerShouldDirectCharacter = false;
-		PlayerController->bIsTargeting = true;
+		// Keep the mouse from moving the character while targeting is active
+		PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (IsValid(PlayerController))
+		{
+			PlayerController->bControllerShouldDirectCharacter = false;
+			PlayerController->bIsTargeting = true;
+		}
+
+		// Reset the decal size
+		Decal->DecalSize = FVector(Radius);
 	}
-	
-	// Reset the decal size
-	Decal->DecalSize = FVector(Radius);
 }
 
 bool AQuestGATargetActorGroundSelect::GetCursorLocation(FVector& CursorLocation)
@@ -134,6 +139,9 @@ void AQuestGATargetActorGroundSelect::ConfirmTargetingAndContinue()
 	}
 
 	// Enable character movement on mouse click
-	PlayerController->bControllerShouldDirectCharacter = true;
-	PlayerController->bIsTargeting = false;
+	if (IsValid(PlayerController))
+	{
+		PlayerController->bControllerShouldDirectCharacter = true;
+		PlayerController->bIsTargeting = false;
+	}
 }

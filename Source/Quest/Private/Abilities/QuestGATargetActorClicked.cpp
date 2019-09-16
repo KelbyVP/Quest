@@ -4,7 +4,6 @@
 #include "QuestGATargetActorClicked.h"
 #include "GameplayAbility.h"
 #include "Kismet/GameplayStatics.h"
-#include "QuestAIController.h"
 #include "QuestPlayerController.h"
 #include "QuestCharacterBase.h"
 

@@ -55,7 +55,7 @@ UBehaviorTree* UQuestOrder::GetBehaviorTree()
 	return BehaviorTree;
 }
 
-void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback) const
+void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback, const TSubclassOf<UQuestGameplayAbility> Ability) const
 {
 	if (!IsValid(OrderedActor))
 	{
@@ -94,6 +94,7 @@ void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& 
 	EQuestOrderTargetType OrderTargetType = GetTargetType();
 
 	Order.bUseLocation = OrderTargetType == EQuestOrderTargetType::LOCATION || OrderTargetType == EQuestOrderTargetType::DIRECTION;
+	Order.Ability = Ability;
 	Controller->IssueOrder(Order, Callback);
 }
 

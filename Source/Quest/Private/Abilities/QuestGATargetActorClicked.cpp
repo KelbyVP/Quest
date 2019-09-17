@@ -23,7 +23,6 @@ void AQuestGATargetActorClicked::StartTargeting(UGameplayAbility* Ability)
 
 	{
 		// Keep the mouse from moving the character while targeting is active
-		UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked:StartTargeting:  MasterPC is valid!"))
 		PlayerController = Cast<AQuestPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (IsValid(PlayerController))
 		{
@@ -53,7 +52,6 @@ void AQuestGATargetActorClicked::EndPlay(EEndPlayReason::Type EndPlayReason)
 
 void AQuestGATargetActorClicked::ConfirmTargetingAndContinue()
 {
-	UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorClicked::ConfirmTargetingingAndContinue:  Confirming!"));
 	FHitResult Hit;
 	if (MasterPC != nullptr)
 	{

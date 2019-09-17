@@ -109,7 +109,6 @@ void AQuestPlayerController::OnSetTargetPressed()
 			BP_OnTargetSelected();
 		}
 	}
-
 }
 
 void AQuestPlayerController::SetPathFollowingComponent()

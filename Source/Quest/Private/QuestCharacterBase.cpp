@@ -2,6 +2,7 @@
 
 
 #include "QuestCharacterBase.h"
+#include "Animation/AnimMontage.h"
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -14,11 +15,13 @@
 #include "QuestAttributeSet.h"
 #include "QuestAutoOrderComponent.h"
 #include "QuestCharacterGroup.h"
+#include "QuestDefaultAbilities.h"
 #include "QuestGlobalTags.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestOrderHelperLibrary.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
+#include "QuestUseAbilityOrder.h"
 
 // Sets default values
 AQuestCharacterBase::AQuestCharacterBase()
@@ -79,6 +82,25 @@ void AQuestCharacterBase::BeginPlay()
 			AddMembersToCharacterGroup();
 		}
 	}
+
+	/** Initialize Default Abilities */
+	AcquireDefaultAbilities();
+
+}
+
+void AQuestCharacterBase::AcquireDefaultAbilities()
+{
+	if (DefaultAbilities)
+	{	
+		TArray<TSubclassOf<UQuestGameplayAbility>> Abilities = DefaultAbilities->DefaultAbilities;
+		if (Abilities.Num() > 0)
+		{
+			for (auto& Ability : Abilities)
+			{
+				AcquireAbility(Ability);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -115,6 +137,15 @@ void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToA
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityToAcquire));
 		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+
+// Removes an ability from the character
+void AQuestCharacterBase::RemoveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->OnRemoveAbility(AbilitySpec);
 	}
 }
 
@@ -173,6 +204,26 @@ void AQuestCharacterBase::TurnTowardLocation(FVector Location)
 void AQuestCharacterBase::MeleeAttack()
 {
 	BP_MeleeAttack();
+}
+
+//UAnimMontage* AQuestCharacterBase::GetProjectileSpellcastingMontage()
+//{
+//	return BP_GetProjectileSpellcastingMontage();
+//}
+
+void AQuestCharacterBase::CastSpell(TSubclassOf<UQuestGameplayAbility> Ability)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Casting base class spell"))
+}
+
+void AQuestCharacterBase::OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbility> Spell, bool bShouldBeRemovedFromMemorizedSpells)
+{
+	if (Spell == AttemptedSpell && bShouldBeRemovedFromMemorizedSpells)
+	{
+		Spellbook->RemoveMemorizedSpell(Spell);
+		return;
+	}
+	AttemptedSpell = nullptr;
 }
 
 void AQuestCharacterBase::SetSpellbookType()

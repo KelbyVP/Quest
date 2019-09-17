@@ -21,6 +21,7 @@
 #include "QuestPlayerController.h"
 #include "QuestRangedAttackOrder.h"
 #include "QuestStorage.h"
+#include "QuestUseAbilityOrder.h"
 #include "QuestWeaponItem.h"
 
 // Sets default values for this component's properties
@@ -40,6 +41,26 @@ UQuestOrderHandlingComponent::UQuestOrderHandlingComponent()
 void UQuestOrderHandlingComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility(TSubclassOf<UQuestGameplayAbility> Ability)
+{
+	AQuestCharacterBase* OrderedCharacter = Cast<AQuestCharacterBase>(GetOwner());
+	if (!IsValid(OrderedCharacter))
+	{
+		return;
+	}
+
+	TSoftClassPtr<UQuestUseAbilityOrder> OrderType = OrderedCharacter->UseAbilityOrder;
+	if (OrderType == nullptr)
+	{
+		return;
+	}
+	FQuestOrderData Order(OrderType, Ability);
+	UE_LOG(LogTemp, Warning, TEXT
+	("QuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility: Casting ability %s"), *Ability->GetName());
+	bIsBeingDirectedByPlayer = true;
+	SetNextOrder(Order);
 }
 
 void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter)
@@ -70,6 +91,7 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithTarget(AQuestChar
 			AQuestCharacter* OwningCharacter = Cast<AQuestCharacter>(GetOwner());
 			if (IsValid(OwningCharacter))
 			{
+				bIsBeingDirectedByPlayer = true;
 				OwningCharacter->Merchant = Merchant;
 				TSoftClassPtr<UQuestOrder> OrderType;
 				OrderType = Merchant->OpenShopOrder;
@@ -312,7 +334,7 @@ void UQuestOrderHandlingComponent::ObeyOrder(const FQuestOrderData& Order)
 	{
 	case EQuestOrderCancellationPolicy::INSTANT:
 		/** Do not register a callback if order is instant; current order continues executing and will still callback when finished */
-		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, FQuestOrderCallback());
+		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, FQuestOrderCallback(), Order.Ability);
 		break;
 	case EQuestOrderCancellationPolicy::CAN_BE_CANCELLED:
 	case EQuestOrderCancellationPolicy::CANNOT_BE_CANCELLED:
@@ -322,7 +344,7 @@ void UQuestOrderHandlingComponent::ObeyOrder(const FQuestOrderData& Order)
 		{
 			Order.OrderType.LoadSynchronous();
 		}
-		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, Callback);
+		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, Callback, Order.Ability);
 		}
 		break;
 	default:
@@ -397,6 +419,8 @@ void UQuestOrderHandlingComponent::OrderEnded(EQuestOrderResult OrderResult)
 			/**
 			*	TODO: Upon failure of one order in the array, need to try next order and so on until one succeeds, and if none succeed, then attack,
 			*	and then restart trying the array again
+			TODO:: Also need to take into account if we had a player directed ordedr; do we want to generate auto order, or maybe hold?
+			(This gets called if, for example, the player tries to cast a spell but chooses an invalid target)
 			*/
 				if (DefaultOrder)
 				{

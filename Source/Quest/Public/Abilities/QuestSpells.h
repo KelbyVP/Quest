@@ -8,6 +8,7 @@
 
 class UGameplayAbility;
 
+// The character class for the spells
 UENUM(BlueprintType)
 enum class ESpellType : uint8
 {
@@ -48,6 +49,6 @@ public:
 		ESpellType SpellTypeEnum;
 
 	/** Array of spells */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spell)
 		TArray<FMasterSpellStruct> Spells;
 };

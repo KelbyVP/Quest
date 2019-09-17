@@ -8,3 +8,8 @@ UQuestAbilitySystemComponent::UQuestAbilitySystemComponent()
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 
 }
+
+void UQuestAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnRemoveAbility(AbilitySpec);
+}

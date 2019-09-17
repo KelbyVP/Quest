@@ -10,6 +10,7 @@ const FName UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_ORDER_TYPE = TEXT("Ord
 const FName UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_LOCATION = TEXT("Order_Location");
 const FName UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_TARGET = TEXT("Order_Target");
 const FName UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_RANGE = TEXT("Order_Range");
+const FName UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_ABILITY = TEXT("Order_Ability");
 
 TSubclassOf<UQuestOrder> UQuestBlackboardHelperLibrary::GetBlackboardOrderType(UBTNode* NodeOwner)
 {
@@ -34,3 +35,10 @@ float UQuestBlackboardHelperLibrary::GetBlackboardRange(UBTNode* NodeOwner)
 	UBlackboardComponent* BlackboardComp = UBTFunctionLibrary::GetOwnersBlackboard(NodeOwner);
 	return BlackboardComp ? BlackboardComp->GetValueAsFloat(BLACKBOARD_KEY_RANGE) : 0.0f;
 }
+
+TSubclassOf<UQuestGameplayAbility> UQuestBlackboardHelperLibrary::GetBlackboardAbility(UBTNode* NodeOwner)
+{
+	UBlackboardComponent* BlackboardComp = UBTFunctionLibrary::GetOwnersBlackboard(NodeOwner);
+	return BlackboardComp ? BlackboardComp->GetValueAsClass(BLACKBOARD_KEY_ABILITY) : nullptr;
+}
+

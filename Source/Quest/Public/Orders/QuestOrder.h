@@ -13,6 +13,7 @@
 
 struct FQuestOrderTargetData;
 class UBehaviorTree;
+class UQuestGameplayAbility;
 
 /** Delegate used to broadcast how the order finished */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestOrderCallback, EQuestOrderResult, Result);
@@ -55,7 +56,7 @@ public:
 	UBehaviorTree* GetBehaviorTree();
 
 	/** Starts the order.  Callback must be called when the character finishes executing the order. */
-	virtual void IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback) const;
+	virtual void IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& TargetData, FQuestOrderCallback Callback, const TSubclassOf<UQuestGameplayAbility> Ability) const;
 
 	/** Tells whether to restart the behavior tree when new order of same type issued */
 	bool ShouldRestartBehaviorTree();

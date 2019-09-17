@@ -16,4 +16,5 @@ class QUEST_API UQuestAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 		UQuestAbilitySystemComponent();
+		virtual void OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec) override;
 };

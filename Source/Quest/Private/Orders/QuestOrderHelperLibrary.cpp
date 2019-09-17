@@ -413,12 +413,10 @@ bool UQuestOrderHelperLibrary::CanObeyWhileCooldownInEffect(const AActor* Ordere
 	OrderType->GetDefaultObject<UQuestOrder>()->GetTagRequirements(OrderedActor, TagRequirements);
 	if (TagRequirements.SourceTagsBlocked.HasTag(UQuestGlobalTags::Cooldown()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyWhileCooldownInEffect: Cannot obey order %s during cooldown!"), *OrderType->GetName());
 		return false;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyWhileCooldownInEffect: Can obey order %s during cooldown!"), *OrderType->GetName());
 		return true;
 	}
 }

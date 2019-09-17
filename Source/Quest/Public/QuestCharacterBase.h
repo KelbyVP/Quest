@@ -18,13 +18,17 @@
 class AQuestCharacterGroup;
 class AQuestSpellbook;
 class AQuestCharacterRotationActor;
+class UAnimMontage;
 class UQuestAttributeSet;
 class UQuestAutoOrderComponent;
 class UQuestDefaultOrder;
+class UQuestDefaultAbilities;
 class UQuestGameplayAbility;
 class UQuestOrder;
 class UQuestOrderHandlingComponent;
+class UQuestUseAbilityOrder;
 class USphereComponent;
+
 
 UENUM(BlueprintType)
 enum class ECharacterClass : uint8
@@ -59,6 +63,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//  Give the character default abilities
+	void AcquireDefaultAbilities();
+
 public:	
 	
 	virtual void Tick(float DeltaTime) override;
@@ -71,6 +78,8 @@ public:
 	/** Basic functions to implement the ability system */
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire);
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		void RemoveAbility(FGameplayAbilitySpec& AbilitySpec);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void AddGameplayTag(FGameplayTag TagToAdd);
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
@@ -116,6 +125,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "MeleeAttack"))
 		void BP_MeleeAttack();
 
+	///** Functions used to retrieve the character's projectile spellcasting montage */
+	//UFUNCTION(BlueprintCallable)
+	//	UAnimMontage* GetProjectileSpellcastingMontage();
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "GetProjectileSpellcastingMontage"))
+		UAnimMontage* BP_GetProjectileSpellcastingMontage();
+
+	/** Function called when character wants to cast a spell */
+	/** NOTE:  This function must be overridden in child classes because enemies handle spells different than party members */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		virtual void CastSpell(TSubclassOf<UQuestGameplayAbility> Ability);
+
+	/** Function called when character finishes casting a spell */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		virtual void OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbility> Spell, bool bShouldBeRemovedFromMemorizedSpells);
+
 	/** Blueprint event that gets called when the character dies */
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();
@@ -160,6 +184,8 @@ public:
 		TArray<TSubclassOf<UQuestGameplayAbility>> AbilitiesToAcquire;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestAttributeSet* AttributeSetComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		UQuestDefaultAbilities* DefaultAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		ECharacterClass CharacterClass;
@@ -223,6 +249,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
 		AQuestSpellbook* Spellbook;
 
+	// Variable used to cache the spell the character is trying to cast 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
+		TSubclassOf<UQuestGameplayAbility> AttemptedSpell;
+
 	// Variable to cache the character that this character's actions are directed toward
 // TODO:  Delete this here and incorporate into AI system
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)
@@ -234,6 +264,7 @@ public:
 		float DistanceFromDestination;
 
 	/** Variables for Order System */
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = QuestCharacterBase)
 	UQuestOrderHandlingComponent* OrderHandlingComponent;
 	UQuestAutoOrderComponent* AutoOrderComponent;
 
@@ -244,6 +275,10 @@ public:
 	/** Default order, puts character at idle */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestCharacterBase)
 	TSoftClassPtr<UQuestDefaultOrder> DefaultOrder;
+
+	/** Order that tells the character to use an ability */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestCharacterBase)
+		TSoftClassPtr<UQuestUseAbilityOrder> UseAbilityOrder;
 
 	/** Variables for the AI perception component */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = QuestCharacterBase)

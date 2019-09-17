@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "BehaviorTree/BTNode.h"
+#include "QuestGameplayAbility.h"
 #include "QuestOrder.h"
 #include "QuestBlackboardHelperLibrary.generated.h"
 
@@ -25,9 +26,12 @@ public:
 		static AActor* GetBlackboardTarget(UBTNode* NodeOwner);
 	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
 		static float GetBlackboardRange(UBTNode* NodeOwner);
+	UFUNCTION(BlueprintPure, Category = "QuestBlackboardHelperLibrary", meta = (HidePin = "NodeOwner", DefaultToSelf = "NodeOwner"))
+		static TSubclassOf<UQuestGameplayAbility> GetBlackboardAbility(UBTNode* NodeOwner);
 
 	static const FName BLACKBOARD_KEY_ORDER_TYPE;
 	static const FName BLACKBOARD_KEY_TARGET;
 	static const FName BLACKBOARD_KEY_LOCATION;
-	static const FName BLACKBOARD_KEY_RANGE;
+	static const FName BLACKBOARD_KEY_RANGE;	
+	static const FName BLACKBOARD_KEY_ABILITY;
 };

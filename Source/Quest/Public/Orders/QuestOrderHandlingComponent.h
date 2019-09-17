@@ -35,6 +35,8 @@ public:
 *	If true, next order depends on what the player's order was. */
 	bool bIsBeingDirectedByPlayer;
 
+	UFUNCTION(BlueprintCallable, Category = "QuestOrderHandlingComponent")
+		void IssuePlayerDirectedOrderWithAbility(TSubclassOf<UQuestGameplayAbility> Ability);
 	void IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter);
 	void IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder);
 	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage, TSoftClassPtr<UQuestOrder> OpenStorageOrder);
@@ -49,6 +51,9 @@ public:
 	bool TryCallNextOrder();
 	bool VerifyOrder(const FQuestOrderData& Order) const;
 
+	/** Function called when FQuestOrderCallback delegate received */
+	UFUNCTION(BlueprintCallable, category = QuestOrderHandlingComponent)
+		void OnOrderEndedCallback(EQuestOrderResult OrderResult);
 
 private:
 
@@ -62,9 +67,7 @@ private:
 
 
 
-	/** Function called when FQuestOrderCallback delegate received */
-	UFUNCTION()
-	void OnOrderEndedCallback(EQuestOrderResult OrderResult);
+
 
 	/** Begins next auto order when prior order is finished */
 	void OrderEnded(EQuestOrderResult OrderResult);

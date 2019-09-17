@@ -10,6 +10,7 @@ FQuestOrderData::FQuestOrderData()
 	bUseLocation = false;
 	TargetLocation = FVector::ZeroVector;
 	TargetActor = nullptr;
+	Ability = nullptr;
 }
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType)
@@ -18,6 +19,16 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType)
 	bUseLocation = false;
 	TargetLocation = FVector::ZeroVector;
 	TargetActor = nullptr;
+	Ability = nullptr;
+}
+
+FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, TSubclassOf<UQuestGameplayAbility> InAbility)
+{
+	OrderType = InOrderType;
+	bUseLocation = false;
+	TargetLocation = FVector::ZeroVector;
+	TargetActor = nullptr;
+	Ability = InAbility;
 }
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor)
@@ -26,6 +37,7 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor*
 	bUseLocation = false;
 	TargetLocation = FVector::ZeroVector;
 	TargetActor = InTargetActor;
+	Ability = nullptr;
 }
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector InTargetLocation)
@@ -34,6 +46,7 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector
 	bUseLocation = true;
 	TargetLocation = InTargetLocation;
 	TargetActor = nullptr;
+	Ability = nullptr;
 }
 
 FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor, FVector InTargetLocation)
@@ -42,7 +55,10 @@ FQuestOrderData::FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor*
 	bUseLocation = true;
 	TargetLocation = InTargetLocation;
 	TargetActor = InTargetActor;
+	Ability = nullptr;
 }
+
+
 
 FString FQuestOrderData::ToString() const
 {
@@ -78,6 +94,12 @@ FString FQuestOrderData::ToString() const
 		}
 	}
 
+	if (Ability != nullptr)
+	{
+		OrderDataString += TEXT(", Ability: ");
+		OrderDataString += Ability->GetName();
+	}
+
 	OrderDataString += TEXT(")");
 	return OrderDataString;
 }
@@ -89,7 +111,10 @@ bool FQuestOrderData::operator!=(const FQuestOrderData& Other) const
 
 bool FQuestOrderData::operator==(const FQuestOrderData& Other) const
 {
-	bool bEqual = OrderType == Other.OrderType && bUseLocation == bUseLocation && TargetActor == Other.TargetActor;
+	bool bEqual = OrderType == Other.OrderType && 
+		bUseLocation == bUseLocation && 
+		TargetActor == Other.TargetActor &&
+		Ability == Other.Ability;
 	if (bUseLocation)
 	{
 		bEqual = bEqual && TargetLocation.Equals(Other.TargetLocation);

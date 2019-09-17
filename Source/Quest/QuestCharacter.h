@@ -28,6 +28,9 @@ public:
 	// Override parent function to ensure it does not interrupt a player directed order
 	virtual void LeaveCombat() override;
 
+	// Override parent function to implement player-directed spellcasting
+	virtual void CastSpell(TSubclassOf<UQuestGameplayAbility> Ability) override;
+
 private:
 
 

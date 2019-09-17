@@ -201,6 +201,10 @@ void AQuestAIController::SetBlackboardValues(const FQuestOrderData& Order)
 	Blackboard->SetValueAsObject(UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_TARGET, Order.TargetActor);
 	Blackboard->SetValueAsFloat(UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_RANGE,
 		UQuestOrderHelperLibrary::GetRange(Order.OrderType));
+	if (Order.Ability != nullptr)
+	{
+		Blackboard->SetValueAsClass(UQuestBlackboardHelperLibrary::BLACKBOARD_KEY_ABILITY, Order.Ability.Get());
+	}
 }
 
 void AQuestAIController::ApplyOrder(const FQuestOrderData& Order, UBehaviorTree* BehaviorTree)

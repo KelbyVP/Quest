@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "QuestGameplayAbility.h"
 #include "QuestOrder.h"
 #include "QuestOrderData.generated.h"
 
@@ -17,9 +18,11 @@ struct QUEST_API FQuestOrderData
 
 	FQuestOrderData();
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType);
+	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, TSubclassOf<UQuestGameplayAbility> InAbility);
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor);
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, FVector InTargetLocation);
 	FQuestOrderData(TSoftClassPtr<UQuestOrder> InOrderType, AActor* InTargetActor, FVector InTargetLocation);
+
 
 	/** The order type */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestOrderData")
@@ -36,6 +39,10 @@ struct QUEST_API FQuestOrderData
 	/** The order's target actor; "null" if none. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestOrderData")
 	AActor* TargetActor;
+
+	/** The order's ability; "null" if none. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestOrderData")
+		TSubclassOf<UQuestGameplayAbility> Ability;
 
 	/** Gets a text description of the order. */
 	FString ToString() const;

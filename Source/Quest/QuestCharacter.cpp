@@ -67,6 +67,13 @@ void AQuestCharacter::LeaveCombat()
 	AutoOrderComponent->GenerateAutoOrder();
 }
 
+void AQuestCharacter::CastSpell(TSubclassOf<UQuestGameplayAbility> Ability)
+{
+	UE_LOG(LogTemp, Warning, TEXT
+	("QuestCharacter::CastSpell: Casting quest character class spell with ability %s"), *Ability->GetName());
+	OrderHandlingComponent->IssuePlayerDirectedOrderWithAbility(Ability);
+}
+
 void AQuestCharacter::InitializeCharacterGroup()
 {
 

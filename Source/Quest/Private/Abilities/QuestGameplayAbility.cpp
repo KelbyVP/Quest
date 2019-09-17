@@ -9,6 +9,8 @@
 UQuestGameplayAbility::UQuestGameplayAbility()
 {
 	SpellType = ESpellType::IT_Other;
+	Range = 200.f;
+	TargetType = EAbilityTargetType::IT_None;
 }
 
 ESpellType UQuestGameplayAbility::GetSpellType()

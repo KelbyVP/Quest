@@ -7,8 +7,9 @@
 #include "QuestOrderErrorTags.h"
 #include "QuestOrderHelperLibrary.generated.h"
 
-class UQuestOrder;
+class AAIController;
 class AQuestCharacterBase;
+class UQuestOrder;
 struct FQuestOrderTargetData;
 
 /**
@@ -59,6 +60,7 @@ public:
 	static bool IsValidTarget(TSoftClassPtr<UQuestOrder> OrderType, const AActor* OrderedActor,
 		const FQuestOrderTargetData& TargetData);
 
+	UFUNCTION(BlueprintCallable, Category = QuestOrderHelperLibrary)
 	static TArray<AQuestCharacterBase*> GetHostileTargetsInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
 
 	/** Chooses the closest target to the ordered character */
@@ -86,10 +88,12 @@ public:
 	*/
 	static AQuestCharacterBase* GetMostPowerfulCharacterInArray(TArray<AQuestCharacterBase*>& CharacterArray);
 
-	static TArray<AQuestCharacterBase*> GetCharactersInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
+	UFUNCTION(BlueprintCallable, Category = QuestOrderHelperLibrary)
+	static TArray<AQuestCharacterBase*> GetCharactersInRange(const AActor* ActorAtCenter, float Radius);
 
-
-
+	/** If an order fails, aborts the order */
+	UFUNCTION(BlueprintCallable, Category = QuestOrderHelperLibrary)
+	static void AbortOrder(AAIController* Controller);
 
 
 

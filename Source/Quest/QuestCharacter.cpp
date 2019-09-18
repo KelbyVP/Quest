@@ -76,7 +76,7 @@ void AQuestCharacter::CastSpell(TSubclassOf<UQuestGameplayAbility> Ability)
 
 void AQuestCharacter::InitializeCharacterGroup()
 {
-
+	/** This function is overridden to do nothing because the features are implemented in the blueprint BP_Party class */
 }
 
 void AQuestCharacter::OnLeaveStorage()

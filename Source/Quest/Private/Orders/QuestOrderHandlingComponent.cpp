@@ -43,7 +43,7 @@ void UQuestOrderHandlingComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility(TSubclassOf<UQuestGameplayAbility> Ability)
+void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility(TSubclassOf<class UQuestGameplayAbility> Ability)
 {
 	AQuestCharacterBase* OrderedCharacter = Cast<AQuestCharacterBase>(GetOwner());
 	if (!IsValid(OrderedCharacter))
@@ -51,7 +51,7 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility(TSubclass
 		return;
 	}
 
-	TSoftClassPtr<UQuestUseAbilityOrder> OrderType = OrderedCharacter->UseAbilityOrder;
+	TSoftClassPtr<UQuestUseAbilityOrder> OrderType = Ability->GetDefaultObject<UQuestGameplayAbility>()->UseAbilityOrder;
 	if (OrderType == nullptr)
 	{
 		return;

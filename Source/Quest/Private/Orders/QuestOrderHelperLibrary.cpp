@@ -10,6 +10,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Math/Vector.h"
 #include "QuestAbilitySystemHelper.h"
+#include "QuestAIController.h"
 #include "QuestAttributeSet.h"
 #include "QuestCharacterBase.h"
 #include "QuestCharacterGroup.h"
@@ -320,22 +321,26 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(T
 	return MostPowerfulCharacter;
 }
 
-TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(const AQuestCharacterBase* OrderedCharacter, float Radius)
+TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(const AActor* ActorAtCenter, float Radius)
 {
 	/** Set variables for sweep */
 	TArray<FHitResult> Hits;
-	FVector OrderedCharacterLocation = OrderedCharacter->GetActorLocation();
+	FVector OrderedCharacterLocation = ActorAtCenter->GetActorLocation();
 	FVector End = OrderedCharacterLocation + FVector(0, 0, 1);
 
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(OrderedCharacter);
-	QueryParams.AddIgnoredComponent(OrderedCharacter->GetCapsuleComponent());
+	QueryParams.AddIgnoredActor(ActorAtCenter);
+	const AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(ActorAtCenter);
+	if (IsValid(Character))
+	{
+		QueryParams.AddIgnoredComponent(Character->GetCapsuleComponent());
+	}
 
 	FCollisionObjectQueryParams ObjParams;
 	ObjParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
 	/** Run sweep */
-	OrderedCharacter->GetWorld()->SweepMultiByObjectType(
+	ActorAtCenter->GetWorld()->SweepMultiByObjectType(
 		Hits,
 		OrderedCharacterLocation,
 		End,
@@ -358,6 +363,18 @@ TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(cons
 	}
 
 	return CharactersInRange;
+}
+
+void UQuestOrderHelperLibrary::AbortOrder(AAIController* Controller)
+{
+	if (IsValid(Controller))
+	{
+		AQuestAIController* QuestController = Cast<AQuestAIController>(Controller);
+		if (IsValid(QuestController))
+		{
+			QuestController->BehaviorTreeEnded(EBTNodeResult::Failed);
+		}
+	}
 }
 
 EQuestOrderCancellationPolicy UQuestOrderHelperLibrary::GetCancellationPolicy(TSoftClassPtr<UQuestOrder> OrderType)

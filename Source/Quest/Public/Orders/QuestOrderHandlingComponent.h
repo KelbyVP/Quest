@@ -36,7 +36,7 @@ public:
 	bool bIsBeingDirectedByPlayer;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestOrderHandlingComponent")
-		void IssuePlayerDirectedOrderWithAbility(TSubclassOf<UQuestGameplayAbility> Ability);
+		void IssuePlayerDirectedOrderWithAbility(TSubclassOf<class UQuestGameplayAbility> Ability);
 	void IssuePlayerDirectedOrderWithTarget(AQuestCharacterBase* TargetCharacter);
 	void IssuePlayerDirectedOrderWithTarget(FVector TargetLocation, TSoftClassPtr<UQuestOrder> MoveOrder);
 	void IssuePlayerDirectedOrderWithTarget(AQuestStorage* Storage, TSoftClassPtr<UQuestOrder> OpenStorageOrder);

@@ -35,15 +35,10 @@ enum class EAbilityTargetType : uint8
 
 	// This Target Type is for abilities that target a location
 	IT_Location UMETA(DisplayName = "Location"),
-
-	// This Target Type is for abilities that can target either a hostile character or a location, such as a fireball
-	IT_LocationOrHostileCharacter UMETA(DisplayName = "LocationOrHostileCharacter"),
-
-	// This Target Type is for abilities that can target either an allied character or a location, such as a spell that heals all in a range
-	IT_LocationOrAlliedCharacter UMETA(DisplayName = "LocationOrAlliedCharacter")
 };
 
 class AQuestCharacterBase;
+class UQuestUseAbilityOrder;
 
 /**
  * 
@@ -92,6 +87,10 @@ public:
 	/** The types of targets that this ability can be directed at; none usually means the character using the ability */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		EAbilityTargetType TargetType;
+
+	/** Order that should be called to trigger this ability */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = QuestGameplayAbility)
+		TSoftClassPtr<UQuestUseAbilityOrder> UseAbilityOrder;
 
 	//* variables that determine the amount of damage done by a damaging ability */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)

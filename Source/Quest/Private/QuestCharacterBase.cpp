@@ -179,7 +179,10 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	{
 		bIsDead = true;
 		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnHealthChanged: %s is dead!"), *GetName());
-		CharacterGroup->OnMemberDeath(this);
+		if (IsValid(CharacterGroup))
+		{
+			CharacterGroup->OnMemberDeath(this);
+		}
 		// TODO:  Ensure that anyone auto-attacking this character doesn't trigger errors because the character is now dead
 		// TODO:  Set up functionality for when player character dies (should be done in blueprint)
 		BP_Die();

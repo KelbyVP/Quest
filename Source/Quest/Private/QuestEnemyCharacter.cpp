@@ -9,6 +9,7 @@ AQuestEnemyCharacter::AQuestEnemyCharacter()
 {
 	bIsHostile = true;
 	Affiliation = ECharacterAffiliation::IT_Hostile;
+	bIsLeader = true;
 }
 
 void AQuestEnemyCharacter::BeginPlay()

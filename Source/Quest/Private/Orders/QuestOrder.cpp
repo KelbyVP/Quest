@@ -75,7 +75,7 @@ void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& 
 	AQuestAIController* Controller = Cast<AQuestAIController>(Pawn->GetController());
 	if (Controller == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: Ordered Actor % does not have the required controller!"), *OrderedActor->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrder::IssueOrder: Ordered Actor % does not have the required controller for order %s!"), *OrderedActor->GetName(), *GetName());
 		Callback.Broadcast(EQuestOrderResult::FAILED);
 		return;
 	}
@@ -95,7 +95,12 @@ void UQuestOrder::IssueOrder(AActor* OrderedActor, const FQuestOrderTargetData& 
 
 	Order.bUseLocation = OrderTargetType == EQuestOrderTargetType::LOCATION || OrderTargetType == EQuestOrderTargetType::DIRECTION;
 	Order.Ability = Ability;
-	Controller->IssueOrder(Order, Callback);
+	if (IsValid(Controller))
+	{
+		Controller->IssueOrder(Order, Callback);
+		return;
+	}
+	
 }
 
 bool UQuestOrder::ShouldRestartBehaviorTree()

@@ -338,13 +338,14 @@ void UQuestOrderHandlingComponent::ObeyOrder(const FQuestOrderData& Order)
 		break;
 	case EQuestOrderCancellationPolicy::CAN_BE_CANCELLED:
 	case EQuestOrderCancellationPolicy::CANNOT_BE_CANCELLED:
-		{FQuestOrderCallback Callback;
-		Callback.AddDynamic(this, &UQuestOrderHandlingComponent::OnOrderEndedCallback);
-		if (!Order.OrderType.IsValid())
 		{
-			Order.OrderType.LoadSynchronous();
-		}
-		Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, Callback, Order.Ability);
+			FQuestOrderCallback Callback;
+			Callback.AddDynamic(this, &UQuestOrderHandlingComponent::OnOrderEndedCallback);
+			if (!Order.OrderType.IsValid())
+			{
+				Order.OrderType.LoadSynchronous();
+			}
+			Order.OrderType->GetDefaultObject<UQuestOrder>()->IssueOrder(Owner, TargetData, Callback, Order.Ability);
 		}
 		break;
 	default:

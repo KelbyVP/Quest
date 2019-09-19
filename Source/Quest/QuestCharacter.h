@@ -38,8 +38,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		UQuestSelectableComponent* SelectableComponent;
 
+	//  I have overridden the overriding because I want the QuestCharacter to function outside the party before they become a member
 	/** Override the parent function to do nothing because the QuestCharacter class uses a party instead */
-	void InitializeCharacterGroup() override;
+	//  void InitializeCharacterGroup() override;
 
 
 public:

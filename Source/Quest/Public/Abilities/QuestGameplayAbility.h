@@ -52,7 +52,7 @@ public:
 	
 	UQuestGameplayAbility();
 	
-	/** Name of spell effects used for UI */
+	/** Name of spell used for UI */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		FText Name;
 

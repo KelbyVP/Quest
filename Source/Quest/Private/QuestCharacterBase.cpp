@@ -257,6 +257,7 @@ void AQuestCharacterBase::SetCharacterGroup(AQuestCharacterGroup* InCharacterGro
 	CharacterGroup = InCharacterGroup;
 	CharacterGroup->OnEnterCombat.AddDynamic(this, &AQuestCharacterBase::EnterCombat);
 	CharacterGroup->OnLeaveCombat.AddDynamic(this, &AQuestCharacterBase::LeaveCombat);
+	// TODO:  If the character is coming from a different character group, unsubscribe to the old group's delegates
 }
 
 void AQuestCharacterBase::CreateCharacterGroup()
@@ -313,6 +314,15 @@ bool AQuestCharacterBase::IsAdverse(const AQuestCharacterBase* OtherActor)
 		&& OtherActor->Affiliation != Affiliation)
 	{
 		return true ;
+	}
+	else { return false; }
+}
+
+bool AQuestCharacterBase::IsAllied(const AQuestCharacterBase* OtherActor)
+{
+	if (OtherActor->Affiliation == Affiliation)
+	{
+		return true;
 	}
 	else { return false; }
 }

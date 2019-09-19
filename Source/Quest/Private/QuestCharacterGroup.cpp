@@ -2,6 +2,7 @@
 
 
 #include "QuestCharacterGroup.h"
+#include "QuestAIController.h"
 #include "QuestCharacterBase.h"
 #include "QuestOrderHelperLibrary.h"
 
@@ -22,6 +23,12 @@ void AQuestCharacterGroup::AddCharacter(AQuestCharacterBase* CharacterToAdd)
 {
 	Members.AddUnique(CharacterToAdd);
 	CharacterToAdd->SetCharacterGroup(this);
+
+	// If this character has been a leader before, but this group already has a leader, this character is no longer a leader
+	if (IsValid(Leader))
+	{
+		CharacterToAdd->bIsLeader = false;
+	}
 }
 
 void AQuestCharacterGroup::SetLeader(AQuestCharacterBase* NewLeader)
@@ -62,10 +69,15 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 			OnEnterCombat.Broadcast();
 		}
 
-		/** Tell the other group to check whether it should start fighting */
+		///** Tell the other group to check whether it should start fighting */
+		// Note:  I have disabled this for now so that you can sneak attack someone if they don't perceive you;
 		if (IsValid(Leader) && IsValid(CharacterToFight) && IsValid(CharacterToFight->CharacterGroup))
 		{
-			CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
+			AQuestAIController* AIController = Cast<AQuestAIController>(CharacterToFight->GetController());
+			if (AIController) 
+			{
+				CharacterToFight->CharacterGroup->CheckShouldStartFighting(Leader);
+			}
 		}
 	}
 }

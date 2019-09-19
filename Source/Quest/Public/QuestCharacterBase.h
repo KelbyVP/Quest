@@ -167,6 +167,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure,  Category = "QuestCharacterBase")
 		bool IsAdverse(const AQuestCharacterBase* OtherActor);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "QuestCharacterBase")
+		bool IsAllied(const AQuestCharacterBase* OtherActor);
+
 	/** Sets an auto order struct to used; called by order handling component once order is successfully completed */
 	void SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order);
 

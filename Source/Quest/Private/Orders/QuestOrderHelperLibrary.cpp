@@ -355,10 +355,10 @@ TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(cons
 
 	for (auto& Hit : Hits)
 	{
-		AQuestCharacterBase* Character = Cast<AQuestCharacterBase>(Hit.GetActor());
-		if (Character && !Character->bIsDead)
+		AQuestCharacterBase* CharacterInRange = Cast<AQuestCharacterBase>(Hit.GetActor());
+		if (CharacterInRange && !CharacterInRange->bIsDead)
 		{
-			CharactersInRange.AddUnique(Character);
+			CharactersInRange.AddUnique(CharacterInRange);
 		}
 	}
 

@@ -41,6 +41,7 @@ float UQuestHealthBoostExecCalc::CalculateHealthBoost(const UQuestGameplayAbilit
 	for (int i = 0; i < NumberOfDice; i++)
 	{
 		HealingAmount += FMath::RandRange(1, DieSize);
+		UE_LOG(LogTemp, Warning, TEXT("Healing %f"), HealingAmount);
 	}
 	HealingAmount += OwningAbility->HealingBonus;
 	HealingAmount += OwningAbility->HealingBonusPerLevel * Level;

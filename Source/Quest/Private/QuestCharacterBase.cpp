@@ -225,9 +225,9 @@ void AQuestCharacterBase::OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbili
 	if (Spell == AttemptedSpell && bShouldBeRemovedFromMemorizedSpells)
 	{
 		Spellbook->DisableCastingOnMemorizedSpell(Spell);
+		AttemptedSpell = nullptr;
 		return;
 	}
-	AttemptedSpell = nullptr;
 }
 
 void AQuestCharacterBase::SetSpellbookType()

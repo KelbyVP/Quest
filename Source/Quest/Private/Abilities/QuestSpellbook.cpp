@@ -96,6 +96,8 @@ bool AQuestSpellbook::GetMemorizedSpellStructAtIndex(int Level, int SlotIndex, F
 			TSubclassOf<UQuestGameplayAbility> SlottedAbility = SpellsStructAtLevel.Spells[SlotIndex].Spell;
 			if (SlottedAbility)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("QuestSpellbook::GetMemorizedSpellsStructAtIndex: shows %s as set to %d!"), 
+					*SlottedAbility->GetName(), SpellsStructAtLevel.Spells[SlotIndex].bCanBeCast)
 				SpellStruct = SpellsStructAtLevel.Spells[SlotIndex];
 				return true;
 			}
@@ -302,6 +304,27 @@ void AQuestSpellbook::EnableCastingOnMemorizedSpells()
 			{
 				SpellStruct.bCanBeCast = true;
 			}
+		}
+	}
+}
+
+void AQuestSpellbook::DisableCastingOnMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> Spell)
+{
+	if (!IsValid(Spell))
+	{
+		return;
+	}
+	int SpellLevel = Spell->GetDefaultObject<UQuestGameplayAbility>()->GetSpellLevel();
+	FMemorizedSpellsArrayStruct SpellsStruct = MemorizedSpells[SpellLevel - 1];
+	for (int i = 0; i < SpellsStruct.Spells.Num(); i++)
+	{
+		TSubclassOf<class UQuestGameplayAbility> SpellAtIndex = SpellsStruct.Spells[i].Spell;
+		if (SpellAtIndex && SpellAtIndex == Spell && SpellsStruct.Spells[i].bCanBeCast == true)
+		{
+			MemorizedSpells[SpellLevel - 1].Spells[i].bCanBeCast = false;
+			UE_LOG(LogTemp, Warning, TEXT("QuestSpellbook::DisableCastingOnMemorizedSpell: %s set to false! Level: %d; Index: %d"), *Spell->GetName(), SpellLevel, i)
+			BP_OnSpellCast(Spell, SpellLevel, i);
+			return;
 		}
 	}
 }

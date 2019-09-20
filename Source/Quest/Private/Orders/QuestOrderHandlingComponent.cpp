@@ -57,8 +57,6 @@ void UQuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility(TSubclass
 		return;
 	}
 	FQuestOrderData Order(OrderType, Ability);
-	UE_LOG(LogTemp, Warning, TEXT
-	("QuestOrderHandlingComponent::IssuePlayerDirectedOrderWithAbility: Casting ability %s"), *Ability->GetName());
 	bIsBeingDirectedByPlayer = true;
 	SetNextOrder(Order);
 }

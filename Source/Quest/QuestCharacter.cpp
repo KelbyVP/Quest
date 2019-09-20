@@ -69,8 +69,7 @@ void AQuestCharacter::LeaveCombat()
 
 void AQuestCharacter::CastSpell(TSubclassOf<UQuestGameplayAbility> Ability)
 {
-	UE_LOG(LogTemp, Warning, TEXT
-	("QuestCharacter::CastSpell: Casting quest character class spell with ability %s"), *Ability->GetName());
+	Super::CastSpell(Ability);
 	OrderHandlingComponent->IssuePlayerDirectedOrderWithAbility(Ability);
 }
 

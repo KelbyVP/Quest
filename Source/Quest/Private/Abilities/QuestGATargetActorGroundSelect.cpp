@@ -85,7 +85,6 @@ bool AQuestGATargetActorGroundSelect::GetCursorLocation(FVector& CursorLocation)
 
 void AQuestGATargetActorGroundSelect::ConfirmTargetingAndContinue()
 {
-	UE_LOG(LogTemp, Warning, TEXT("QGATargetActorGroundSelect::  ConfirmTargetingAndContinue called!"))
 	// Get the cursor location
 	FVector CursorLocation;
 	GetCursorLocation(CursorLocation);

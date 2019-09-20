@@ -155,9 +155,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		bool IsSpellLearned(TSubclassOf<class UQuestGameplayAbility> Spell);
 
-	// Enables casting on all memorized spells, primarily used when character rests
+	// Enables casting on all memorized spells; primarily used when character rests
 	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
 		void EnableCastingOnMemorizedSpells();
 
+	// Disables casting on a memorized spell; used when character casts the spell
+	UFUNCTION(BlueprintCallable, Category = QuestSpellbook)
+		void DisableCastingOnMemorizedSpell(TSubclassOf<class UQuestGameplayAbility> Spell);
+
+	//  Triggers blueprint function when spell cast so blueprint can update memorized spells in widget
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestSpellbook)
+		void BP_OnSpellCast(TSubclassOf<class UQuestGameplayAbility> DisabledSpell, int SpellLevel, int IndexOfDisabledSpell);
 
 };

@@ -216,14 +216,15 @@ void AQuestCharacterBase::MeleeAttack()
 
 void AQuestCharacterBase::CastSpell(TSubclassOf<UQuestGameplayAbility> Ability)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Casting base class spell"))
+	UE_LOG(LogTemp, Warning, TEXT("Casting base class spell"));
+	AttemptedSpell = Ability;
 }
 
 void AQuestCharacterBase::OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbility> Spell, bool bShouldBeRemovedFromMemorizedSpells)
 {
 	if (Spell == AttemptedSpell && bShouldBeRemovedFromMemorizedSpells)
 	{
-		Spellbook->RemoveMemorizedSpell(Spell);
+		Spellbook->DisableCastingOnMemorizedSpell(Spell);
 		return;
 	}
 	AttemptedSpell = nullptr;

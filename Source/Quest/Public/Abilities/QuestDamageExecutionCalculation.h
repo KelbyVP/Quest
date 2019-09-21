@@ -6,6 +6,7 @@
 #include "GameplayEffectExecutionCalculation.h"
 #include "QuestDamageExecutionCalculation.generated.h"
 
+class AQuestCharacterBase;
 /**
  * 
  */
@@ -20,6 +21,6 @@ public:
 
 
 protected:
-
+	int8 GetAttackRollTagModifiers(AQuestCharacterBase* SourceQuestCharacter, int8 AttackTry) const;
 
 };

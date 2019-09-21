@@ -3,9 +3,10 @@
 
 #include "QuestSpellDamageExecCalcBase.h"
 #include "GameplayTagsModule.h"
-#include "QuestGameplayAbility.h"
-#include "QuestCharacterBase.h"
 #include "QuestAttributeSet.h"
+#include "QuestCharacterBase.h"
+#include "QuestGameplayAbility.h"
+#include "QuestGlobalTags.h"
 
 struct SpellDamageStatics
 {
@@ -150,8 +151,12 @@ bool UQuestSpellDamageExecCalcBase::DoesMakeSavingThrow(const UQuestGameplayAbil
 	{
 		bool bMadeSavingThrow = false;
 		int SavingThrow = rand() % 20 + 1;
-		float AgilityModifier = (TargetAbilityScore - 10) / 2;
-		float AbilityCheck = TargetCharacter->AttributeSetComponent->Level.GetCurrentValue() + (trunc(AgilityModifier));
+		float AbilityModifier = (TargetAbilityScore - 10) / 2;
+		float AbilityCheck = TargetCharacter->AttributeSetComponent->Level.GetCurrentValue() + (trunc(AbilityModifier));
+		if (TargetCharacter->DoesCharacterHaveTag(UQuestGlobalTags::Status_Blessed()))
+		{
+			AbilityCheck += FMath::RandRange(1, 4);
+		}
 		if (AbilityCheck >= SavingThrow)
 		{
 			return true;

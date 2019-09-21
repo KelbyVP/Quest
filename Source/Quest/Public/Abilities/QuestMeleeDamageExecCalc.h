@@ -25,6 +25,6 @@ public:
 
 protected:
 
-	bool TryAttack(float Strength, float ArmorClass, float Level, int8 AttackTry) const;
+	bool TryAttack(AQuestCharacterBase* TargetQuestCharacter, float Strength, float ArmorClass, float Level, int8 AttackTry) const;
 	float CalculateMeleeDamage(float Strength, float ArmorClass) const;
 };

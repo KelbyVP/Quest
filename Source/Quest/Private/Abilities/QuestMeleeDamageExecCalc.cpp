@@ -3,6 +3,8 @@
 
 #include "QuestMeleeDamageExecCalc.h"
 #include "QuestAttributeSet.h"
+#include "QuestCharacterBase.h"
+#include "QuestGlobalTags.h"
 
 struct DamageStatics
 {
@@ -79,7 +81,11 @@ void UQuestMeleeDamageExecCalc::Execute_Implementation(const FGameplayEffectCust
 	}
 	else
 	{
-		bIsAttackSuccessful = TryAttack(SourceStrength, TargetArmorClass, SourceLevel, AttackTry);
+		UAbilitySystemComponent* SourceAbilitySystemComponent = ExecutionParams.GetSourceAbilitySystemComponent();
+		AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->AvatarActor : nullptr;
+		AQuestCharacterBase* SourceQuestCharacter = SourceActor ? Cast<AQuestCharacterBase>(SourceActor) : nullptr;
+
+		bIsAttackSuccessful = TryAttack(SourceQuestCharacter, SourceStrength, TargetArmorClass, SourceLevel, AttackTry);
 	}
 
 	//	Calculates the damage
@@ -95,7 +101,7 @@ void UQuestMeleeDamageExecCalc::Execute_Implementation(const FGameplayEffectCust
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -FinalDamage));
 }
 
-bool UQuestMeleeDamageExecCalc::TryAttack(float Strength, float ArmorClass, float Level, int8 AttackTry) const
+bool UQuestMeleeDamageExecCalc::TryAttack(AQuestCharacterBase* TargetQuestCharacter, float Strength, float ArmorClass, float Level, int8 AttackTry) const
 {
 	// Modify the minimum successful attack number based on armor class and level
 	int8 ACAdjustment = 0;
@@ -113,8 +119,11 @@ bool UQuestMeleeDamageExecCalc::TryAttack(float Strength, float ArmorClass, floa
 	int8 StrengthAdjustment = (Strength / 2);
 	StrengthAdjustment -= 5;
 
+	// Modify attack roll by any available modifiers
+	int8 AttackRollModifierAdjustment = GetAttackRollTagModifiers(TargetQuestCharacter, AttackTry);
+
 	// See whether attack succeeded
-	int8 AttackSuccessThreshhold = 20 - ACAdjustment - StrengthAdjustment;
+	int8 AttackSuccessThreshhold = 20 - ACAdjustment - StrengthAdjustment - AttackRollModifierAdjustment;
 	if (AttackTry > AttackSuccessThreshhold)
 	{
 		return true;

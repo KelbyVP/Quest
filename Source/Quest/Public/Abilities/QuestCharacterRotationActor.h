@@ -62,6 +62,12 @@ public:
 	// Finds the tangent point at the center actor's radius so the transition from movement to rotation will be smooth
 	void GetStartingRotationPosition();
 
+	UFUNCTION(BlueprintCallable)
+		void StopRotating();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void BP_StopRotating();
+
 	UFUNCTION()
 	void OnCharacterDeath();
 

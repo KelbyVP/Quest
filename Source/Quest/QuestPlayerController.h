@@ -80,8 +80,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
 		void BP_OnTargetSelected();
 
-
-
 private:
 
 	void SetPathFollowingComponent();

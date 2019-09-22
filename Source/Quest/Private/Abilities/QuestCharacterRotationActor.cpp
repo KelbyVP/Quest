@@ -98,9 +98,21 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 	}
 }
 
+void AQuestCharacterRotationActor::StopRotating()
+{
+	bShouldRotate = false;
+	AQuestCharacterBase* QuestCharacterToRotate = Cast<AQuestCharacterBase>(CharacterToRotate);
+	if (IsValid(QuestCharacterToRotate))
+	{
+		QuestCharacterToRotate->bIsCapturedByRotationActor = false;
+	}
+	BP_StopRotating();
+}
+
 void AQuestCharacterRotationActor::OnCharacterDeath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterRotationActor::OnCharacterDeath:  Function called!"))
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterRotationActor::OnCharacterDeath:  Function called!"));
+	StopRotating();
 	BP_OnCharacterDeath();
 }
 

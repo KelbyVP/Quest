@@ -97,7 +97,6 @@ void UQuestMeleeDamageExecCalc::Execute_Implementation(const FGameplayEffectCust
 	{
 		FinalDamage = CalculateMeleeDamage(SourceStrength, TargetArmorClass);
 	}
-
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -FinalDamage));
 }
 

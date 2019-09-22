@@ -19,6 +19,8 @@ void AQuestCharacterRotationActor::BeginPlay()
 	Super::BeginPlay();
 	InitialLocation = CharacterToRotate->GetActorLocation();
 	ClockwiseFloat = (bClockwise) ? 1 : -1;
+	AQuestCharacterBase* QuestCharacter = Cast<AQuestCharacterBase>(CharacterToRotate);
+	QuestCharacter->OnDeath.AddDynamic(this, &AQuestCharacterRotationActor::OnCharacterDeath);
 }
 
 // Called every frame
@@ -74,7 +76,6 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 {
 	if (ActorAtCenter && CharacterToRotate)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Height: %f"), CharacterToRotate->GetActorLocation().Z)
 		// Adjust rotation height based on the fact that the character's Z position is different than the center's Z position
 		RotationHeight = RotationHeight + (CharacterToRotate->GetActorLocation().Z);
 		FVector CharacterLocation = CharacterToRotate->GetActorLocation();
@@ -91,12 +92,15 @@ void AQuestCharacterRotationActor::GetStartingRotationPosition()
 		FVector RotatedVectorAroundAxis = FVector(Radius, 0, 0);
 		StartingRotationPosition = CenterLocation + RotatedVectorAroundAxis.RotateAngleAxis(StartingAngle, FVector(0, 0, 1));
 		StartingRotationPosition.Z = RotationHeight;
-
-		UE_LOG(LogTemp, Warning, TEXT("Starting Height: %f"), StartingRotationPosition.Z)
 		bHasStartingRotationPosition = true;
 		bShouldMoveToStartingPosition = true;
 		CurrentPosition = InitialLocation;
 	}
 }
 
+void AQuestCharacterRotationActor::OnCharacterDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("QuestCharacterRotationActor::OnCharacterDeath:  Function called!"))
+	BP_OnCharacterDeath();
+}
 

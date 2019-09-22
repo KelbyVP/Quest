@@ -50,6 +50,8 @@ enum class ECharacterAffiliation : uint8
 	IT_Friendly UMETA(DisplayName = "Friendly")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+
 UCLASS()
 class QUEST_API AQuestCharacterBase : public ACharacter, public IAbilitySystemInterface, public IGameplayTagAssetInterface
 {
@@ -173,6 +175,7 @@ public:
 	/** Sets an auto order struct to used; called by order handling component once order is successfully completed */
 	void SetAutoOrderAsUsed(TSoftClassPtr<UQuestOrder> Order);
 
+	FOnDeath OnDeath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
 		FGameplayTagContainer GameplayTags;

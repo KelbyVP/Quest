@@ -184,6 +184,7 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 		{
 			CharacterGroup->OnMemberDeath(this);
 		}
+		OnDeath.Broadcast();
 		// TODO:  Ensure that anyone auto-attacking this character doesn't trigger errors because the character is now dead
 		// TODO:  Set up functionality for when player character dies (should be done in blueprint)
 		BP_Die();

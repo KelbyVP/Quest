@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "QuestCharacterRotationActor.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class QUEST_API AQuestCharacterRotationActor : public AActor
 {
 	GENERATED_BODY()
@@ -61,5 +61,11 @@ public:
 
 	// Finds the tangent point at the center actor's radius so the transition from movement to rotation will be smooth
 	void GetStartingRotationPosition();
+
+	UFUNCTION()
+	void OnCharacterDeath();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void BP_OnCharacterDeath();
 
 };

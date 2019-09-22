@@ -179,6 +179,7 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	{
 		bIsDead = true;
 		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::OnHealthChanged: %s is dead!"), *GetName());
+		RemoveGameplayTag(UQuestGlobalTags::Status_Alive());
 		if (IsValid(CharacterGroup))
 		{
 			CharacterGroup->OnMemberDeath(this);

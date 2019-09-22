@@ -84,6 +84,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		float Range;
 
+	/** How much the range increases for each character level beyond the spell level */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
+		float RangeIncreasePerLevel;
+
 	/** The types of targets that this ability can be directed at; none usually means the character using the ability */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestGameplayAbility)
 		EAbilityTargetType TargetType;
@@ -123,4 +127,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
 		int GetSpellLevel();
+
+	UFUNCTION(BlueprintCallable, Category = QuestGameplayAbility)
+		void AdjustRangeByCharacterLevel(float CharacterLevel);
 };

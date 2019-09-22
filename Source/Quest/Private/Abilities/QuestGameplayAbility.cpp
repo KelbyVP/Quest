@@ -22,3 +22,8 @@ int UQuestGameplayAbility::GetSpellLevel()
 {
 	return SpellLevel;
 }
+
+void UQuestGameplayAbility::AdjustRangeByCharacterLevel(float CharacterLevel)
+{
+	Range += RangeIncreasePerLevel * (CharacterLevel - SpellLevel);
+}

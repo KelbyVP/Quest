@@ -323,6 +323,11 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::GetMostPowerfulCharacterInArray(T
 
 TArray<AQuestCharacterBase*> UQuestOrderHelperLibrary::GetCharactersInRange(const AActor* ActorAtCenter, float Radius)
 {
+	if (!IsValid(ActorAtCenter))
+	{
+		TArray<AQuestCharacterBase*> EmptyArray;
+		return EmptyArray;
+	}
 	/** Set variables for sweep */
 	TArray<FHitResult> Hits;
 	FVector OrderedCharacterLocation = ActorAtCenter->GetActorLocation();

@@ -18,8 +18,10 @@ class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalc
 {
 	GENERATED_BODY()
 
-		// Default constructor
-		UQuestSpellDamageExecCalcBase();
+protected:
+
+	// Default constructor
+	UQuestSpellDamageExecCalcBase();
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const;
 
@@ -27,6 +29,6 @@ class QUEST_API UQuestSpellDamageExecCalcBase : public UQuestDamageExecutionCalc
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
 	//UQuestGameplayAbility* OwningAbility;
 
-	bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility, AQuestCharacterBase* TargetCharacter) const;
-	int CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const;
+	virtual bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility, AQuestCharacterBase* TargetCharacter) const;
+	virtual int CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const;
 };

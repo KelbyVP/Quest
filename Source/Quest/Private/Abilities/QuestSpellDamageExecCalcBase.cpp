@@ -79,6 +79,10 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 	{
 		TargetQuestCharacter = Cast<AQuestCharacterBase>(TargetActor);
 	}
+	if (!IsValid(TargetQuestCharacter))
+	{
+		return;
+	}
 
 	//	Sets the variables to a reference to the value of the relevant attributes
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetSpellDamageStatics().LevelDef, FAggregatorEvaluateParameters(), SourceLevel);
@@ -100,7 +104,7 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 	}
 
 	/** Cut damage in half for each resistance tag that target character has */
-
+	//  TODO:  These resistances currently stack; do I want to limit it to one halving no matter how many resistance tags apply
 	if (TargetQuestCharacter)
 		{
 			for (auto TagToCheck : RelevantResistanceTags)

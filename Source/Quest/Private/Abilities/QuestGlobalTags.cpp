@@ -58,6 +58,12 @@ const FGameplayTag& UQuestGlobalTags::Status_Blessed()
 	return Tag;
 }
 
+const FGameplayTag& UQuestGlobalTags::Resistance_Fire()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("resistance.Fire")));
+	return Tag;
+}
+
 const FGameplayTag& UQuestGlobalTags::Cooldown()
 {
 	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("cooldown")));

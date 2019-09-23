@@ -40,6 +40,7 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 	if (OrderType == nullptr || !IsValid(OrderedActor))
 	{
 		return false;
+		UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: Order type is null ptr!"));
 	}
 
 	if (OrderType.IsValid())
@@ -50,7 +51,7 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 	const UQuestOrder* Order = OrderType->GetDefaultObject<UQuestOrder>();
 	const UAbilitySystemComponent* AbilitySystem = OrderedActor->FindComponentByClass<UAbilitySystemComponent>();
 
-	if (AbilitySystem != nullptr)
+	if (IsValid(AbilitySystem) && IsValid(Order))
 	{
 		FQuestOrderTagRequirements TagRequirements;
 		Order->GetTagRequirements(OrderedActor, TagRequirements);
@@ -62,6 +63,7 @@ bool UQuestOrderHelperLibrary::CanObeyOrder(TSoftClassPtr<UQuestOrder> OrderType
 			OrderedActorTags, TagRequirements.SourceTagsRequired, TagRequirements.SourceTagsBlocked,
 			ErrorTags.MissingTags, ErrorTags.BlockingTags))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestOrderHelperLibrary::CanObeyOrder: Tags not met: %s!"), *ErrorTags.ToString());
 			return false;
 		}
 	}
@@ -95,7 +97,7 @@ FQuestOrderTargetData UQuestOrderHelperLibrary::CreateTargetDataForOrder(const A
 		return TargetData;
 	}
 
-	/** If we have a target actor, also create the target tags */
+	/** If we have a target actor, also create the tags */
 
 	FGameplayTagContainer SourceTags;
 	FGameplayTagContainer TargetTags;
@@ -189,6 +191,8 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectClosestHostileTarget(const 
 {
 	float TargetAcquisitionRange = GetTargetAcquisitionRange(OrderType);
 	TArray<AQuestCharacterBase*> TargetsInRange = GetHostileTargetsInRange(OrderedCharacter, TargetAcquisitionRange);
+
+	FilterInvalidTargets(OrderedCharacter, OrderType, TargetsInRange);
 	return SelectClosestTarget(OrderedCharacter, TargetsInRange);
 }
 
@@ -198,17 +202,19 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectClosestHostileLeaderInAcqui
 	float Distance = Range +1;
 	AQuestCharacterBase* ClosestLeader = nullptr;
 	FVector OrderedCharacterLocation = OrderedCharacter->GetActorLocation();
+	FVector ZeroVector = FVector::ZeroVector;
 	for (auto& AdverseGroup : OrderedCharacter->CharacterGroup->AdverseGroupsInCombat)
 	{
 		float LeaderDistance = FVector::Dist(AdverseGroup->Leader->GetActorLocation(), OrderedCharacterLocation);
+		FQuestOrderTargetData TargetData = CreateTargetDataForOrder(OrderedCharacter, AdverseGroup->Leader, ZeroVector);
 		if (LeaderDistance < Distance &&
-			LeaderDistance < Range)
+			LeaderDistance < Range &&
+			IsValidTarget(OrderType, OrderedCharacter, TargetData))
 		{
 			Distance = LeaderDistance;
 			ClosestLeader = AdverseGroup->Leader;
 		}
 	}
-
 	return ClosestLeader;
 }
 
@@ -216,14 +222,17 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAdversaryInAcqu
 {
 	float AcquisitionRange = GetTargetAcquisitionRange(OrderType);
 	TArray<AQuestCharacterBase*> HostileTargetsInRange = GetHostileTargetsInRange(OrderedCharacter, AcquisitionRange);
+	FilterInvalidTargets(OrderedCharacter, OrderType, HostileTargetsInRange);
 	return GetMostPowerfulCharacterInArray(HostileTargetsInRange);
 }
 
 AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAdverseSpellcasterInAcquisitionRange(const AQuestCharacterBase* OrderedCharacter, TSoftClassPtr<UQuestOrder> OrderType)
 {
+	// TODO:  Filter out targets that are not valid for the order
 	AQuestCharacterBase* MostPowerfulSpellcaster = nullptr;
 	float AcquisitionRange = GetTargetAcquisitionRange(OrderType);
 	TArray<AQuestCharacterBase*> HostileTargetsInRange = GetHostileTargetsInRange(OrderedCharacter, AcquisitionRange);
+	FilterInvalidTargets(OrderedCharacter, OrderType, HostileTargetsInRange);
 	TArray<AQuestCharacterBase*> SpellcastersInRange;
 	if (HostileTargetsInRange.Num() > 0)
 	{
@@ -267,14 +276,15 @@ AQuestCharacterBase* UQuestOrderHelperLibrary::SelectMostPowerfulAlliedLeaderInA
 			AlliedLeaders.AddUnique(Character);
 		}
 	}
+	FilterInvalidTargets(OrderedCharacter, OrderType, AlliedLeaders);
 
-	/** If we have ally leaders in range, return the most powerful one */
+	/** If we have valid ally leaders in range, return the most powerful one */
 	if (AlliedLeaders.Num() > 0)
 	{
 		return GetMostPowerfulCharacterInArray(AlliedLeaders);
 	}
 
-	/** If we have no ally leaders in range, return most powerful ally in range */
+	/** If we have no valid ally leaders in range, return most powerful ally in range */
 	else
 	{
 		TArray<AQuestCharacterBase*> Allies;
@@ -521,6 +531,24 @@ bool UQuestOrderHelperLibrary::IsValidTarget(TSoftClassPtr<UQuestOrder> OrderTyp
 
 	/** Check to see whether the target meets any additional requirements the order may have */
 	return Order->IsValidTarget(OrderedActor, TargetData);
+}
+
+void UQuestOrderHelperLibrary::FilterInvalidTargets(const AActor* OrderedActor, TSoftClassPtr<UQuestOrder> OrderType, TArray<AQuestCharacterBase*> &ArrayToFilter)
+{
+		FVector ZeroVector = FVector::ZeroVector;
+		TArray<AQuestCharacterBase*> TempArray;
+		for (auto& Target : ArrayToFilter)
+		{
+			if (IsValid(Target))
+			{
+				FQuestOrderTargetData TargetData = CreateTargetDataForOrder(OrderedActor, Target, ZeroVector);
+				if (UQuestOrderHelperLibrary::IsValidTarget(OrderType, OrderedActor, TargetData))
+				{
+					TempArray.AddUnique(Target);
+				}
+			}
+		}
+		ArrayToFilter = TempArray;
 }
 
 bool UQuestOrderHelperLibrary::ShouldRestartBehaviorTree(TSoftClassPtr<UQuestOrder> OrderType)

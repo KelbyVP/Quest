@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "QuestAttributeSet.h"
 #include "QuestAutoOrderComponent.h"
+#include "QuestGlobalTags.h"
 #include "QuestMerchantCharacter.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestPlayerController.h"
@@ -48,6 +49,7 @@ AQuestCharacter::AQuestCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	bIsHostile = false;
+	DefaultTags.AddUnique(UQuestGlobalTags::Relationship_Friendly());
 	Affiliation = ECharacterAffiliation::IT_Friendly;
 	StorageChest = nullptr;
 	Experience = 500000;

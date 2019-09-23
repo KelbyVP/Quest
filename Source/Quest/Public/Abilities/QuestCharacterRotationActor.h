@@ -65,13 +65,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void StopRotating();
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void BP_StopRotating();
+	//UFUNCTION(BlueprintImplementableEvent)
+	//	void BP_StopRotating();
 
 	UFUNCTION()
 	void OnCharacterDeath();
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void BP_OnCharacterDeath();
+	//UFUNCTION(BlueprintImplementableEvent)
+	//	void BP_OnCharacterDeath();
 
 };

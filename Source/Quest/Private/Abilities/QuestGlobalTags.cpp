@@ -58,6 +58,24 @@ const FGameplayTag& UQuestGlobalTags::Status_Blessed()
 	return Tag;
 }
 
+const FGameplayTag& UQuestGlobalTags::Status_Invulnerable()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("status.invulnerable")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Status_Spinning()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("status.spinning")));
+	return Tag;
+}
+
+const FGameplayTag& UQuestGlobalTags::Status_Stunned()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("status.stunned")));
+	return Tag;
+}
+
 const FGameplayTag& UQuestGlobalTags::Resistance_Fire()
 {
 	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("resistance.Fire")));

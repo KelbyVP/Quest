@@ -60,6 +60,9 @@ public:
 	static bool IsValidTarget(TSoftClassPtr<UQuestOrder> OrderType, const AActor* OrderedActor,
 		const FQuestOrderTargetData& TargetData);
 
+	/** Filter out targets that have blocked tags */
+	static void FilterInvalidTargets(const AActor* OrderedActor, TSoftClassPtr<UQuestOrder> OrderType, TArray<AQuestCharacterBase*> &ArrayToFilter);
+
 	UFUNCTION(BlueprintCallable, Category = QuestOrderHelperLibrary)
 	static TArray<AQuestCharacterBase*> GetHostileTargetsInRange(const AQuestCharacterBase* OrderedCharacter, float Radius);
 

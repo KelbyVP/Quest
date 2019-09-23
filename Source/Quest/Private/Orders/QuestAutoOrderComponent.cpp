@@ -84,6 +84,7 @@ bool UQuestAutoOrderComponent::IssueAutoOrder(const TSoftClassPtr<UQuestOrder> O
 			{
 				OrderComponent->SetNextOrder(FQuestOrderData(Order, TargetCharacter));
 			}
+			// TODO:  If we can't get a valid Target Character, just issue a hold order
 			break;
 		}
 		// TODO:  what do we want to do with other TargetTypes?

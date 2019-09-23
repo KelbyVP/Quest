@@ -19,6 +19,7 @@
 #include "QuestGlobalTags.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestOrderHelperLibrary.h"
+#include "QuestRotationComponent.h"
 #include "QuestSpellbook.h"
 #include "QuestSpells.h"
 #include "QuestUseAbilityOrder.h"
@@ -37,7 +38,11 @@ AQuestCharacterBase::AQuestCharacterBase()
 	OrderHandlingComponent = CreateDefaultSubobject<UQuestOrderHandlingComponent>("OrderHandlingComponent");
 	AutoOrderComponent = CreateDefaultSubobject<UQuestAutoOrderComponent>("AutoOrderComponent");
 
+	// Create rotation component
+	RotationComponent = CreateDefaultSubobject<UQuestRotationComponent>("RotationComponent");
+
 	bIsDead = false;
+	DefaultTags.AddUnique(UQuestGlobalTags::Status_Alive());
 	CharacterClass = ECharacterClass::IT_Wizard;
 	bIsLeader = false;
 	CharacterGroup = nullptr;
@@ -66,7 +71,12 @@ void AQuestCharacterBase::BeginPlay()
 	/** Add default tags */
 	if (DefaultTags.Num() > 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::BeginPlay: %s Adding tags!"), *GetName());
 		AddGameplayTags(DefaultTags);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::BeginPlay: % has No default tags!"), *GetName());
 	}
 	if (EquippedWeapon)
 	{

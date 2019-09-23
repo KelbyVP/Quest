@@ -26,6 +26,7 @@ class UQuestDefaultAbilities;
 class UQuestGameplayAbility;
 class UQuestOrder;
 class UQuestOrderHandlingComponent;
+class UQuestRotationComponent;
 class UQuestUseAbilityOrder;
 class USphereComponent;
 
@@ -152,7 +153,11 @@ public:
 
 	/** Moves character to start point on rotation actor such as whirlwind */
 	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = MoveToStartPositionForRotationActor))
-		void BP_MoveToStartPositionForRotationActor(FVector StartPosition, AQuestCharacterRotationActor* RotationActor);
+		void BP_MoveToStartPositionForRotationActor(FVector StartPosition);
+
+	/** Called when the rotation component stops rotating; used to give the character a delay before rotating again */
+	UFUNCTION(BlueprintImplementableEvent, Category = QuestCharacterBase, meta = (DisplayName = OnStopRotating))
+		void BP_OnStopRotating();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		void SetCharacterGroup(AQuestCharacterGroup* InCharacterGroup);
@@ -193,6 +198,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		UQuestDefaultAbilities* DefaultAbilities;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
+		UQuestRotationComponent* RotationComponent;
+	//  Tells us whether the character's rotation component is currently rotating the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
+		bool bIsRotating;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		ECharacterClass CharacterClass;
 	/** Used to track whether this character has a spellbook */
@@ -226,10 +237,6 @@ public:
 	// If this character is the leader of its CharacterGroup, how far to look for other group members
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")
 		float GroupRange;
-
-	//  Tells us whether this character is currently spinning in a rotation actor, so that it does not get picked up by another
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spells)
-		bool bIsCapturedByRotationActor;
 
 	// Tells us whether the character is dead
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacterBase")

@@ -70,7 +70,8 @@ void AQuestCharacterGroup::CheckShouldStartFighting(AQuestCharacterBase* Charact
 		}
 
 		///** Tell the other group to check whether it should start fighting */
-		// Note:  I have disabled this for now so that you can sneak attack someone if they don't perceive you;
+		// TODO:  I may want to disabled this so that you can sneak attack someone if they don't perceive you;
+		// Maybe just attack them once they attack you
 		if (IsValid(Leader) && IsValid(CharacterToFight) && IsValid(CharacterToFight->CharacterGroup))
 		{
 			AQuestAIController* AIController = Cast<AQuestAIController>(CharacterToFight->GetController());

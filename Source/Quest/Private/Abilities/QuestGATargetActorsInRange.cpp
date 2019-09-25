@@ -41,9 +41,9 @@ void AQuestGATargetActorsInRange::ConfirmTargetingAndContinue()
 		{
 			if (auto Character = Cast<APawn>(o.GetActor()))
 			{
-				CharactersInRange.AddUnique(Character);
-				UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorsInRange::ConfirmTargetingAndContinue: adding %s to target list!"),
-					*Character->GetName());
+					CharactersInRange.AddUnique(Character);
+					UE_LOG(LogTemp, Warning, TEXT("QuestGATargetActorsInRange::ConfirmTargetingAndContinue: trying to add %s to target list!"),
+						*Character->GetName());
 			}
 		}
 	}

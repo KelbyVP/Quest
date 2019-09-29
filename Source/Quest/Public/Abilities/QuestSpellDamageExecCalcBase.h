@@ -29,6 +29,5 @@ protected:
 	FGameplayEffectAttributeCaptureDefinition HealthDef;
 	//UQuestGameplayAbility* OwningAbility;
 
-	virtual bool DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility, AQuestCharacterBase* TargetCharacter) const;
 	virtual int CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const;
 };

@@ -89,7 +89,7 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 
 	// Calculate Damage
 	int Damage = CalculateBaseDamageAmount(OwningAbility, SourceLevel);
-	if (DoesMakeSavingThrow(OwningAbility, TargetQuestCharacter))
+	if (TargetQuestCharacter->AttributeSetComponent->DoesMakeSavingThrow(OwningAbility->SavingThrowAbilityType))
 	{
 		Damage = int(Damage / 2);
 	}
@@ -118,55 +118,6 @@ void UQuestSpellDamageExecCalcBase::Execute_Implementation(const FGameplayEffect
 
 	// Output damage
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(HealthProperty, EGameplayModOp::Additive, -Damage));
-}
-
-bool UQuestSpellDamageExecCalcBase::DoesMakeSavingThrow(const UQuestGameplayAbility* OwningAbility, AQuestCharacterBase* TargetCharacter) const
-{
-	float TargetAbilityScore = 0.0f;
-	bool bCanSave = true;
-
-	switch (OwningAbility->SavingThrowAbilityType)
-	{
-	case ESavingsThrowType::IT_None:
-		bCanSave = false;
-		break;
-	case ESavingsThrowType::IT_Agility:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Agility.GetCurrentValue();
-		break;
-	case ESavingsThrowType::IT_Constitution:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Constitution.GetCurrentValue();
-		break;
-	case ESavingsThrowType::IT_Charm:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Charm.GetCurrentValue();
-		break;
-	case ESavingsThrowType::IT_Intelligence:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Intelligence.GetCurrentValue();
-		break;
-	case ESavingsThrowType::IT_Strength:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Strength.GetCurrentValue();
-		break;
-	case ESavingsThrowType::IT_Wisdom:
-		TargetAbilityScore = TargetCharacter->AttributeSetComponent->Wisdom.GetCurrentValue();
-		break;
-	}
-
-	//  Checks saving throw based on TargetAbilityScore
-	if (bCanSave)
-	{
-		bool bMadeSavingThrow = false;
-		int SavingThrow = rand() % 20 + 1;
-		float AbilityModifier = (TargetAbilityScore - 10) / 2;
-		float AbilityCheck = TargetCharacter->AttributeSetComponent->Level.GetCurrentValue() + (trunc(AbilityModifier));
-		if (TargetCharacter->DoesCharacterHaveTag(UQuestGlobalTags::Status_Blessed()))
-		{
-			AbilityCheck += FMath::RandRange(1, 4);
-		}
-		if (AbilityCheck >= SavingThrow)
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 int UQuestSpellDamageExecCalcBase::CalculateBaseDamageAmount(const UQuestGameplayAbility* OwningAbility, float SourceCharacterLevel) const

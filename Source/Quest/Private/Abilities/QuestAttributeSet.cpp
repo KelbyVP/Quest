@@ -5,6 +5,7 @@
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
 #include "QuestCharacterBase.h"
+#include "QuestGlobalTags.h"
 
 UQuestAttributeSet::UQuestAttributeSet()
 	: Health(50.0f)
@@ -83,6 +84,11 @@ bool UQuestAttributeSet::DoesMakeSavingThrow(ESavingsThrowType SavingThrowType)
 		int SavingThrow = rand() % 20 + 1;
 		float AgilityModifier = (TargetAbilityScore - 10) / 2;
 		float AbilityCheck = Level.GetCurrentValue() + (trunc(AgilityModifier));
+		AQuestCharacterBase* CharacterOwner = Cast<AQuestCharacterBase>(GetOwningActor());
+		if (CharacterOwner->DoesCharacterHaveTag(UQuestGlobalTags::Status_Blessed()))
+		{
+			AbilityCheck += FMath::RandRange(1, 4);
+		}
 		if (AbilityCheck >= SavingThrow)
 		{
 			return true;

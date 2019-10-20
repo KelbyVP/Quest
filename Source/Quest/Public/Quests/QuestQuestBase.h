@@ -66,7 +66,7 @@ public:
 		void BP_OnGoalCompleted(int32 GoalIndex);
 
 	/** Allows child classes to triggers some event if the goal succeeds */
-	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnGoalFailed"))
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnGoalSucceeded"))
 		void BP_OnGoalSucceeded(int32 GoalIndex);
 
 	/** Allows child classes to triggers some event if the goal fails */

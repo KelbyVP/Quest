@@ -75,7 +75,16 @@ void AQuestQuestBase::AddGoal(int32 Index)
 
 FGoalData AQuestQuestBase::GetGoalAtIndex(int32 Index)
 {
-	return QuestData.Goals[Index];
+	if (QuestData.Goals.IsValidIndex(Index))
+	{
+		return QuestData.Goals[Index];
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestQuestBase::GetGoalAtIndex: No valid goal at index, so returning empty goal data!"))
+		FGoalData EmptyGoalData;
+		return EmptyGoalData;
+	}
 }
 
 bool AQuestQuestBase::IsItemAlreadyObtained(int32 GoalIndex)
@@ -128,10 +137,6 @@ bool AQuestQuestBase::CompleteGoal(int32 GoalIndex, bool IsGoalFailed)
 		{
 			OnGoalEndsQuest(IsGoalFailed);
 			return true;
-		}
-		else
-		{
-
 		}
 	}
 	else

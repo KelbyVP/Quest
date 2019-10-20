@@ -82,9 +82,6 @@ void AQuestQuestManager::EndQuest(AQuestQuestBase* Quest)
 			SelectNewCurrentQuest(Quest, CurrentQuests[0]);
 		}
 	}
-
-	
-
 }
 
 void AQuestQuestManager::

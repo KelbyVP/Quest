@@ -15,6 +15,7 @@
 #include "QuestMoveOrder.h"
 #include "QuestOrder.h"
 #include "QuestOrderHandlingComponent.h"
+#include "QuestQuestManager.h"
 #include "QuestSpectatorPawn.h"
 #include "QuestStorage.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
@@ -41,11 +42,6 @@ void AQuestPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	// keep updating the destination every tick while desired
-	//if (bMoveToMouseCursor)
-	//{
-	//	MoveToMouseCursor();
-	//}
 }
 
 void AQuestPlayerController::SetupInputComponent()
@@ -110,6 +106,7 @@ void AQuestPlayerController::OnSetTargetPressed()
 		}
 	}
 }
+
 
 void AQuestPlayerController::SetPathFollowingComponent()
 {

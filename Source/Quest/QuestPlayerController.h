@@ -12,6 +12,7 @@
 class AQuestCharacter;
 class AQuestCharacterBase;
 class AQuestMerchantCharacter;
+class AQuestQuestManager;
 class UQuestOrder;
 class AQuestSpectatorPawn;
 class AQuestStorage;
@@ -45,6 +46,9 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
+		void BP_OnTargetSelected();
+
 	/** The invisible Spectator Pawn that controls the camera */
 	UPROPERTY(BlueprintReadOnly, Category = "QuestPlayerController")
 	AQuestSpectatorPawn* ControlledPawn;
@@ -58,8 +62,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestPlayerController")
 		TSoftClassPtr<UQuestOrder> OpenStorageOrder;
-	
 
+	UPROPERTY(BlueprintReadWrite, Category = "QuestPlayerController")
+		AQuestQuestManager* QuestManager;
 
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */
@@ -77,8 +82,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestPlayerController")
 		int MaxGold = 999999999;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
-		void BP_OnTargetSelected();
+
 
 private:
 

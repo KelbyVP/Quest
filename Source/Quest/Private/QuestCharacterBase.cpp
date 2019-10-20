@@ -71,12 +71,7 @@ void AQuestCharacterBase::BeginPlay()
 	/** Add default tags */
 	if (DefaultTags.Num() > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::BeginPlay: %s Adding tags!"), *GetName());
 		AddGameplayTags(DefaultTags);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::BeginPlay: % has No default tags!"), *GetName());
 	}
 	if (EquippedWeapon)
 	{

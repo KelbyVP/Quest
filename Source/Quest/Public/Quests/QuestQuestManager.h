@@ -24,10 +24,18 @@ public:
 		bool AddNewQuest(TSubclassOf<AQuestQuestBase> QuestClass, bool ShouldStartImmediately);
 
 	UFUNCTION(BlueprintCallable)
-		void SelectNewCurrentQuest(AQuestQuestBase* Quest);
+		void SelectNewCurrentQuest(AQuestQuestBase* OldQuest, AQuestQuestBase* NewQuest);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnNewQuestSelected"))
+		void BP_OnNewQuestSelected(AQuestQuestBase* OldQuest, AQuestQuestBase* Quest);
+
+	UFUNCTION(BlueprintCallable)
+		void EndQuest(AQuestQuestBase* Quest);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnAddNewQuest"))
-		void BP_OnAddNewQuest(AQuestQuestBase* Quest);
+		void BP_OnAddNewQuest(AQuestQuestBase* NewQuest);
+
+
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Quest Manager")
 		AQuestCharacter* PlayerCharacter;

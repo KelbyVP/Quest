@@ -11,6 +11,7 @@
 #include "QuestCharacter.h"
 #include "QuestGameMode.h"
 #include "QuestGameplayAbility.h"
+#include "QuestItem.h"
 #include "QuestMerchantCharacter.h"
 #include "QuestMoveOrder.h"
 #include "QuestOrder.h"
@@ -107,6 +108,14 @@ void AQuestPlayerController::OnSetTargetPressed()
 	}
 }
 
+
+void AQuestPlayerController::AddItemsToInventory(TArray<UQuestItem*> ItemsToAdd)
+{
+	for (auto& Item : ItemsToAdd)
+	{
+		BP_AddItemToInventory(Item);
+	}
+}
 
 void AQuestPlayerController::SetPathFollowingComponent()
 {

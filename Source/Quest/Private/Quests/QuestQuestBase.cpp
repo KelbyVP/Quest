@@ -3,9 +3,14 @@
 
 #include "QuestQuestBase.h"
 #include "Containers/Array.h"
+#include "GameFramework/Actor.h"
+#include "QuestCharacter.h"
 #include "QuestCompletedGoal.h"
 #include "QuestData.h"
+#include "QuestGameInstanceBase.h"
 #include "QuestItem.h"
+#include "QuestPlayerController.h"
+#include "QuestQuestManager.h"
 
 // Sets default values
 AQuestQuestBase::AQuestQuestBase()
@@ -82,5 +87,143 @@ bool AQuestQuestBase::IsItemAlreadyObtained(int32 GoalIndex)
 	}
 
 	return BP_HasInventoryItem(GoalData.ItemToFind);	
+}
+
+bool AQuestQuestBase::CompleteGoal(int32 GoalIndex, bool IsGoalFailed)
+{
+	if (!CurrentGoalIndices.Contains(GoalIndex))
+	{
+		return false;
+	}
+	FQuestCompletedGoal CompletedGoal = FQuestCompletedGoal();
+	CompletedGoal.GoalData = QuestData.Goals[GoalIndex];
+	CompletedGoal.GoalIndex = GoalIndex;
+	CompletedGoal.WasSuccessful = !IsGoalFailed;
+	CompletedGoals.Add(CompletedGoal);
+
+	if (QuestData.Goals[GoalIndex].ShouldUpdateQuestDescriptionUponCompletion && !IsGoalFailed)
+	{
+		BP_UpdateCurrentDescription(GoalIndex);
+	}
+
+	
+	//  Here, we are trying to do the following, which C++ won't let us do:  CurrentGoals.Remove(CompletedGoal.GoalData);
+	int32 Index = CurrentGoalIndices.Find(GoalIndex);
+	if (CurrentGoals.Num() > 0 && CurrentGoals.IsValidIndex(Index))
+	{
+		CurrentGoals.RemoveAt(Index);
+	}
+
+	if (AmountsOfTargetsObtained.Num() > 0 && AmountsOfTargetsObtained.IsValidIndex(Index))
+	{
+		AmountsOfTargetsObtained.RemoveAt(Index);
+	}
+
+	CurrentGoalIndices.Remove(GoalIndex);
+
+	if (IsGoalFailed)
+	{
+		BP_OnGoalFailed(GoalIndex);
+		if (CompletedGoal.GoalData.DoesFailingGoalCauseQuestToFail)
+		{
+			OnGoalEndsQuest(IsGoalFailed);
+			return true;
+		}
+		else
+		{
+
+		}
+	}
+	else
+	{
+		BP_OnGoalSucceeded(GoalIndex);
+		if (QuestData.Goals[GoalIndex].DoesCompletingGoalMeanCompletingQuest)
+		{
+			OnGoalEndsQuest(IsGoalFailed);
+			return true;
+		}
+		else
+		{
+			/** Add following goals */
+			for (int32& FollowingIndex : QuestData.Goals[GoalIndex].FollowingGoalIndices)
+			{
+				AddGoal(FollowingIndex);
+			}
+		}
+	}
+	BP_UpdateGoalsInJournal();
+	// add the rest of the functions from the demo's Complete Sub Goal in BP_MasterQuest after journal subgoals generated
+	return true;
+}
+
+void AQuestQuestBase::OnGoalEndsQuest(bool IsGoalFailed)
+{
+	/** Fail all remaining goals */
+	for (int& CurrentGoalIndex : CurrentGoalIndices)
+	{
+		FQuestCompletedGoal GoalToFail;
+		GoalToFail.GoalData = GetGoalAtIndex((CurrentGoalIndex));
+		GoalToFail.GoalIndex = CurrentGoalIndex;
+		GoalToFail.WasSuccessful = false;
+		CompletedGoals.Add(GoalToFail);
+	}
+	CurrentGoalIndices.Empty();
+	if (AmountsOfTargetsObtained.Num() > 0)
+	{
+		AmountsOfTargetsObtained.Empty();
+	}
+	CurrentGoals.Empty();
+
+	if (IsGoalFailed) { Status = EGoalStatus::FAILED; }
+	else { Status = EGoalStatus::SUCCEEDED; }
+
+	BP_RemoveWidgets();
+	QuestManager->EndQuest(this);
+}
+
+void AQuestQuestBase::GiveCompletionRewards(AQuestPlayerController* PlayerController, AQuestCharacter* PlayerCharacter)
+{
+	if (QuestData.Rewards.Experience > 0)
+	{
+		if (IsValid(PlayerCharacter))
+		{
+			PlayerCharacter->Experience += QuestData.Rewards.Experience;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestQuestBase::GiveCompletionRewards:  No PlayerCharacter found!"))
+		}
+	}
+
+	if (QuestData.Rewards.ReputationPoints > 0)
+	{
+		if (IsValid(PlayerCharacter))
+		{
+			FRegionReputation ReputationToAdd;
+			ReputationToAdd.Region = QuestData.Region;
+			ReputationToAdd.ReputationPoints = QuestData.Rewards.ReputationPoints;
+			PlayerCharacter->AddReputationPoints(ReputationToAdd);
+		}
+		else
+		{UE_LOG(LogTemp, Warning, TEXT("QuestQuestBase::GiveCompletionRewards:  No PlayerCharacter found!")) }
+	}
+
+	if (QuestData.Rewards.Gold > 0)
+	{
+		UQuestGameInstanceBase* GameInstance = Cast<UQuestGameInstanceBase>(GetGameInstance());
+		if (IsValid(GameInstance))
+		{
+			GameInstance->IncreaseGold(QuestData.Rewards.Gold);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("QuestQuestBase::GiveCompletionRewards:  Game instance not found!"))
+		}
+	}
+
+	if (QuestData.Rewards.Items.Num() > 0)
+	{
+		PlayerController->AddItemsToInventory(QuestData.Rewards.Items);
+	}
 }
 

@@ -6,6 +6,7 @@
 #include "AITypes.h"
 #include "GameFramework/PlayerController.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "QuestItem.h"
 #include "UObject/UObjectGlobals.h"
 #include "QuestPlayerController.generated.h"
 
@@ -48,6 +49,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "OnTargetSelected"))
 		void BP_OnTargetSelected();
+
+	void AddItemsToInventory(TArray<UQuestItem*> ItemsToAdd);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "QuestPlayerController", meta = (DisplayName = "AddItemToInventory"))
+		void BP_AddItemToInventory(UQuestItem* ItemToAdd);
 
 	/** The invisible Spectator Pawn that controls the camera */
 	UPROPERTY(BlueprintReadOnly, Category = "QuestPlayerController")

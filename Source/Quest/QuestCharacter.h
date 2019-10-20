@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "QuestCharacterBase.h"
+#include "RegionReputation.h"
 #include "QuestCharacter.generated.h"
 
 class AQuestStorage;
@@ -59,6 +60,8 @@ public:
 		int32 NextLevelExperience;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
 		TSoftClassPtr<UQuestHoldOrder> HoldOrder;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCharacter")
+		TArray<FRegionReputation> Reputation;
 
 	void OnLeaveStorage();
 
@@ -77,6 +80,10 @@ public:
 	// Trigger the Blueprint Event that gets called when we level up
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "QuestCharacter", meta = (DisplayName = "OnLevelUp"))
 		void BP_OnLevelUp();
+
+	//  Add reputation points for the relevant region
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacter")
+		void AddReputationPoints(FRegionReputation ReputationToAdd);
 
 };
 

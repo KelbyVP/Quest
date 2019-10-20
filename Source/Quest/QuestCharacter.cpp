@@ -18,8 +18,10 @@
 #include "QuestMerchantCharacter.h"
 #include "QuestOrderHandlingComponent.h"
 #include "QuestPlayerController.h"
+#include "QuestRegion.h"
 #include "QuestSelectableComponent.h"
 #include "QuestStorage.h"
+#include "RegionReputation.h"
 #include "UObject/ConstructorHelpers.h"
 
 AQuestCharacter::AQuestCharacter()
@@ -53,6 +55,8 @@ AQuestCharacter::AQuestCharacter()
 	Affiliation = ECharacterAffiliation::IT_Friendly;
 	StorageChest = nullptr;
 	Experience = 500000;
+	
+
 }
 
 void AQuestCharacter::Tick(float DeltaSeconds)
@@ -97,5 +101,17 @@ void AQuestCharacter::TryLevelUp()
 	{
 		AttributeSetComponent->LevelUp();
 		BP_OnLevelUp();
+	}
+}
+
+void AQuestCharacter::AddReputationPoints(FRegionReputation ReputationToAdd)
+{
+	for (auto& RegionalReputation : Reputation)
+	{
+		if (ReputationToAdd.Region == RegionalReputation.Region)
+		{
+			RegionalReputation.ReputationPoints += ReputationToAdd.ReputationPoints;
+			return;
+		}
 	}
 }

@@ -5,7 +5,10 @@
 #include "UObject/SoftObjectPtr.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
+#include "GoalStatus.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "QuestCharacter.h"
+#include "QuestPlayerController.h"
 #include "QuestQuestBase.h"
 
 // Sets default values
@@ -31,6 +34,7 @@ bool AQuestQuestManager::AddNewQuest(TSubclassOf<AQuestQuestBase> QuestClass, bo
 	{
 		return false;
 	}
+	NewQuest->QuestManager = this;
 	AllQuestClasses.Add(QuestClass);
 	CurrentQuests.Add(NewQuest);
 
@@ -42,18 +46,54 @@ bool AQuestQuestManager::AddNewQuest(TSubclassOf<AQuestQuestBase> QuestClass, bo
 	/** See if we should select this quest as the current quest */
 	if (ShouldStartImmediately || CurrentQuests.Num() <= 1)
 	{
-		SelectNewCurrentQuest(NewQuest);
+		SelectNewCurrentQuest(CurrentQuest, NewQuest);
 	}
 
 	return true;
 }
 
-void AQuestQuestManager::
-SelectNewCurrentQuest(AQuestQuestBase* Quest)
+void AQuestQuestManager::EndQuest(AQuestQuestBase* Quest)
 {
-	if (IsValid(Quest))
+	
+	CurrentQuests.Remove(Quest);
+	switch (Quest->Status)
 	{
-		CurrentQuest = Quest;
+	case EGoalStatus::CURRENT:
+		CurrentQuests.Add(Quest);
+		break;
+	case EGoalStatus::SUCCEEDED:
+		CompletedQuests.Add(Quest);
+		Quest->GiveCompletionRewards(PlayerController, PlayerCharacter);
+		break;
+	case EGoalStatus::FAILED:
+		FailedQuests.Add(Quest);
+		break;
+	default:
+		break;
+	}
+
+	BP_OnAddNewQuest(Quest);
+
+	if (Quest == CurrentQuest)
+	{
+		CurrentQuest = nullptr;
+		if (IsValid(CurrentQuests[0]))
+		{
+			SelectNewCurrentQuest(Quest, CurrentQuests[0]);
+		}
+	}
+
+	
+
+}
+
+void AQuestQuestManager::
+SelectNewCurrentQuest(AQuestQuestBase* OldQuest, AQuestQuestBase* NewQuest)
+{
+	if (IsValid(NewQuest))
+	{
+		CurrentQuest = NewQuest;
+		BP_OnNewQuestSelected(OldQuest, NewQuest);
 	}
 }
 

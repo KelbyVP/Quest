@@ -6,6 +6,7 @@
 #include "GoalType.h"
 #include "GoalData.generated.h"
 
+class AActor;
 class UQuestItem;
 /**
  * Holds information about a goal
@@ -36,9 +37,9 @@ struct QUEST_API FGoalData
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestGoalData")
 		FVector Location;
 
-	/** Tells us the class of enemy we are supposed to kill */
+	/** Tells us the class of character we are supposed to kill or talk to */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestGoalData")
-		TSubclassOf<AActor> EnemyClassToKill;
+		TSubclassOf<AActor> TargetCharacterClass;
 
 	/** Tells us the type of item we are supposed to find */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestGoalData")

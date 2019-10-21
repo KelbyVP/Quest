@@ -26,6 +26,8 @@ protected:
 
 public:
 
+	virtual void Die() override;
+
 	// Determines whether enemy has character class abilities
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestEnemyCharacter")
 		bool bIsCharacterClass;

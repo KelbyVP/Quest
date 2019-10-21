@@ -16,8 +16,6 @@ struct QUEST_API FQuestCompletedGoal
 {
 	GENERATED_BODY()
 
-	FQuestCompletedGoal();
-
 	/** The index of the goal in the quest */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestCompletedGoal")
 		int32 GoalIndex;

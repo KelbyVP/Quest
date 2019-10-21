@@ -134,6 +134,11 @@ TSoftClassPtr<UQuestDefaultOrder> AQuestCharacterBase::GetDefaultOrder() const
 // Gives this character an ability
 void AQuestCharacterBase::AcquireAbility(TSubclassOf<UGameplayAbility>AbilityToAcquire)
 {
+	if (!UKismetSystemLibrary::IsValidClass(AbilityToAcquire))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("QuestCharacterBase::AcquireAbility:  ability is not a valid class!"))
+			return;
+	}
 	FString Name = AbilityToAcquire->GetName();
 	if (AbilitySystemComponent)
 	{
@@ -192,7 +197,7 @@ void AQuestCharacterBase::OnHealthChanged(float Health, float MaxHealth)
 		OnDeath.Broadcast();
 		// TODO:  Ensure that anyone auto-attacking this character doesn't trigger errors because the character is now dead
 		// TODO:  Set up functionality for when player character dies (should be done in blueprint)
-		BP_Die();
+		Die();
 		return;
 	}
 
@@ -235,6 +240,11 @@ void AQuestCharacterBase::OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbili
 		AttemptedSpell = nullptr;
 		return;
 	}
+}
+
+void AQuestCharacterBase::Die()
+{
+	BP_Die();
 }
 
 void AQuestCharacterBase::SetSpellbookType()

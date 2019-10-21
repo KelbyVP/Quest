@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "QuestItem.h"
+#include "QuestRegion.h"
 #include "UObject/UObjectGlobals.h"
 #include "QuestPlayerController.generated.h"
 
@@ -71,6 +72,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestPlayerController")
 		AQuestQuestManager* QuestManager;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "QuestPlayerController")
+		EQuestRegion CurrentRegion;
 
 	/**	Set whether the controller should move the character
 	*	(false if mouse click should cause character to do something other than move, such as cast spell, attack from range, etc.) */

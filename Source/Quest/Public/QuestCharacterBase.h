@@ -18,6 +18,7 @@
 class AQuestCharacterGroup;
 class AQuestSpellbook;
 class AQuestCharacterRotationActor;
+class AQuestPlayerController;
 class UAnimMontage;
 class UQuestAttributeSet;
 class UQuestAutoOrderComponent;
@@ -120,6 +121,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "TurnTowardLocation"))
 	void BP_TurnTowardLocation(FVector Location);
 
+	/** A blueprint function that allows the player to interact with the character */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (DisplayName = "OnInteract"), Category = "QuestPlayerController")
+		void OnInteract(AQuestPlayerController* PlayerController);
+
 	/** Function called when character wants to make a melee attack */
 	UFUNCTION()
 		void MeleeAttack();
@@ -143,6 +148,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
 		virtual void OnFinishedCastingSpell(TSubclassOf<UQuestGameplayAbility> Spell, bool bShouldBeRemovedFromMemorizedSpells);
 
+
+	/** Function called when the character dies; should be ovverridden in child classes depending on what we want to happen */
+	UFUNCTION(BlueprintCallable, Category = "QuestCharacterBase")
+		virtual void Die();
 	/** Blueprint event that gets called when the character dies */
 	UFUNCTION(BlueprintImplementableEvent, Category = "QuestCharacterBase", meta = (DisplayName = "Die"))
 		void BP_Die();

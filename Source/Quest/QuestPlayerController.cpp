@@ -31,6 +31,7 @@ AQuestPlayerController::AQuestPlayerController(const FObjectInitializer& ObjectI
 	bControllerShouldDirectCharacter = true;
 	bIsTargeting = false;
 	Gold = 0;
+	CurrentRegion = EQuestRegion::ELGONTAAR;
 }
 
 void AQuestPlayerController::BeginPlay()

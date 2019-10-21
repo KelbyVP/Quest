@@ -48,7 +48,7 @@ void AQuestQuestBase::AddGoal(int32 Index)
 	/** If the goal is to obtain an item we already have, mark the goal completed */
 	if (IsItemAlreadyObtained(Index))
 	{
-		FQuestCompletedGoal CompletedGoal = FQuestCompletedGoal();
+		FQuestCompletedGoal CompletedGoal;
 		CompletedGoal.GoalIndex = Index;
 		CompletedGoal.GoalData = GetGoalAtIndex(Index);
 		CompletedGoal.WasSuccessful = true;
@@ -104,7 +104,7 @@ bool AQuestQuestBase::CompleteGoal(int32 GoalIndex, bool IsGoalFailed)
 	{
 		return false;
 	}
-	FQuestCompletedGoal CompletedGoal = FQuestCompletedGoal();
+	FQuestCompletedGoal CompletedGoal;
 	CompletedGoal.GoalData = QuestData.Goals[GoalIndex];
 	CompletedGoal.GoalIndex = GoalIndex;
 	CompletedGoal.WasSuccessful = !IsGoalFailed;
@@ -156,8 +156,9 @@ bool AQuestQuestBase::CompleteGoal(int32 GoalIndex, bool IsGoalFailed)
 			}
 		}
 	}
+	// TODO:  Do we need to check whether we have no remaining current goals, 
+	//  but there are goals left in the quest that we should add (maybe add the next one?)?
 	BP_UpdateGoalsInJournal();
-	// add the rest of the functions from the demo's Complete Sub Goal in BP_MasterQuest after journal subgoals generated
 	return true;
 }
 

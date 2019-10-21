@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GoalData.h"
+#include "GoalsToCompleteLater.h"
 #include "QuestQuestBase.h"
 #include "QuestQuestManager.generated.h"
 
 class AQuestCharacter;
+class AQuestCharacterBase;
+class AQuestEnemyCharacter;
 class AQuestPlayerController;
 
 UCLASS()
@@ -35,7 +38,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnAddNewQuest"))
 		void BP_OnAddNewQuest(AQuestQuestBase* NewQuest);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestManager")
+		void OnItemObtained(UQuestItem* ObtainedItem);
 
+	/** Checks whether killing this enemy completes a goal for a current quest */
+	UFUNCTION(BlueprintCallable, Category = "QuestManager")
+		void OnEnemyKilled(AQuestEnemyCharacter* Enemy);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestManager")
+		void OnTalkToCharacter(AQuestCharacterBase* Character);
+
+	void CompleteGoals(TArray<FGoalsToCompleteLater> GoalsToComplete);
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Quest Manager")
 		AQuestCharacter* PlayerCharacter;

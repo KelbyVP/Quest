@@ -6,7 +6,6 @@
 #include "QuestCharacterBase.h"
 #include "QuestMerchantCharacter.generated.h"
 
-class AQuestPlayerController;
 class UQuestOrder;
 /**
  * 
@@ -18,10 +17,6 @@ class QUEST_API AQuestMerchantCharacter : public AQuestCharacterBase
 	
 public:
 	AQuestMerchantCharacter();
-
-	/** A blueprint function that allows the player to buy and sell goods with a merchant */
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, meta = (DisplayName = "OnInteract"), Category = "QuestPlayerController")
-		void OnInteract(AQuestPlayerController *PlayerController);
 
 	// How close the character must be to interact with the storage
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "QuestMerchantCharacter")
